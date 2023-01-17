@@ -1,0 +1,89 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+    id 'signing'
+    id 'org.openjfx.javafxplugin' version '0.0.10'
+    id 'org.beryx.jlink' version '2.26.0'
+}
+
+group 'io.vproxy'
+version '1.0.0'
+
+repositories {
+    mavenCentral()
+}
+
+sourceCompatibility = '11'
+targetCompatibility = '11'
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+javafx {
+    version = '11'
+    modules = ['javafx.controls']
+}
+
+dependencies {
+}
+
+task runTest(type: JavaExec) {
+    classpath = sourceSets.test.runtimeClasspath
+    main = "io.vproxy.vfx.test.TestMain"
+    systemProperty("IsDebug", System.getProperty("IsDebug", "false"))
+    args = ["io.vproxy.vfx.test." + System.getProperty("TestClass")]
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+            artifactId 'vfx'
+
+            pom {
+                name = 'vfx'
+                description = 'javafx library'
+                url = 'http://vfx.vproxy.io'
+                licenses {
+                    license {
+                        name = 'MIT License'
+                        url = 'https://github.com/wkgcass/vfx/blob/master/LICENSE'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'wkgcass'
+                        name = 'K.G. Wang'
+                        email = 'wkgcass@hotmail.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/wkgcass/vfx.git'
+                    developerConnection = 'scm:git:git://github.com/wkgcass/vfx.git'
+                    url = 'https://github.com/wkgcass/vfx'
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            credentials {
+                username 'wkgcass'
+                password System.getProperty("MavenPublishPassword")
+            }
+            def releasesRepoUrl = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+            def snapshotsRepoUrl = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+            url = version.contains('-DEV') ? snapshotsRepoUrl : releasesRepoUrl
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.maven
+}
