@@ -1,5 +1,5 @@
 plugins {
-    id 'java'
+    id 'java-library'
     id 'maven-publish'
     id 'signing'
     id 'org.openjfx.javafxplugin' version '0.0.10'
@@ -27,10 +27,18 @@ java {
 
 javafx {
     version = '11'
-    modules = ['javafx.controls']
+    modules = ['javafx.controls', 'javafx.swing', 'javafx.media']
 }
 
 dependencies {
+    //noinspection DifferentStdlibGradleVersion
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.31"
+    api group: 'com.github.kwhat', name: 'jnativehook', version: '2.2.2'
+    api group: 'io.vproxy', name: 'vjson', version: '1.4.4'
+}
+
+javadoc {
+    exclude '**/*.java'
 }
 
 task runTest(type: JavaExec) {
