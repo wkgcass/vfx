@@ -22,7 +22,9 @@ abstract public class Logger {
             }
         };
         handler.setFormatter(new SimpleFormatter());
-        handler.setLevel(Level.ALL);
+        var logLevel = System.getProperty("io.vproxy.vfx.logLevel", "ALL");
+        Level level = MiscUtils.javaLoggingLevelValueOf(logLevel);
+        handler.setLevel(level);
         defaultLogger.addHandler(handler);
         defaultLogger.setUseParentHandlers(false);
     }

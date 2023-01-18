@@ -2,9 +2,11 @@ package io.vproxy.vfx.util;
 
 import javafx.scene.paint.Color;
 
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.Set;
+import java.util.logging.Level;
 
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
 import static java.time.temporal.ChronoField.*;
@@ -65,5 +67,34 @@ public class MiscUtils {
         if (s == null) return null;
         if (s.isBlank()) return null;
         return s;
+    }
+
+    public static Level javaLoggingLevelValueOf(String logLevel) {
+        switch (logLevel) {
+            case "ALL":
+                return Level.ALL;
+            case "FINEST":
+                return Level.FINEST;
+            case "FINER":
+                return Level.FINER;
+            case "DEBUG":
+            case "FINE":
+                return Level.FINE;
+            case "CONFIG":
+                return Level.CONFIG;
+            case "INFO":
+                return Level.INFO;
+            case "WARN":
+            case "WARNING":
+                return Level.WARNING;
+            case "ERROR":
+            case "FATAL":
+            case "SEVERE":
+                return Level.SEVERE;
+            case "OFF":
+                return Level.OFF;
+        }
+        System.out.println(YYYYMMddHHiissDateTimeFormatter.format(ZonedDateTime.now()) + " SEVERE invalid logLevel: " + logLevel + ", returning ALL instead");
+        return Level.ALL;
     }
 }
