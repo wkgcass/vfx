@@ -23,12 +23,14 @@ public class VTableRow<S> implements RowInformer {
     private static final Background BG_1 = new Background(new BackgroundFill(COLOR_1, CornerRadii.EMPTY, Insets.EMPTY));
     private static final Background BG_2 = new Background(new BackgroundFill(COLOR_2, CornerRadii.EMPTY, Insets.EMPTY));
 
+    final long rowId;
     final S item;
     final VTableSharedData<S> shared;
     final ObservableList<VTableCellPane<S>> nodes = FXCollections.observableArrayList();
     private boolean selected = false;
 
     VTableRow(S item, VTableSharedData<S> shared) {
+        this.rowId = ++shared.rowAdder;
         this.item = item;
         this.shared = shared;
         if (item instanceof RowInformerAware) {

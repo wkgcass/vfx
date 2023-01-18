@@ -58,4 +58,8 @@ public abstract class InternalI18n {
     public String keyChooserDescWithoutMouse() {
         return "Please press the key you want to use.";
     }
+
+    public String emptyTableLabel() {
+        return "No Data";
+    }
 }

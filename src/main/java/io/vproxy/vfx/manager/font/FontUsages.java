@@ -11,6 +11,8 @@ public class FontUsages {
     };
     public static FontUsage keyChooserDesc = new FontUsage() {
     };
+    public static FontUsage tableEmptyTableLabel = new FontUsage() {
+    };
 
     private FontUsages() {
     }

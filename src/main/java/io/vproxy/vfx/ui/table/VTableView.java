@@ -1,10 +1,16 @@
 package io.vproxy.vfx.ui.table;
 
+import io.vproxy.vfx.manager.font.FontManager;
+import io.vproxy.vfx.manager.font.FontUsages;
+import io.vproxy.vfx.manager.internal_i18n.InternalI18n;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -14,7 +20,7 @@ public class VTableView<S> {
         new BorderWidths(0, 1, 1, 1)));
 
     private final VBox root = new VBox();
-    private final HBox columnPane = new HBox();
+    final HBox columnPane = new HBox();
     private final Pane fixColumnWidthColum = new Pane() {{
         setBackground(VTableColumn.BG);
         setBorder(VTableColumn.BORDER_COL_FIX);
@@ -24,6 +30,11 @@ public class VTableView<S> {
         setBorder(BORDER_SCROLL);
     }};
     private final HBox dataPane = new HBox();
+    private final Label emptyTableLabel = new Label(InternalI18n.get().emptyTableLabel()) {{
+        FontManager.get().setFont(FontUsages.tableEmptyTableLabel, this);
+        setAlignment(Pos.CENTER);
+        setTextFill(Color.GRAY);
+    }};
 
     private final VTableSharedData<S> shared = new VTableSharedData<>(this);
 
@@ -33,10 +44,12 @@ public class VTableView<S> {
     private final VTableRowListDelegate<S> itemsDelegate = new VTableRowListDelegate<>(items, shared);
     private VTableRow<S> selectedRow = null;
 
+    private double scrollSpeed = 0.01;
+
     public VTableView() {
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        scrollPane.setContent(dataPane);
+        scrollPane.setContent(emptyTableLabel);
         columns.addListener(colsListener);
         items.addListener(itemsListener);
 
@@ -56,10 +69,27 @@ public class VTableView<S> {
         this.columnPane.widthProperty().addListener((ob, old, now) -> columnWidthFix());
         scrollPane.heightProperty().addListener((ob, old, now) -> updateWidth());
         dataPane.heightProperty().addListener((ob, old, now) -> updateWidth());
+        scrollPane.widthProperty().addListener((ob, old, now) -> {
+            if (now == null) return;
+            emptyTableLabel.setPrefWidth(now.doubleValue() - 10);
+        });
+        scrollPane.heightProperty().addListener((ob, old, now) -> {
+            if (now == null) return;
+            emptyTableLabel.setPrefHeight(now.doubleValue() - 10);
+        });
         root.heightProperty().addListener((ob, old, now) ->
             scrollPane.setPrefHeight(root.getHeight() - columnPane.getHeight()));
         columnPane.heightProperty().addListener((ob, old, now) ->
             scrollPane.setPrefHeight(root.getHeight() - columnPane.getHeight()));
+
+        scrollPane.contentProperty().addListener((ob, old, now) -> {
+            if (now == null) return;
+            now.setOnScroll(e -> {
+                double dy = e.getDeltaY() * scrollSpeed;
+                scrollPane.setVvalue(scrollPane.getVvalue() - dy);
+                e.consume();
+            });
+        });
 
         columnPane.getChildren().addAll(this.columnPane, fixColumnWidthColum);
     }
@@ -80,10 +110,18 @@ public class VTableView<S> {
         this.items.removeListener(itemsListener);
         this.items.clear();
         for (var item : items) {
-            this.items.add(new VTableRow<>(item, shared));
+            var row = new VTableRow<>(item, shared);
+            row.setCols(columns);
+            this.items.add(row);
         }
         this.items.addListener(itemsListener);
         sort();
+        updateWidth();
+        if (items.isEmpty()) {
+            scrollPane.setContent(emptyTableLabel);
+        } else {
+            scrollPane.setContent(dataPane);
+        }
     }
 
     @SuppressWarnings("FieldCanBeLocal")
@@ -116,6 +154,7 @@ public class VTableView<S> {
                 col.shared = shared;
             }
         }
+        updateWidth();
     };
 
     private final ListChangeListener<VTableRow<S>> itemsListener = c -> {
@@ -135,6 +174,22 @@ public class VTableView<S> {
         for (int i = 0; i < items.size(); i++) {
             var row = items.get(i);
             row.setBgColor(i);
+        }
+        if (items.isEmpty()) {
+            scrollPane.setContent(emptyTableLabel);
+        } else {
+            scrollPane.setContent(dataPane);
+            updateWidth();
+        }
+        var hasSort = false;
+        for (var col : columns) {
+            if (col.getSortPriority() > 0) {
+                hasSort = true;
+                break;
+            }
+        }
+        if (hasSort) {
+            sort();
         }
     };
 
@@ -277,6 +332,9 @@ public class VTableView<S> {
             var c = columns.get(i);
             var w = plan.get(c);
             assert w != null;
+            if (items.isEmpty()) {
+                c.columnNode.setPrefWidth(w);
+            }
             for (var row : items) {
                 row.updateColWidth(i, w);
             }
@@ -374,7 +432,7 @@ public class VTableView<S> {
                     return -res;
                 }
             }
-            return 0;
+            return Long.compare(a.rowId, b.rowId);
         });
 
         this.items.removeListener(itemsListener);
@@ -382,5 +440,13 @@ public class VTableView<S> {
         this.items.addAll(tmp);
         this.items.addListener(itemsListener);
         refresh();
+    }
+
+    public void setScrollSpeed(double scrollSpeed) {
+        this.scrollSpeed = scrollSpeed;
+    }
+
+    public double getScrollSpeed() {
+        return scrollSpeed;
     }
 }
