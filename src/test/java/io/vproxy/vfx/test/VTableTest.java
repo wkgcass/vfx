@@ -1,9 +1,11 @@
 package io.vproxy.vfx.test;
 
+import io.vproxy.vfx.ui.layout.HPadding;
+import io.vproxy.vfx.ui.layout.VPadding;
+import io.vproxy.vfx.ui.table.*;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -12,9 +14,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import io.vproxy.vfx.ui.layout.HPadding;
-import io.vproxy.vfx.ui.layout.VPadding;
-import io.vproxy.vfx.ui.table.*;
 
 import java.text.DecimalFormat;
 import java.util.Arrays;
@@ -27,9 +26,10 @@ public class VTableTest extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        var group = new Group();
-        var scene = new Scene(group);
+        var borderPane = new BorderPane();
+        var scene = new Scene(borderPane);
 
+        var tablePane = new Pane();
         var table = new VTableView<Data>();
 
         var colStrF = new VTableColumn<>("str", Data::getStrF);
@@ -68,7 +68,7 @@ public class VTableTest extends Application {
         var hbox = new HBox();
         hbox.setLayoutX(15);
         hbox.setLayoutY(10);
-        group.getChildren().add(hbox);
+        tablePane.getChildren().add(hbox);
 
         hbox.getChildren().add(table.getNode());
         hbox.getChildren().add(new HPadding(15));
@@ -96,14 +96,54 @@ public class VTableTest extends Application {
             table.getItems().remove(selected);
         });
 
-        primaryStage.widthProperty().addListener((ob, old, now) -> {
+        tablePane.widthProperty().addListener((ob, old, now) -> {
             if (now == null) return;
             table.getNode().setPrefWidth(now.doubleValue() - 165);
         });
-        primaryStage.heightProperty().addListener((ob, old, now) -> {
+        tablePane.heightProperty().addListener((ob, old, now) -> {
             if (now == null) return;
-            table.getNode().setPrefHeight(now.doubleValue() - 50);
+            table.getNode().setPrefHeight(now.doubleValue() - 20);
         });
+
+        var tablePane2 = new Pane();
+        var table2 = new VTableView<Data2>();
+        var aCol = new VTableColumn<Data2, Integer>("a", d -> d.a);
+        var bCol = new VTableColumn<Data2, String>("b", d -> d.b);
+        //noinspection unchecked
+        table2.getColumns().addAll(aCol, bCol);
+        table2.setItems(Arrays.asList(
+            new Data2(1, "a"),
+            new Data2(2, "b"),
+            new Data2(3, "c")
+        ));
+        tablePane2.getChildren().add(new VBox(
+            new VPadding(10),
+            new HBox(new HPadding(15), table2.getNode())
+        ));
+
+        tablePane2.widthProperty().addListener((ob, old, now) -> {
+            if (now == null) return;
+            table2.getNode().setPrefWidth(now.doubleValue() - 30);
+        });
+        tablePane2.heightProperty().addListener((ob, old, now) -> {
+            if (now == null) return;
+            table2.getNode().setPrefHeight(now.doubleValue() - 20);
+        });
+
+        borderPane.setCenter(tablePane);
+        borderPane.setBottom(new VBox(
+            new HBox(
+                new HPadding(15),
+                new Button("table1") {{
+                    setOnAction(e -> borderPane.setCenter(tablePane));
+                }},
+                new HPadding(5),
+                new Button("table2") {{
+                    setOnAction(e -> borderPane.setCenter(tablePane2));
+                }}
+            ),
+            new VPadding(10)
+        ));
 
         primaryStage.setScene(scene);
         primaryStage.setWidth(1024);
@@ -223,5 +263,15 @@ class Data implements RowInformerAware, CellAware<Data> {
     @Override
     public void setCell(VTableColumn<Data, ?> col, VTableCellPane<Data> pane) {
         cells.add(pane);
+    }
+}
+
+class Data2 {
+    final int a;
+    final String b;
+
+    Data2(int a, String b) {
+        this.a = a;
+        this.b = b;
     }
 }
