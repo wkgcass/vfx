@@ -37,7 +37,7 @@ public class MiscUtils {
     }
 
     public static boolean almostEquals(Color a, Color b) {
-        return Math.abs(a.getRed() - b.getRed()) < 0.02 && Math.abs(a.getGreen() - b.getGreen()) < 0.02 && Math.abs(a.getBlue() - b.getBlue()) < 0.02;
+        return Math.abs(a.getRed() - b.getRed()) < 0.04 && Math.abs(a.getGreen() - b.getGreen()) < 0.04 && Math.abs(a.getBlue() - b.getBlue()) < 0.04;
     }
 
     public static boolean almostIn(Color color, Set<Color> colors) {
