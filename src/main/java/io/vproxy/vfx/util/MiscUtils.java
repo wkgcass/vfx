@@ -36,13 +36,13 @@ public class MiscUtils {
         }
     }
 
-    public static boolean almostEquals(Color a, Color b) {
-        return Math.abs(a.getRed() - b.getRed()) < 0.04 && Math.abs(a.getGreen() - b.getGreen()) < 0.04 && Math.abs(a.getBlue() - b.getBlue()) < 0.04;
+    public static boolean almostEquals(Color a, Color b, double delta) {
+        return Math.abs(a.getRed() - b.getRed()) < delta && Math.abs(a.getGreen() - b.getGreen()) < delta && Math.abs(a.getBlue() - b.getBlue()) < delta;
     }
 
-    public static boolean almostIn(Color color, Set<Color> colors) {
+    public static boolean almostIn(Color color, Set<Color> colors, double delta) {
         for (var c : colors) {
-            if (almostEquals(color, c)) return true;
+            if (almostEquals(color, c, delta)) return true;
         }
         return false;
     }
