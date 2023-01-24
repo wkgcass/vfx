@@ -7,7 +7,7 @@ plugins {
 }
 
 group 'io.vproxy'
-version '1.1.0'
+version '1.1.2'
 
 repositories {
     mavenCentral()
@@ -49,6 +49,10 @@ task runTest(type: JavaExec) {
     args = ["io.vproxy.vfx.test." + System.getProperty("TestClass")]
 }
 
+tasks.withType(GenerateModuleMetadata) {
+    enabled = false
+}
+
 publishing {
     publications {
         maven(MavenPublication) {
@@ -76,6 +80,14 @@ publishing {
                     connection = 'scm:git:git://github.com/wkgcass/vfx.git'
                     developerConnection = 'scm:git:git://github.com/wkgcass/vfx.git'
                     url = 'https://github.com/wkgcass/vfx'
+                }
+            }
+            pom.withXml {
+                def pomNode = asNode()
+                pomNode.dependencies.'*'.findAll() {
+                    it.groupId.text() == 'org.openjfx'
+                }.each {
+                    it.parent().remove(it)
                 }
             }
         }
