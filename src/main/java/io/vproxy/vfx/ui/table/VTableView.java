@@ -1,14 +1,18 @@
 package io.vproxy.vfx.ui.table;
 
+import io.vproxy.vfx.control.scroll.VScrollPane;
 import io.vproxy.vfx.manager.font.FontManager;
 import io.vproxy.vfx.manager.font.FontUsages;
 import io.vproxy.vfx.manager.internal_i18n.InternalI18n;
+import io.vproxy.vfx.theme.Theme;
+import io.vproxy.vfx.ui.pane.FusionPane;
+import io.vproxy.vfx.util.FXUtils;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
@@ -16,22 +20,19 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class VTableView<S> {
-    private static final Border BORDER_SCROLL = new Border(new BorderStroke(VTableColumn.COLOR_BORDER, BorderStrokeStyle.SOLID, CornerRadii.EMPTY,
-        new BorderWidths(0, 1, 1, 1)));
-
-    private final VBox root = new VBox();
+    private final FusionPane root = new FusionPane();
+    private final VBox rootVBox = new VBox();
     final HBox columnPane = new HBox();
     private final Pane fixColumnWidthColum = new Pane() {{
         setBackground(VTableColumn.BG);
-        setBorder(VTableColumn.BORDER_COL_FIX);
+        // setBorder(VTableColumn.BORDER_COL_FIX);
         setPrefWidth(0);
     }};
-    private final ScrollPane scrollPane = new ScrollPane() {{
-        setBorder(BORDER_SCROLL);
-    }};
+    private final VScrollPane scrollPane = new VScrollPane();
     private final HBox dataPane = new HBox();
     private final Label emptyTableLabel = new Label(InternalI18n.get().emptyTableLabel()) {{
         FontManager.get().setFont(FontUsages.tableEmptyTableLabel, this);
+        setTextFill(Theme.current().tableTextColor());
         setAlignment(Pos.CENTER);
         setTextFill(Color.GRAY);
     }};
@@ -44,58 +45,51 @@ public class VTableView<S> {
     private final VTableRowListDelegate<S> itemsDelegate = new VTableRowListDelegate<>(items, shared);
     private VTableRow<S> selectedRow = null;
 
-    private double scrollSpeed = 0.01;
-
     public VTableView() {
-        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setContent(emptyTableLabel);
         columns.addListener(colsListener);
         items.addListener(itemsListener);
 
-        var columnPane = new HBox();
-        root.getChildren().addAll(columnPane, scrollPane);
+        root.getContentPane().getChildren().add(rootVBox);
+        FXUtils.observeWidthHeightWithPreferred(root.getContentPane(), rootVBox);
 
-        root.widthProperty().addListener((ob, old, now) -> {
+        var columnPane = new HBox();
+        rootVBox.getChildren().addAll(columnPane, scrollPane.getNode());
+
+        ChangeListener<? super Number> rootVBoxWidthChange = (ob, old, now) -> {
             if (now == null) return;
-            scrollPane.setPrefWidth(now.doubleValue());
-            if (root.getPrefWidth() != 0) {
-                updateWidth(root.getPrefWidth());
+            scrollPane.getNode().setPrefWidth(now.doubleValue());
+            if (rootVBox.getPrefWidth() != 0) {
+                updateWidth(rootVBox.getPrefWidth());
             } else {
                 updateWidth();
             }
             columnWidthFix();
-        });
+        };
+        rootVBox.widthProperty().addListener(rootVBoxWidthChange);
+        rootVBox.prefWidthProperty().addListener(rootVBoxWidthChange);
         this.columnPane.widthProperty().addListener((ob, old, now) -> columnWidthFix());
-        scrollPane.heightProperty().addListener((ob, old, now) -> updateWidth());
-        dataPane.heightProperty().addListener((ob, old, now) -> updateWidth());
-        scrollPane.widthProperty().addListener((ob, old, now) -> {
+        scrollPane.getNode().widthProperty().addListener((ob, old, now) -> {
             if (now == null) return;
-            emptyTableLabel.setPrefWidth(now.doubleValue() - 10);
+            emptyTableLabel.setPrefWidth(now.doubleValue());
+            columnWidthFix();
         });
-        scrollPane.heightProperty().addListener((ob, old, now) -> {
+        scrollPane.getNode().heightProperty().addListener((ob, old, now) -> {
             if (now == null) return;
             emptyTableLabel.setPrefHeight(now.doubleValue() - 10);
         });
-        root.heightProperty().addListener((ob, old, now) ->
-            scrollPane.setPrefHeight(root.getHeight() - columnPane.getHeight()));
+        rootVBox.heightProperty().addListener((ob, old, now) ->
+            scrollPane.getNode().setPrefHeight(rootVBox.getHeight() - columnPane.getHeight()));
         columnPane.heightProperty().addListener((ob, old, now) ->
-            scrollPane.setPrefHeight(root.getHeight() - columnPane.getHeight()));
-
-        scrollPane.contentProperty().addListener((ob, old, now) -> {
-            if (now == null) return;
-            now.setOnScroll(e -> {
-                double dy = e.getDeltaY() * scrollSpeed;
-                scrollPane.setVvalue(scrollPane.getVvalue() - dy);
-                e.consume();
-            });
-        });
+            scrollPane.getNode().setPrefHeight(rootVBox.getHeight() - columnPane.getHeight()));
 
         columnPane.getChildren().addAll(this.columnPane, fixColumnWidthColum);
+
+        FXUtils.makeBottomOnlyCutFor(dataPane, 4);
     }
 
     public Region getNode() {
-        return root;
+        return root.getNode();
     }
 
     public ObservableList<VTableColumn<S, ?>> getColumns() {
@@ -195,7 +189,7 @@ public class VTableView<S> {
 
     private void columnWidthFix() {
         double columnW = columnPane.getWidth();
-        double scrollW = scrollPane.getWidth();
+        double scrollW = scrollPane.getNode().getWidth();
         if (scrollW > columnW) {
             fixColumnWidthColum.setPrefWidth(scrollW - columnW);
         } else {
@@ -204,14 +198,10 @@ public class VTableView<S> {
     }
 
     void updateWidth() {
-        updateWidth(scrollPane.getWidth());
+        updateWidth(scrollPane.getNode().getWidth());
     }
 
     private void updateWidth(double width) {
-        width -= 10;
-        if (dataPane.getHeight() > scrollPane.getHeight()) {
-            width -= 15;
-        }
         if (width <= 0) return;
         if (columns.isEmpty()) return;
         var plan = buildUpdateWithPrefWidthPlan(width);
@@ -443,10 +433,10 @@ public class VTableView<S> {
     }
 
     public void setScrollSpeed(double scrollSpeed) {
-        this.scrollSpeed = scrollSpeed;
+        scrollPane.setScrollSpeed(scrollSpeed);
     }
 
     public double getScrollSpeed() {
-        return scrollSpeed;
+        return scrollPane.getScrollSpeed();
     }
 }

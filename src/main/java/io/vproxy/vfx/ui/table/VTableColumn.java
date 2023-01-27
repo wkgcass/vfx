@@ -1,5 +1,7 @@
 package io.vproxy.vfx.ui.table;
 
+import io.vproxy.vfx.theme.Theme;
+import io.vproxy.vfx.ui.layout.HPadding;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -9,17 +11,16 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
-import javafx.scene.text.Text;
-import io.vproxy.vfx.ui.layout.HPadding;
 
 import java.util.Comparator;
 import java.util.function.Function;
 
-import static io.vproxy.vfx.ui.table.VTableSortOrder.*;
+import static io.vproxy.vfx.ui.table.VTableSortOrder.ASC;
+import static io.vproxy.vfx.ui.table.VTableSortOrder.DESC;
 
 public class VTableColumn<S, T> {
-    private static final Color COLOR_TOP = new Color(0xef / 255d, 0xef / 255d, 0xef / 255d, 1);
-    private static final Color COLOR_BOT = new Color(0xe1 / 255d, 0xe1 / 255d, 0xe1 / 255d, 1);
+    private static final Color COLOR_TOP = Theme.current().tableHeaderTopBackgroundColor();// = new Color(0xef / 255d, 0xef / 255d, 0xef / 255d, 1);
+    private static final Color COLOR_BOT = Theme.current().tableHeaderBottomBackgroundColor();// = new Color(0xe1 / 255d, 0xe1 / 255d, 0xe1 / 255d, 1);
     static final Color COLOR_BORDER = new Color(0xc8 / 255d, 0xc8 / 255d, 0xc8 / 255d, 1);
     static final Background BG = new Background(new BackgroundFill(
         new LinearGradient(
@@ -60,6 +61,7 @@ public class VTableColumn<S, T> {
         this.valueRetriever = valueRetriever;
         nameLabel = new Label(name) {{
             setAlignment(Pos.CENTER);
+            setTextFill(Theme.current().tableHeaderTextColor());
         }};
         sortLabel = new Label() {{
             setPadding(new Insets(0, 4, 0, 4));
@@ -71,7 +73,7 @@ public class VTableColumn<S, T> {
             nameLabel,
             sortLabel
         );
-        columnNode.setBorder(BORDER_COL);
+        // columnNode.setBorder(BORDER_COL);
         columnNode.setBackground(BG);
         columnNode.setPrefHeight(25);
         columnNode.setAlignment(Pos.CENTER);
@@ -146,7 +148,9 @@ public class VTableColumn<S, T> {
     public void setTextBuilder(Function<T, String> textBuilder) {
         setNodeBuilder(t -> {
             var str = textBuilder.apply(t);
-            return new Text(str);
+            return new Label(str) {{
+                setTextFill(Theme.current().tableTextColor());
+            }};
         });
     }
 

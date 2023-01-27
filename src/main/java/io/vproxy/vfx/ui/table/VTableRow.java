@@ -1,23 +1,24 @@
 package io.vproxy.vfx.ui.table;
 
+import io.vproxy.vfx.theme.Theme;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 
 import java.util.List;
 import java.util.function.Function;
 
 public class VTableRow<S> implements RowInformer {
-    private static final Color COLOR_SELECTED = new Color(0, 0x96 / 255d, 0xc9 / 255d, 1);
-    private static final Color COLOR_1 = new Color(0xf9 / 255d, 0xf9 / 255d, 0xf9 / 255d, 1);
-    private static final Color COLOR_2 = new Color(0xff / 255d, 0xff / 255d, 0xff / 255d, 1);
+    private static final Color COLOR_SELECTED = Theme.current().tableCellSelectedBackgroundColor();// = new Color(0, 0x96 / 255d, 0xc9 / 255d, 1);
+    private static final Color COLOR_1 = Theme.current().tableCellBackgroundColor1();// = new Color(0xf9 / 255d, 0xf9 / 255d, 0xf9 / 255d, 1);
+    private static final Color COLOR_2 = Theme.current().tableCellBackgroundColor2();// = new Color(0xff / 255d, 0xff / 255d, 0xff / 255d, 1);
 
     private static final Background BG_SELECTED = new Background(new BackgroundFill(COLOR_SELECTED, CornerRadii.EMPTY, Insets.EMPTY));
     private static final Background BG_1 = new Background(new BackgroundFill(COLOR_1, CornerRadii.EMPTY, Insets.EMPTY));
@@ -126,9 +127,11 @@ public class VTableRow<S> implements RowInformer {
         var v = col.valueRetriever.apply(item);
         if (col.nodeBuilder == null) {
             if (v == null)
-                return new Text();
+                return new Label();
             else
-                return new Text(v.toString());
+                return new Label(v.toString()) {{
+                    setTextFill(Theme.current().tableTextColor());
+                }};
         } else {
             //noinspection unchecked,rawtypes
             return (Node) ((Function) col.nodeBuilder).apply(v);

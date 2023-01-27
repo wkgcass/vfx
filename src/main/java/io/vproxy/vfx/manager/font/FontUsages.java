@@ -7,11 +7,15 @@ public class FontUsages {
     };
     public static final FontUsage alert = new FontUsage() {
     };
-    public static FontUsage movableShapeLabel = new FontUsage() {
+    public static final FontUsage movableShapeLabel = new FontUsage() {
     };
-    public static FontUsage keyChooserDesc = new FontUsage() {
+    public static final FontUsage keyChooserDesc = new FontUsage() {
     };
-    public static FontUsage tableEmptyTableLabel = new FontUsage() {
+    public static final FontUsage tableEmptyTableLabel = new FontUsage() {
+    };
+    public static final FontUsage windowTitle = new FontUsage() {
+    };
+    public static final FontUsage fusionButtonText = new FontUsage() {
     };
 
     private FontUsages() {

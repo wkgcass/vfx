@@ -29,7 +29,7 @@ public class VTableCellPane<S> extends StackPane {
             getChildren().add(node);
         }
         setAlignment(Pos.CENTER_LEFT);
-        setBorder(BORDER_CELL);
+        // setBorder(BORDER_CELL);
         setPadding(new Insets(2, 5, 2, 5));
 
         setOnMouseClicked(e -> shared.tableView.selectRow(row));

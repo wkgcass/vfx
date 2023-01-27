@@ -1,5 +1,6 @@
 package io.vproxy.vfx.ui.button;
 
+import io.vproxy.vfx.control.click.ClickEventHandler;
 import io.vproxy.vfx.manager.image.ImageManager;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -20,17 +21,40 @@ public class ImageButton extends ImageView {
         var hoverImage = ImageManager.get().load(prefix + "-hover" + "." + suffix);
         var downImage = ImageManager.get().load(prefix + "-down" + "." + suffix);
         setImage(normalImage);
-        setOnMouseEntered(e -> setImage(hoverImage));
-        setOnMouseExited(e -> setImage(normalImage));
-        setOnMousePressed(e -> setImage(downImage));
-        setOnMouseReleased(e -> setImage(normalImage));
-        setOnMouseClicked(e -> {
-            var handler = this.handler;
-            if (handler == null) {
-                return;
+        var clickHandler = new ClickEventHandler() {
+            @Override
+            protected void onMouseEntered() {
+                setImage(hoverImage);
             }
-            handler.handle(null);
-        });
+
+            @Override
+            protected void onMouseExited() {
+                setImage(normalImage);
+            }
+
+            @Override
+            protected void onMousePressed() {
+                setImage(downImage);
+            }
+
+            @Override
+            protected void onMouseReleased() {
+                setImage(hoverImage);
+            }
+
+            @Override
+            protected void onMouseClicked() {
+                var handler = ImageButton.this.handler;
+                if (handler == null) {
+                    return;
+                }
+                handler.handle(null);
+            }
+        };
+        setOnMouseEntered(clickHandler);
+        setOnMouseExited(clickHandler);
+        setOnMousePressed(clickHandler);
+        setOnMouseReleased(clickHandler);
     }
 
     public void setOnAction(EventHandler<? extends Event> handler) {

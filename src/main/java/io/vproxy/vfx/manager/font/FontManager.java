@@ -1,5 +1,7 @@
 package io.vproxy.vfx.manager.font;
 
+import io.vproxy.vfx.theme.Theme;
+import io.vproxy.vfx.util.Logger;
 import javafx.scene.control.Labeled;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.text.Font;
@@ -13,7 +15,24 @@ public class FontManager {
     private FontProvider provider;
 
     private FontManager() {
+        var font = Font.loadFont(getClass().getResourceAsStream("/io/vproxy/vfx/res/font/SmileySans-Oblique.otf"), 1);
+        if (font == null) {
+            Logger.error("failed loading font: SmileySans-Oblique");
+        }
+        font = Font.loadFont(getClass().getResourceAsStream("/io/vproxy/vfx/res/font/NotoSansSC-Regular.otf"), 1);
+        if (font == null) {
+            Logger.error("failed loading font: NotoSansSC-Regular");
+        }
+        font = Font.loadFont(getClass().getResourceAsStream("/io/vproxy/vfx/res/font/JetBrainsMono-Regular.ttf"), 1);
+        if (font == null) {
+            Logger.error("failed loading font: JetBrainsMono-Regular");
+        }
     }
+
+    public static final String FONT_NAME_Default = Font.getDefault().getFamily();
+    public static final String FONT_NAME_SmileySansOblique = "Smiley Sans Oblique";
+    public static final String FONT_NAME_NotoSansSCRegular = "Noto Sans SC Regular";
+    public static final String FONT_NAME_JetBrainsMono = "JetBrains Mono";
 
     public static FontManager get() {
         return instance;
@@ -23,168 +42,145 @@ public class FontManager {
         this.provider = provider;
     }
 
+    private FontProvider getProvider() {
+        if (provider == null) {
+            setFontProvider(Theme.current().fontProvider());
+        }
+        return provider;
+    }
+
     public void setFont(Labeled labeled) {
-        if (provider == null) return;
-        labeled.setFont(Font.font(provider.name(FontUsages.defaultUsage), 16));
+        labeled.setFont(Font.font(getProvider().name(FontUsages.defaultUsage), 16));
     }
 
     public void setFont(Labeled labeled, int size) {
-        if (provider == null) return;
-        labeled.setFont(Font.font(provider.name(FontUsages.defaultUsage), size));
+        labeled.setFont(Font.font(getProvider().name(FontUsages.defaultUsage), size));
     }
 
     public void setFont(Labeled labeled, FontPosture posture, double size) {
-        if (provider == null) return;
-        labeled.setFont(Font.font(provider.name(FontUsages.defaultUsage), posture, size));
+        labeled.setFont(Font.font(getProvider().name(FontUsages.defaultUsage), posture, size));
     }
 
     public void setFont(Labeled labeled, FontWeight weight, double size) {
-        if (provider == null) return;
-        labeled.setFont(Font.font(provider.name(FontUsages.defaultUsage), weight, size));
+        labeled.setFont(Font.font(getProvider().name(FontUsages.defaultUsage), weight, size));
     }
 
     public void setFont(Labeled labeled, FontWeight weight,
                         FontPosture posture, double size) {
-        if (provider == null) return;
-        labeled.setFont(Font.font(provider.name(FontUsages.defaultUsage), weight, posture, size));
+        labeled.setFont(Font.font(getProvider().name(FontUsages.defaultUsage), weight, posture, size));
     }
 
     // -------------
 
     public void setFont(FontUsage usage, Labeled labeled) {
-        if (provider == null) return;
-        labeled.setFont(Font.font(provider.name(usage), 16));
+        labeled.setFont(Font.font(getProvider().name(usage), 16));
     }
 
     public void setFont(FontUsage usage, Labeled labeled, int size) {
-        if (provider == null) return;
-        labeled.setFont(Font.font(provider.name(usage), size));
+        labeled.setFont(Font.font(getProvider().name(usage), size));
     }
 
     public void setFont(FontUsage usage, Labeled labeled, FontPosture posture, double size) {
-        if (provider == null) return;
-        labeled.setFont(Font.font(provider.name(usage), posture, size));
+        labeled.setFont(Font.font(getProvider().name(usage), posture, size));
     }
 
     public void setFont(FontUsage usage, Labeled labeled, FontWeight weight, double size) {
-        if (provider == null) return;
-        labeled.setFont(Font.font(provider.name(usage), weight, size));
+        labeled.setFont(Font.font(getProvider().name(usage), weight, size));
     }
 
     public void setFont(FontUsage usage, Labeled labeled, FontWeight weight,
                         FontPosture posture, double size) {
-        if (provider == null) return;
-        labeled.setFont(Font.font(provider.name(usage), weight, posture, size));
+        labeled.setFont(Font.font(getProvider().name(usage), weight, posture, size));
     }
 
     // =============
 
     public void setFont(TextInputControl input) {
-        if (provider == null) return;
-        input.setFont(Font.font(provider.name(FontUsages.defaultUsage), 16));
+        input.setFont(Font.font(getProvider().name(FontUsages.defaultUsage), 16));
     }
 
     public void setFont(TextInputControl input, int size) {
-        if (provider == null) return;
-        input.setFont(Font.font(provider.name(FontUsages.defaultUsage), size));
+        input.setFont(Font.font(getProvider().name(FontUsages.defaultUsage), size));
     }
 
     public void setFont(TextInputControl input, FontPosture posture, double size) {
-        if (provider == null) return;
-        input.setFont(Font.font(provider.name(FontUsages.defaultUsage), posture, size));
+        input.setFont(Font.font(getProvider().name(FontUsages.defaultUsage), posture, size));
     }
 
     public void setFont(TextInputControl input, FontWeight weight, double size) {
-        if (provider == null) return;
-        input.setFont(Font.font(provider.name(FontUsages.defaultUsage), weight, size));
+        input.setFont(Font.font(getProvider().name(FontUsages.defaultUsage), weight, size));
     }
 
     public void setFont(TextInputControl input, FontWeight weight,
                         FontPosture posture, double size) {
-        if (provider == null) return;
-        input.setFont(Font.font(provider.name(FontUsages.defaultUsage), weight, posture, size));
+        input.setFont(Font.font(getProvider().name(FontUsages.defaultUsage), weight, posture, size));
     }
 
     // -------------
 
     public void setFont(FontUsage usage, TextInputControl input) {
-        if (provider == null) return;
-        input.setFont(Font.font(provider.name(usage), 16));
+        input.setFont(Font.font(getProvider().name(usage), 16));
     }
 
     public void setFont(FontUsage usage, TextInputControl input, int size) {
-        if (provider == null) return;
-        input.setFont(Font.font(provider.name(usage), size));
+        input.setFont(Font.font(getProvider().name(usage), size));
     }
 
     public void setFont(FontUsage usage, TextInputControl input, FontPosture posture, double size) {
-        if (provider == null) return;
-        input.setFont(Font.font(provider.name(usage), posture, size));
+        input.setFont(Font.font(getProvider().name(usage), posture, size));
     }
 
     public void setFont(FontUsage usage, TextInputControl input, FontWeight weight, double size) {
-        if (provider == null) return;
-        input.setFont(Font.font(provider.name(usage), weight, size));
+        input.setFont(Font.font(getProvider().name(usage), weight, size));
     }
 
     public void setFont(FontUsage usage, TextInputControl input, FontWeight weight,
                         FontPosture posture, double size) {
-        if (provider == null) return;
-        input.setFont(Font.font(provider.name(usage), weight, posture, size));
+        input.setFont(Font.font(getProvider().name(usage), weight, posture, size));
     }
 
     // =============
     public void setFont(Text text) {
-        if (provider == null) return;
-        text.setFont(Font.font(provider.name(FontUsages.defaultUsage)));
+        text.setFont(Font.font(getProvider().name(FontUsages.defaultUsage)));
     }
 
     public void setFont(Text text, int size) {
-        if (provider == null) return;
-        text.setFont(Font.font(provider.name(FontUsages.defaultUsage), size));
+        text.setFont(Font.font(getProvider().name(FontUsages.defaultUsage), size));
     }
 
     public void setFont(Text text, FontPosture posture, double size) {
-        if (provider == null) return;
-        text.setFont(Font.font(provider.name(FontUsages.defaultUsage), posture, size));
+        text.setFont(Font.font(getProvider().name(FontUsages.defaultUsage), posture, size));
     }
 
     public void setFont(Text text, FontWeight weight, double size) {
-        if (provider == null) return;
-        text.setFont(Font.font(provider.name(FontUsages.defaultUsage), weight, size));
+        text.setFont(Font.font(getProvider().name(FontUsages.defaultUsage), weight, size));
     }
 
     public void setFont(Text text, FontWeight weight,
                         FontPosture posture, double size) {
-        if (provider == null) return;
-        text.setFont(Font.font(provider.name(FontUsages.defaultUsage), weight, posture, size));
+        text.setFont(Font.font(getProvider().name(FontUsages.defaultUsage), weight, posture, size));
     }
 
     // -------------
 
     public void setFont(FontUsage usage, Text text) {
-        if (provider == null) return;
-        text.setFont(Font.font(provider.name(usage)));
+        text.setFont(Font.font(getProvider().name(usage)));
     }
 
     public void setFont(FontUsage usage, Text text, int size) {
-        if (provider == null) return;
-        text.setFont(Font.font(provider.name(usage), size));
+        text.setFont(Font.font(getProvider().name(usage), size));
     }
 
     public void setFont(FontUsage usage, Text text, FontPosture posture, double size) {
-        if (provider == null) return;
-        text.setFont(Font.font(provider.name(usage), posture, size));
+        text.setFont(Font.font(getProvider().name(usage), posture, size));
     }
 
     public void setFont(FontUsage usage, Text text, FontWeight weight, double size) {
-        if (provider == null) return;
-        text.setFont(Font.font(provider.name(usage), weight, size));
+        text.setFont(Font.font(getProvider().name(usage), weight, size));
     }
 
     public void setFont(FontUsage usage, Text text, FontWeight weight,
                         FontPosture posture, double size) {
-        if (provider == null) return;
-        text.setFont(Font.font(provider.name(usage), weight, posture, size));
+        text.setFont(Font.font(getProvider().name(usage), weight, posture, size));
     }
 }

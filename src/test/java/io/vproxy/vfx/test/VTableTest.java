@@ -1,16 +1,23 @@
 package io.vproxy.vfx.test;
 
+import io.vproxy.vfx.manager.image.ImageManager;
+import io.vproxy.vfx.ui.button.FusionButton;
+import io.vproxy.vfx.ui.button.FusionImageButton;
 import io.vproxy.vfx.ui.layout.HPadding;
 import io.vproxy.vfx.ui.layout.VPadding;
+import io.vproxy.vfx.ui.pane.FusionPane;
+import io.vproxy.vfx.ui.scene.*;
+import io.vproxy.vfx.ui.stage.VStage;
 import io.vproxy.vfx.ui.table.*;
+import io.vproxy.vfx.ui.wrapper.FusionW;
+import io.vproxy.vfx.util.FXUtils;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -26,10 +33,11 @@ public class VTableTest extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        var borderPane = new BorderPane();
-        var scene = new Scene(borderPane);
+        var stage = new VStage(primaryStage);
 
-        var tablePane = new Pane();
+        var rootPane = stage.getInitialScene().getContentPane();
+        FXUtils.observeWidthHeight(stage.getInitialScene().getNode(), rootPane);
+
         var table = new VTableView<Data>();
 
         var colStrF = new VTableColumn<>("str", Data::getStrF);
@@ -52,11 +60,20 @@ public class VTableTest extends Application {
             colDoubleF.setPrefWidth(80);
             colDoubleF.setTextBuilder(roughFloatValueFormat::format);
             colDoubleF.setComparator(Double::compareTo);
+            colDoubleF.setAlignment(Pos.CENTER);
         }
         {
             colNodeF.setMinWidth(500);
             colNodeF.setPrefWidth(1000);
-            colNodeF.setNodeBuilder(n -> n);
+            colNodeF.setNodeBuilder(n -> {
+                if (n instanceof TextInputControl) {
+                    return new FusionW((TextInputControl) n);
+                } else if (n instanceof ComboBox) {
+                    return new FusionW((ComboBox<?>) n);
+                } else {
+                    return n;
+                }
+            });
         }
 
         table.getColumns().addAll(Arrays.asList(colStrF, colIntF, colDoubleF, colNodeF));
@@ -67,19 +84,20 @@ public class VTableTest extends Application {
 
         var hbox = new HBox();
         hbox.setLayoutX(15);
-        hbox.setLayoutY(10);
-        tablePane.getChildren().add(hbox);
+        hbox.setLayoutY(5);
 
         hbox.getChildren().add(table.getNode());
         hbox.getChildren().add(new HPadding(15));
         var buttons = new VBox();
-        hbox.getChildren().add(buttons);
+        var buttonsPane = new FusionPane();
+        buttonsPane.getContentPane().getChildren().add(buttons);
+        hbox.getChildren().add(buttonsPane.getNode());
 
-        var addBtn = new Button("add") {{
-            setPrefWidth(120);
+        var addBtn = new FusionButton("add") {{
+            setPrefWidth(100);
         }};
-        var delBtn = new Button("del") {{
-            setPrefWidth(120);
+        var delBtn = new FusionButton("del") {{
+            setPrefWidth(100);
         }};
         buttons.getChildren().addAll(
             addBtn,
@@ -96,11 +114,15 @@ public class VTableTest extends Application {
             table.getItems().remove(selected);
         });
 
-        tablePane.widthProperty().addListener((ob, old, now) -> {
+        var table1Scene = new VScene(VSceneRole.MAIN);
+        var sceneGroup = new VSceneGroup(table1Scene);
+        table1Scene.getContentPane().getChildren().add(hbox);
+
+        sceneGroup.getNode().widthProperty().addListener((ob, old, now) -> {
             if (now == null) return;
             table.getNode().setPrefWidth(now.doubleValue() - 165);
         });
-        tablePane.heightProperty().addListener((ob, old, now) -> {
+        sceneGroup.getNode().heightProperty().addListener((ob, old, now) -> {
             if (now == null) return;
             table.getNode().setPrefHeight(now.doubleValue() - 20);
         });
@@ -117,35 +139,66 @@ public class VTableTest extends Application {
             new Data2(3, "c")
         ));
         tablePane2.getChildren().add(new VBox(
-            new VPadding(10),
+            new VPadding(5),
             new HBox(new HPadding(15), table2.getNode())
         ));
 
-        tablePane2.widthProperty().addListener((ob, old, now) -> {
+        sceneGroup.getNode().widthProperty().addListener((ob, old, now) -> {
             if (now == null) return;
             table2.getNode().setPrefWidth(now.doubleValue() - 30);
         });
-        tablePane2.heightProperty().addListener((ob, old, now) -> {
+        sceneGroup.getNode().heightProperty().addListener((ob, old, now) -> {
             if (now == null) return;
             table2.getNode().setPrefHeight(now.doubleValue() - 20);
         });
 
-        borderPane.setCenter(tablePane);
-        borderPane.setBottom(new VBox(
+        var table2Scene = new VScene(VSceneRole.MAIN);
+        sceneGroup.addScene(table2Scene);
+        table2Scene.getContentPane().getChildren().add(tablePane2);
+
+        rootPane.getChildren().add(sceneGroup.getNode());
+
+        var bottomButtonsPane = new FusionPane();
+        bottomButtonsPane.getContentPane().getChildren().add(
             new HBox(
-                new HPadding(15),
-                new Button("table1") {{
-                    setOnAction(e -> borderPane.setCenter(tablePane));
+                new FusionButton("table1") {{
+                    setOnAction(e -> sceneGroup.show(table1Scene, VSceneShowMethod.FROM_LEFT));
                 }},
                 new HPadding(5),
-                new Button("table2") {{
-                    setOnAction(e -> borderPane.setCenter(tablePane2));
+                new FusionButton("table2") {{
+                    setOnAction(e -> sceneGroup.show(table2Scene, VSceneShowMethod.FROM_RIGHT));
                 }}
-            ),
-            new VPadding(10)
-        ));
+            )
+        );
+        stage.getInitialScene().getNode().widthProperty().addListener((ob, old, now) -> {
+            if (now == null) return;
+            var w = now.doubleValue();
+            bottomButtonsPane.getNode().setPrefWidth(w - 30);
+        });
+        bottomButtonsPane.getNode().setPrefHeight(44);
 
-        primaryStage.setScene(scene);
+        var bottomScene = new VScene(VSceneRole.DRAWER_HORIZONTAL);
+        sceneGroup.addScene(bottomScene, VSceneHideMethod.TO_BOTTOM);
+        bottomScene.getContentPane().getChildren().add(bottomButtonsPane.getNode());
+
+        var menuBtn = new FusionImageButton(ImageManager.get().load("io/vproxy/vfx/res/image/menu.png:white")) {{
+            setPrefWidth(40);
+            setPrefHeight(VStage.TITLE_BAR_HEIGHT - 4);
+            getImageView().setFitHeight(15);
+            setLayoutX(2);
+            setLayoutY(3);
+        }};
+        stage.getRoot().getChildren().add(menuBtn);
+        menuBtn.setOnAction(e -> {
+            if (sceneGroup.isShowing(bottomScene)) {
+                sceneGroup.hide(bottomScene, VSceneHideMethod.TO_BOTTOM);
+            } else {
+                sceneGroup.show(bottomScene, VSceneShowMethod.FROM_BOTTOM);
+            }
+        });
+
+        FXUtils.observeWidthHeight(rootPane, sceneGroup.getNode());
+
         primaryStage.setWidth(1024);
         primaryStage.setHeight(768);
         primaryStage.centerOnScreen();
