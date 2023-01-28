@@ -25,6 +25,7 @@ import javafx.stage.Stage;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -33,6 +34,8 @@ public class VTableTest extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        ImageManager.get().loadBlackAndChangeColor("images/menu.png", Map.of("white", 0xffffffff));
+
         var stage = new VStage(primaryStage);
 
         var rootPane = stage.getInitialScene().getContentPane();
@@ -181,7 +184,7 @@ public class VTableTest extends Application {
         sceneGroup.addScene(bottomScene, VSceneHideMethod.TO_BOTTOM);
         bottomScene.getContentPane().getChildren().add(bottomButtonsPane.getNode());
 
-        var menuBtn = new FusionImageButton(ImageManager.get().load("io/vproxy/vfx/res/image/menu.png:white")) {{
+        var menuBtn = new FusionImageButton(ImageManager.get().load("images/menu.png:white")) {{
             setPrefWidth(40);
             setPrefHeight(VStage.TITLE_BAR_HEIGHT - 4);
             getImageView().setFitHeight(15);

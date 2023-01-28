@@ -39,10 +39,15 @@ public class FusionW extends Pane {
         this(node, n -> {
             var p = new SimpleStringProperty();
             n.valueProperty().addListener((ob, old, now) ->
-                p.set(now == null ? "" : now.toString()));
-            p.set(n.getValue() == null ? "" : n.getValue().toString());
+                p.set(toStringOrEmpty(now)));
+            p.set(toStringOrEmpty(n.getValue()));
             return p;
         });
+    }
+
+    private static String toStringOrEmpty(Object o) {
+        if (o == null) return "";
+        return o.toString();
     }
 
     public <T extends Node> FusionW(T node, Function<T, StringProperty> fluentPropertyGetter) {

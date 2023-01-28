@@ -4,6 +4,7 @@ public class VStageInitParams {
     public boolean closeButton = true;
     public boolean maximizeAndResetButton = true;
     public boolean iconifyButton = true;
+    public boolean resizable = true;
 
     public VStageInitParams() {
     }
@@ -20,6 +21,11 @@ public class VStageInitParams {
 
     public VStageInitParams setIconifyButton(boolean iconifyButton) {
         this.iconifyButton = iconifyButton;
+        return this;
+    }
+
+    public VStageInitParams setResizable(boolean resizable) {
+        this.resizable = resizable;
         return this;
     }
 }

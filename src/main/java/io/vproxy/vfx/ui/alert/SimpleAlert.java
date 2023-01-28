@@ -1,18 +1,23 @@
 package io.vproxy.vfx.ui.alert;
 
+import io.vproxy.vfx.manager.font.FontManager;
 import io.vproxy.vfx.manager.font.FontUsage;
 import io.vproxy.vfx.manager.font.FontUsages;
 import io.vproxy.vfx.manager.internal_i18n.InternalI18n;
-import javafx.scene.control.*;
-import io.vproxy.vfx.manager.font.FontManager;
+import io.vproxy.vfx.ui.wrapper.ThemeLabel;
+import io.vproxy.vfx.util.FXUtils;
+import javafx.scene.control.Alert;
 
-public class SimpleAlert extends Dialog<Void> {
+public class SimpleAlert extends ThemeAlertBase {
     private SimpleAlert(String title, String contentText, FontUsage fontUsage) {
         setTitle(title);
-        getDialogPane().getButtonTypes().addAll(ButtonType.OK);
-        getDialogPane().setContent(new Label(contentText) {{
+        var alertMessage = new ThemeLabel(contentText) {{
+            setWrapText(true);
             FontManager.get().setFont(fontUsage, this);
-        }});
+        }};
+        FXUtils.observeWidth(getSceneGroup().getNode(), alertMessage, -PADDING_H * 2);
+
+        alertMessagePane.getChildren().add(alertMessage);
     }
 
     private static String typeToTitle(Alert.AlertType type) {

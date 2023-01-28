@@ -44,6 +44,10 @@ public class VSceneGroup {
     }
 
     public void addScene(VScene scene, VSceneHideMethod defaultHideMethod) {
+        addScene(scene, defaultHideMethod, new VSceneAddParams());
+    }
+
+    public void addScene(VScene scene, VSceneHideMethod defaultHideMethod, VSceneAddParams addParams) {
         if (!this.scenes.add(scene)) {
             throw new IllegalArgumentException("scene " + scene + " already added");
         }
@@ -63,6 +67,16 @@ public class VSceneGroup {
                 FXUtils.observeHeight(root, scene.getNode())
             );
         }
+        if (scene.role.centralWidth) {
+            scene.changeListeners.add(
+                FXUtils.observeWidthCenter(root, scene.getNode())
+            );
+        }
+        if (scene.role.centralHeight) {
+            scene.changeListeners.add(
+                FXUtils.observeHeightCenter(root, scene.getNode())
+            );
+        }
         if (scene.role.showCover) {
             var cover = new Pane() {{
                 setBackground(new Background(new BackgroundFill(
@@ -71,7 +85,7 @@ public class VSceneGroup {
                     Insets.EMPTY
                 )));
             }};
-            if (scene.role.temporary) {
+            if (scene.role.temporary && addParams.coverClickable) {
                 cover.setOnMouseClicked(e -> hide(scene, defaultHideMethod));
             }
             scene.cover = cover;
@@ -123,7 +137,6 @@ public class VSceneGroup {
         scenes.remove(scene);
         scene.getNode().setLayoutX(0);
         scene.getNode().setLayoutY(0);
-        setBeforeShowing(scene);
     }
 
     private void setBeforeShowing(VScene scene) {
@@ -175,6 +188,9 @@ public class VSceneGroup {
             case FROM_RIGHT:
                 animate(scene, root.getWidth(), 0, root.getWidth() - scene.getNode().getWidth(), 0, true);
                 break;
+            case FADE_IN:
+                animateFade(scene, 0, 1, true);
+                break;
         }
     }
 
@@ -218,12 +234,13 @@ public class VSceneGroup {
                     scene.getNode().getLayoutX(), scene.getNode().getLayoutY(),
                     root.getWidth(), scene.getNode().getLayoutY(), false);
                 break;
+            case FADE_OUT:
+                animateFade(scene, 1, 0, false);
+                break;
         }
     }
 
     private void animate(VScene scene, double startX, double startY, double endX, double endY, boolean isShowing) {
-        var animatingSet = isShowing ? animatingShow : animatingHide;
-
         scene.animationFunction = (p) -> {
             var x = (endX - startX) * p + startX;
             var y = (endY - startY) * p + startY;
@@ -237,6 +254,30 @@ public class VSceneGroup {
                 }
             }
         };
+        doAnimate(scene, isShowing);
+    }
+
+    private void animateFade(VScene scene, int start, int end, boolean isShowing) {
+        scene.animationFunction = (p) -> {
+            var v = (end - start) * p + start;
+            scene.getNode().setOpacity(v);
+            animateCover(scene, p, isShowing);
+        };
+        doAnimate(scene, isShowing);
+    }
+
+    private void animateCover(VScene scene, double p, boolean isShowing) {
+        if (scene.cover != null) {
+            if (isShowing) {
+                scene.cover.setOpacity(p);
+            } else {
+                scene.cover.setOpacity(1 - p);
+            }
+        }
+    }
+
+    private void doAnimate(VScene scene, boolean isShowing) {
+        var animatingSet = isShowing ? animatingShow : animatingHide;
         animatingSet.add(scene);
         scene.progress.stopAndSetNode(scene.state0);
         scene.progress.play(scene.state1, new Callback<>() {

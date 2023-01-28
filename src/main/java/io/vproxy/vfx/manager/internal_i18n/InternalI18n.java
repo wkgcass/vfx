@@ -15,6 +15,10 @@ public abstract class InternalI18n {
         return instance;
     }
 
+    public String cancelButton() {
+        return "Cancel";
+    }
+
     public String alertInfoTitle() {
         return "Info";
     }
@@ -25,6 +29,10 @@ public abstract class InternalI18n {
 
     public String alertErrorTitle() {
         return "Error";
+    }
+
+    public String alertOkButton() {
+        return "Ok";
     }
 
     public String cannotFindAnyDisplay() {

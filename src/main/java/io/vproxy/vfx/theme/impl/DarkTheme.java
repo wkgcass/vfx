@@ -74,11 +74,6 @@ public class DarkTheme extends Theme {
         return ImageManager.get().load("io/vproxy/vfx/res/image/iconify.png:yellow");
     }
 
-//    @Override
-//    public Color windowControlButtonNormalBackgroundColor() {
-//        return new Color(0x32 / 255d, 0x38 / 255d, 0x3d / 255d, 1);
-//    }
-
     @Override
     public Color fusionButtonHoverBackgroundColor() {
         return new Color(0x52 / 255d, 0x5a / 255d, 0x5e / 255d, 1);
@@ -92,6 +87,11 @@ public class DarkTheme extends Theme {
     @Override
     public Color fusionButtonAnimatingBorderLightColor() {
         return new Color(0x4d / 255d, 0x6e / 255d, 0xbe / 255d, 1);
+    }
+
+    @Override
+    public Color transparentFusionButtonDownBackgroundColor() {
+        return new Color(0x1a / 255d, 0x1e / 255d, 0x21 / 255d, 0.3);
     }
 
     @Override
@@ -130,6 +130,11 @@ public class DarkTheme extends Theme {
     }
 
     @Override
+    public Color tableSortLabelColor() {
+        return Color.GRAY;
+    }
+
+    @Override
     public Color tableCellSelectedBackgroundColor() {
         return new Color(0x40 / 255d, 0x49 / 255d, 0x52 / 255d, 1);
     }
@@ -147,5 +152,15 @@ public class DarkTheme extends Theme {
     @Override
     public Color tableHeaderBottomBackgroundColor() {
         return new Color(0x1b / 255d, 0x20 / 255d, 0x23 / 255d, 1);
+    }
+
+    @Override
+    public Color progressBarProgressColor() {
+        return new Color(0x59 / 255d, 0xb6 / 255d, 0x55 / 255d, 1);
+    }
+
+    @Override
+    public Color progressBarBackgroundColor() {
+        return new Color(0x40 / 255d, 0x49 / 255d, 0x52 / 255d, 1);
     }
 }

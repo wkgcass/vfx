@@ -13,6 +13,7 @@ open module io.vproxy.vfx {
     exports io.vproxy.vfx.animation;
     exports io.vproxy.vfx.component.keychooser;
     exports io.vproxy.vfx.control.click;
+    exports io.vproxy.vfx.control.dialog;
     exports io.vproxy.vfx.control.drag;
     exports io.vproxy.vfx.control.globalscreen;
     exports io.vproxy.vfx.control.scroll;

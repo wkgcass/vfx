@@ -16,6 +16,8 @@ import java.util.Set;
 import java.util.function.DoubleConsumer;
 
 public class VScene {
+    public static final int ANIMATION_DURATION_MILLIS = 300;
+
     private final Pane root = new Pane();
     private final VScrollPane scrollPane = new VScrollPane();
     private final Pane content = new Pane();
@@ -23,7 +25,7 @@ public class VScene {
     final AnimationNode<DoubleData> state0 = new AnimationNode<>("0", new DoubleData(0));
     final AnimationNode<DoubleData> state1 = new AnimationNode<>("1", new DoubleData(1));
     final AnimationGraph<DoubleData> progress = AnimationGraphBuilder
-        .simpleTwoNodeGraph(state0, state1, 300)
+        .simpleTwoNodeGraph(state0, state1, ANIMATION_DURATION_MILLIS)
         .setApply(d -> apply(d.value))
         .build(state0);
     DoubleConsumer animationFunction;

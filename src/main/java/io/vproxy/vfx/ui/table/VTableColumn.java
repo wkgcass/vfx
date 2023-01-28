@@ -21,7 +21,6 @@ import static io.vproxy.vfx.ui.table.VTableSortOrder.DESC;
 public class VTableColumn<S, T> {
     private static final Color COLOR_TOP = Theme.current().tableHeaderTopBackgroundColor();// = new Color(0xef / 255d, 0xef / 255d, 0xef / 255d, 1);
     private static final Color COLOR_BOT = Theme.current().tableHeaderBottomBackgroundColor();// = new Color(0xe1 / 255d, 0xe1 / 255d, 0xe1 / 255d, 1);
-    static final Color COLOR_BORDER = new Color(0xc8 / 255d, 0xc8 / 255d, 0xc8 / 255d, 1);
     static final Background BG = new Background(new BackgroundFill(
         new LinearGradient(
             0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
@@ -31,10 +30,6 @@ public class VTableColumn<S, T> {
         CornerRadii.EMPTY,
         Insets.EMPTY
     ));
-    private static final Border BORDER_COL = new Border(new BorderStroke(COLOR_BORDER, BorderStrokeStyle.SOLID, CornerRadii.EMPTY,
-        new BorderWidths(1, 0, 0, 1)));
-    static final Border BORDER_COL_FIX = new Border(new BorderStroke(COLOR_BORDER, BorderStrokeStyle.SOLID, CornerRadii.EMPTY,
-        new BorderWidths(1, 1, 0, 1)));
     private static final int sortWidth = 15;
 
     public final String name;
@@ -66,14 +61,13 @@ public class VTableColumn<S, T> {
         sortLabel = new Label() {{
             setPadding(new Insets(0, 4, 0, 4));
             setPrefWidth(sortWidth);
-            setTextFill(Color.GRAY);
+            setTextFill(Theme.current().tableSortLabelColor());
         }};
         columnNode.getChildren().addAll(
             new HPadding(sortWidth),
             nameLabel,
             sortLabel
         );
-        // columnNode.setBorder(BORDER_COL);
         columnNode.setBackground(BG);
         columnNode.setPrefHeight(25);
         columnNode.setAlignment(Pos.CENTER);

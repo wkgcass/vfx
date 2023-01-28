@@ -227,7 +227,29 @@ public class FXUtils {
         observed.prefHeightProperty().addListener(lsn);
     }
 
+    public static void observeWidthHeightCenter(Region observed, Region modified) {
+        observeWidthCenter(observed, modified);
+        observeHeightCenter(observed, modified);
+    }
+
+    public static ChangeListener<? super Number> observeWidthCenter(Region observed, Region modified) {
+        ChangeListener<? super Number> lsn = (ob, old, now) ->
+            modified.setLayoutX((observed.getWidth() - modified.getWidth()) / 2);
+        observed.widthProperty().addListener(lsn);
+        modified.widthProperty().addListener(lsn);
+        return lsn;
+    }
+
+    public static ChangeListener<? super Number> observeHeightCenter(Region observed, Region modified) {
+        ChangeListener<? super Number> lsn = (ob, old, now) ->
+            modified.setLayoutY((observed.getHeight() - modified.getHeight()) / 2);
+        observed.heightProperty().addListener(lsn);
+        modified.heightProperty().addListener(lsn);
+        return lsn;
+    }
+
     @SuppressWarnings("DuplicatedCode")
+
     public static Group makeCutFor(Region node, double cornerRadii) {
         var nodeCutTL = new Circle() {{
             setLayoutX(cornerRadii);
@@ -310,5 +332,13 @@ public class FXUtils {
             nodeCutMid.setHeight(h - cornerRadii);
         });
         return nodeCut;
+    }
+
+    public static void forceUpdate(Stage stage) {
+        FXUtils.runDelay(50, () -> {
+            var w = stage.getWidth();
+            stage.setWidth(w + 0.001);
+            FXUtils.runDelay(50, () -> stage.setWidth(w));
+        });
     }
 }

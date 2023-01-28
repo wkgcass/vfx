@@ -1,44 +1,88 @@
 package io.vproxy.vfx.ui.alert;
 
+import io.vproxy.vfx.manager.font.FontManager;
+import io.vproxy.vfx.manager.font.FontUsages;
 import io.vproxy.vfx.manager.internal_i18n.InternalI18n;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
+import io.vproxy.vfx.theme.Theme;
+import io.vproxy.vfx.ui.layout.VPadding;
+import io.vproxy.vfx.ui.pane.AbstractFusionPane;
+import io.vproxy.vfx.ui.pane.FusionPane;
+import io.vproxy.vfx.ui.wrapper.ThemeLabel;
+import io.vproxy.vfx.util.FXUtils;
+import javafx.scene.Cursor;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.DataFormat;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Map;
 
-public class StackTraceAlert extends Alert {
+public class StackTraceAlert extends ThemeAlertBase {
     private StackTraceAlert(String desc, Throwable throwable) {
-        super(AlertType.ERROR);
         setTitle(InternalI18n.get().stacktraceAlertTitle());
-        setHeaderText(InternalI18n.get().stacktraceAlertHeaderText());
-        setContentText(desc);
+
+        var headerText = new ThemeLabel(InternalI18n.get().stacktraceAlertHeaderText()) {{
+            FontManager.get().setFont(FontUsages.alert, this);
+        }};
+        var descText = new ThemeLabel() {{
+            FontManager.get().setFont(FontUsages.alert, this);
+        }};
+        if (desc != null && !desc.isBlank()) {
+            descText.setText(desc);
+        }
+
+        var aboutStacktraceText = new ThemeLabel(InternalI18n.get().stacktraceAlertLabel()) {{
+            FontManager.get().setFont(FontUsages.alert, this);
+        }};
 
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         throwable.printStackTrace(pw);
         String exceptionText = sw.toString();
 
-        Label label = new Label(InternalI18n.get().stacktraceAlertLabel());
+        var stacktracePane = new FusionPane() {
+            @Override
+            protected AbstractFusionPane buildRootNode() {
+                return new FusionPaneImpl() {
+                    {
+                        setCursor(Cursor.HAND);
+                    }
 
-        TextArea textArea = new TextArea(exceptionText);
-        textArea.setEditable(false);
-        textArea.setWrapText(true);
+                    @Override
+                    protected void onMouseClicked() {
+                        Clipboard.getSystemClipboard().setContent(
+                            Map.of(DataFormat.PLAIN_TEXT, exceptionText)
+                        );
+                    }
 
-        textArea.setMaxWidth(Double.MAX_VALUE);
-        textArea.setMaxHeight(Double.MAX_VALUE);
-        GridPane.setVgrow(textArea, Priority.ALWAYS);
-        GridPane.setHgrow(textArea, Priority.ALWAYS);
+                    @Override
+                    protected Color downColor() {
+                        return Theme.current().fusionButtonDownBackgroundColor();
+                    }
+                };
+            }
+        };
+        stacktracePane.getNode().setPrefWidth(getStage().getWidth() - 2 * PADDING_H - 5);
+        var stacktraceText = new ThemeLabel(exceptionText) {{
+            setFont(new Font(FontManager.FONT_NAME_JetBrainsMono, 14));
+            setWrapText(true);
+            setPrefWidth(stacktracePane.getNode().getPrefWidth() - FusionPane.PADDING_H * 2);
+        }};
+        stacktracePane.getContentPane().getChildren().add(stacktraceText);
+        FXUtils.observeHeight(stacktraceText, stacktracePane.getNode(), FusionPane.PADDING_V * 2);
 
-        GridPane expContent = new GridPane();
-        expContent.setMaxWidth(Double.MAX_VALUE);
-        expContent.add(label, 0, 0);
-        expContent.add(textArea, 0, 1);
+        // this triggers height update
+        FXUtils.runDelay(50, () -> stacktraceText.setMinHeight(stacktraceText.getHeight() + 1));
 
-        getDialogPane().setExpandableContent(expContent);
+        alertMessagePane.getChildren().addAll(
+            headerText,
+            descText,
+            new VPadding(20),
+            aboutStacktraceText,
+            stacktracePane.getNode()
+        );
     }
 
     public static void show(Throwable throwable) {

@@ -33,12 +33,12 @@ public class FusionPane {
         root.prefWidthProperty().addListener((ob, old, now) -> {
             if (now == null) return;
             var w = now.doubleValue();
-            content.setPrefWidth(w - 20);
+            content.setPrefWidth(w - PADDING_H * 2);
         });
         root.prefHeightProperty().addListener((ob, old, now) -> {
             if (now == null) return;
             var h = now.doubleValue();
-            content.setPrefHeight(h - 20);
+            content.setPrefHeight(h - PADDING_V * 2);
         });
         FXUtils.makeCutFor(content, 4);
     }

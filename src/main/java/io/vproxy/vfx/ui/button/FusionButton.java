@@ -1,5 +1,7 @@
 package io.vproxy.vfx.ui.button;
 
+import io.vproxy.vfx.manager.font.FontManager;
+import io.vproxy.vfx.manager.font.FontUsages;
 import io.vproxy.vfx.theme.Theme;
 import io.vproxy.vfx.util.FXUtils;
 import javafx.animation.AnimationTimer;
@@ -15,6 +17,7 @@ import javafx.stage.Window;
 public class FusionButton extends AbstractFusionButton {
     private final Label text = new Label() {{
         setTextFill(Theme.current().fusionButtonTextColor());
+        FontManager.get().setFont(FontUsages.fusionButtonText, this);
     }};
     private EventHandler<?> actionHandler = null;
 

@@ -15,11 +15,10 @@ public class ImageManager {
     }
 
     private ImageManager() {
-        loadAndChangeColor("io/vproxy/vfx/res/image/close.png", Map.of("red", 0xffed6a5e, "white", 0xffffffff));
-        loadAndChangeColor("io/vproxy/vfx/res/image/maximize.png", Map.of("white", 0xffffffff, "green", 0xff61c454));
-        loadAndChangeColor("io/vproxy/vfx/res/image/reset-window-size.png", Map.of("white", 0xffffffff, "green", 0xff61c454));
-        loadAndChangeColor("io/vproxy/vfx/res/image/iconify.png", Map.of("white", 0xffffffff, "yellow", 0xfff4bd4f));
-        loadAndChangeColor("io/vproxy/vfx/res/image/menu.png", Map.of("white", 0xffffffff));
+        loadBlackAndChangeColor("io/vproxy/vfx/res/image/close.png", Map.of("red", 0xffed6a5e, "white", 0xffffffff));
+        loadBlackAndChangeColor("io/vproxy/vfx/res/image/maximize.png", Map.of("white", 0xffffffff, "green", 0xff61c454));
+        loadBlackAndChangeColor("io/vproxy/vfx/res/image/reset-window-size.png", Map.of("white", 0xffffffff, "green", 0xff61c454));
+        loadBlackAndChangeColor("io/vproxy/vfx/res/image/iconify.png", Map.of("white", 0xffffffff, "yellow", 0xfff4bd4f));
     }
 
     private final Map<String, Image> map = new ConcurrentHashMap<>();
@@ -56,7 +55,7 @@ public class ImageManager {
         return image;
     }
 
-    private void loadAndChangeColor(String path, Map<String, Integer> argbs) {
+    public void loadBlackAndChangeColor(String path, Map<String, Integer> argbs) {
         if (!path.startsWith("/")) {
             path = "/" + path;
         }

@@ -17,12 +17,16 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.util.Map;
+
 public class VStageTest extends Application {
     private int n = 12;
     private final Label label = new Label();
 
     @Override
     public void start(Stage primaryStage) {
+        ImageManager.get().loadBlackAndChangeColor("images/menu.png", Map.of("white", 0xffffffff));
+
         var stage = new VStage(primaryStage);
         stage.getStage().centerOnScreen();
         stage.getStage().setWidth(1024);
@@ -30,7 +34,7 @@ public class VStageTest extends Application {
         stage.setTitle("你好 Hello World 世界");
         stage.getStage().show();
 
-        var menuBtn = new FusionImageButton(ImageManager.get().load("io/vproxy/vfx/res/image/menu.png:white")) {{
+        var menuBtn = new FusionImageButton(ImageManager.get().load("images/menu.png:white")) {{
             setPrefWidth(40);
             setPrefHeight(VStage.TITLE_BAR_HEIGHT - 4);
             getImageView().setFitHeight(15);

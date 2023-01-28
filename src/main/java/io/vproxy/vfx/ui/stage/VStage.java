@@ -80,11 +80,7 @@ public class VStage {
             root.setPrefHeight(h - 1);
         });
         rootContainer.setBackground(Background.EMPTY);
-        rootContainer.setBorder(new Border(new BorderStroke(
-            Theme.current().windowBorderColor(),
-            BorderStrokeStyle.SOLID,
-            new CornerRadii(8),
-            new BorderWidths(0.5))));
+        useNormalBorder();
         setBackground(Theme.current().sceneBackgroundColor());
 
         var movingPane = new Pane();
@@ -180,7 +176,26 @@ public class VStage {
             resizeButton.setLayoutY(h - 8);
         });
 
-        rootContainer.getChildren().addAll(root, resizeButton);
+        rootContainer.getChildren().add(root);
+        if (initParams.resizable) {
+            rootContainer.getChildren().add(resizeButton);
+        }
+    }
+
+    public void useNormalBorder() {
+        rootContainer.setBorder(new Border(new BorderStroke(
+            Theme.current().windowBorderColor(),
+            BorderStrokeStyle.SOLID,
+            new CornerRadii(8),
+            new BorderWidths(0.5))));
+    }
+
+    public void useInverseBorder() {
+        rootContainer.setBorder(new Border(new BorderStroke(
+            Theme.current().windowBorderColorInverse(),
+            BorderStrokeStyle.SOLID,
+            new CornerRadii(8),
+            new BorderWidths(0.5))));
     }
 
     private void updateTitlePosition() {
@@ -272,5 +287,13 @@ public class VStage {
 
     public void close() {
         stage.close();
+    }
+
+    public void show() {
+        stage.show();
+    }
+
+    public void showAndWait() {
+        stage.showAndWait();
     }
 }

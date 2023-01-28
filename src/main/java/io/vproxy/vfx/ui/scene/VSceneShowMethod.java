@@ -5,4 +5,5 @@ public enum VSceneShowMethod {
     FROM_RIGHT,
     FROM_TOP,
     FROM_BOTTOM,
+    FADE_IN,
 }

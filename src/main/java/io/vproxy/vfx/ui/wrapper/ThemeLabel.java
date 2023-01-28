@@ -5,6 +5,7 @@ import javafx.scene.control.Label;
 
 public class ThemeLabel extends Label {
     public ThemeLabel() {
+        setTextFill(Theme.current().normalTextColor());
     }
 
     public ThemeLabel(String text) {

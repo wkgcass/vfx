@@ -26,14 +26,19 @@ abstract public class Callback<T, EX> {
 
     public void succeeded(T value) {
         succeeded0(value);
+        finally0();
     }
 
     protected abstract void succeeded0(T value);
 
     public void failed(EX ex) {
         failed0(ex);
+        finally0();
     }
 
     protected void failed0(EX ex) {
+    }
+
+    protected void finally0() {
     }
 }

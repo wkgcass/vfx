@@ -1,0 +1,114 @@
+package io.vproxy.vfx.control.dialog;
+
+import io.vproxy.vfx.manager.font.FontManager;
+import io.vproxy.vfx.manager.font.FontUsages;
+import io.vproxy.vfx.theme.Theme;
+import io.vproxy.vfx.ui.button.FusionButton;
+import io.vproxy.vfx.ui.layout.HPadding;
+import io.vproxy.vfx.ui.layout.VPadding;
+import io.vproxy.vfx.ui.pane.FusionPane;
+import io.vproxy.vfx.ui.stage.VStage;
+import io.vproxy.vfx.util.FXUtils;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Optional;
+
+public class VDialog<T> {
+    private static final int BUTTON_HEIGHT = 45;
+    private static final int BUTTON_PANE_HEIGHT = BUTTON_HEIGHT + FusionPane.PADDING_V * 2;
+
+    private final VStage stage = new VStage();
+    private final Label messageLabel = new Label();
+    private final FusionPane buttonPane = new FusionPane();
+    private final HBox buttonHBox = new HBox();
+
+    protected T returnValue;
+
+    public VDialog() {
+        stage.getStage().setWidth(900);
+
+        messageLabel.setWrapText(true);
+        FontManager.get().setFont(FontUsages.dialogText, messageLabel);
+        messageLabel.setTextFill(Theme.current().normalTextColor());
+
+        buttonPane.getContentPane().getChildren().add(buttonHBox);
+        buttonPane.getNode().setPrefHeight(BUTTON_PANE_HEIGHT);
+
+        buttonHBox.setAlignment(Pos.CENTER_RIGHT);
+        FXUtils.observeWidth(buttonPane.getContentPane(), buttonHBox);
+
+        FXUtils.observeWidth(
+            stage.getInitialScene().getScrollPane().getNode(),
+            stage.getInitialScene().getContentPane(),
+            -1);
+        var root = stage.getInitialScene().getContentPane();
+        root.widthProperty().addListener((ob, old, now) -> {
+            if (now == null) return;
+            var w = now.doubleValue();
+            messageLabel.setPrefWidth(w - 20);
+            buttonPane.getNode().setPrefWidth(w - 20);
+        });
+        root.heightProperty().addListener((ob, old, now) -> {
+            if (now == null) return;
+            var h = now.doubleValue();
+            h = VStage.TITLE_BAR_HEIGHT + h + 10;
+            stage.getStage().setHeight(h);
+        });
+        FXUtils.forceUpdate(stage.getStage());
+        root.getChildren().add(new HBox(
+            new HPadding(10),
+            new VBox(
+                new VPadding(10),
+                messageLabel,
+                new VPadding(10),
+                buttonPane.getNode()
+            )
+        ));
+    }
+
+    public Label getMessageNode() {
+        return messageLabel;
+    }
+
+    public void setButtons(LinkedHashMap<String, VDialogValueProvider<T>> buttons) {
+        buttonHBox.getChildren().clear();
+        var ls = new ArrayList<Node>();
+        var isFirst = true;
+        for (var entry : buttons.entrySet()) {
+            var name = entry.getKey();
+            var value = entry.getValue();
+            var button = new FusionButton(name);
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                ls.add(new HPadding(5));
+            }
+            var textBounds = FXUtils.calculateTextBounds(button.getTextNode());
+            button.setPrefWidth(Math.max(textBounds.getWidth() + 40, 120));
+            button.setPrefHeight(BUTTON_HEIGHT);
+            ls.add(button);
+            button.setOnAction(e -> {
+                if (!value.directlySetValue) {
+                    returnValue = value.provider.get();
+                }
+                stage.close();
+            });
+        }
+        buttonHBox.getChildren().addAll(ls);
+    }
+
+    public Optional<T> showAndWait() {
+        stage.showAndWait();
+        return Optional.ofNullable(returnValue);
+    }
+
+    public VStage getStage() {
+        return stage;
+    }
+}

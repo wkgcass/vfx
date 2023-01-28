@@ -25,7 +25,6 @@ public class VTableView<S> {
     final HBox columnPane = new HBox();
     private final Pane fixColumnWidthColum = new Pane() {{
         setBackground(VTableColumn.BG);
-        // setBorder(VTableColumn.BORDER_COL_FIX);
         setPrefWidth(0);
     }};
     private final VScrollPane scrollPane = new VScrollPane();

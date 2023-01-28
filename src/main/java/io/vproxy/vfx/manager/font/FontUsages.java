@@ -17,6 +17,8 @@ public class FontUsages {
     };
     public static final FontUsage fusionButtonText = new FontUsage() {
     };
+    public static final FontUsage dialogText = new FontUsage() {
+    };
 
     private FontUsages() {
     }

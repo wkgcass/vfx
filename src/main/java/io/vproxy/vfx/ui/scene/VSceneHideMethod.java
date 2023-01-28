@@ -5,4 +5,5 @@ public enum VSceneHideMethod {
     TO_RIGHT,
     TO_TOP,
     TO_BOTTOM,
+    FADE_OUT,
 }

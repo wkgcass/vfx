@@ -38,8 +38,16 @@ public abstract class Theme {
 
     public abstract Color borderColor();
 
+    public Color borderColorInverse() {
+        return sceneBackgroundColor();
+    }
+
     public Color windowBorderColor() {
         return borderColor();
+    }
+
+    public Color windowBorderColorInverse() {
+        return borderColorInverse();
     }
 
     public abstract Color sceneBackgroundColor();
@@ -69,6 +77,16 @@ public abstract class Theme {
     public abstract Color fusionButtonDownBackgroundColor();
 
     public abstract Color fusionButtonAnimatingBorderLightColor();
+
+    public Color transparentFusionButtonNormalBackgroundColor() {
+        return transparentFusionPaneNormalBackgroundColor();
+    }
+
+    public Color transparentFusionButtonHoverBackgroundColor() {
+        return transparentFusionPaneHoverBackgroundColor();
+    }
+
+    public abstract Color transparentFusionButtonDownBackgroundColor();
 
     public boolean enableFusionButtonAnimation() {
         return true;
@@ -106,6 +124,8 @@ public abstract class Theme {
         return normalTextColor();
     }
 
+    public abstract Color tableSortLabelColor();
+
     public abstract Color tableCellSelectedBackgroundColor();
 
     public Color tableCellBackgroundColor1() {
@@ -117,4 +137,8 @@ public abstract class Theme {
     public abstract Color tableHeaderTopBackgroundColor();
 
     public abstract Color tableHeaderBottomBackgroundColor();
+
+    public abstract Color progressBarProgressColor();
+
+    public abstract Color progressBarBackgroundColor();
 }
