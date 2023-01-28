@@ -1,4 +1,4 @@
-open module io.vproxy.vfx {
+module io.vproxy.vfx {
     requires javafx.base;
     requires javafx.graphics;
     requires javafx.controls;
@@ -41,4 +41,7 @@ open module io.vproxy.vfx {
     exports io.vproxy.vfx.util.algebradata;
     exports io.vproxy.vfx.util.graph;
     exports io.vproxy.vfx.util.imagewrapper;
+
+    opens io.vproxy.vfx.res.font;
+    opens io.vproxy.vfx.res.image;
 }
