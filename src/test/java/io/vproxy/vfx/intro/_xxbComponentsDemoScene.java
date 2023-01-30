@@ -17,10 +17,11 @@ import java.util.LinkedHashMap;
 public class _xxbComponentsDemoScene extends DemoVScene {
     public _xxbComponentsDemoScene() {
         super(VSceneRole.MAIN);
-        enableAutoContentWidthHeight();
+        enableAutoContentWidth();
 
-        var buttonButton = new Btn("This is a\nFusionButton");
-        buttonButton.getTextNode().setTextAlignment(TextAlignment.CENTER);
+        var buttonButton = new Btn("This is a\nFusionButton") {{
+            getTextNode().setTextAlignment(TextAlignment.CENTER);
+        }};
 
         var alertButton = new Btn("SimpleAlert");
         alertButton.setOnAction(e -> SimpleAlert.showAndWait(Alert.AlertType.INFORMATION,
@@ -50,17 +51,31 @@ public class _xxbComponentsDemoScene extends DemoVScene {
             SimpleAlert.showAndWait(Alert.AlertType.INFORMATION, "the chosen key is " + keyOpt);
         });
 
+        var noAnimationButton = new Btn("FusionButton\n" +
+                                        "setDisableAnimation(true)") {{
+            getTextNode().setTextAlignment(TextAlignment.CENTER);
+        }};
+        noAnimationButton.setDisableAnimation(true);
+
+        var onlyAnimateWhenNotClickedButton = new Btn("FusionButton\n" +
+                                                      "setOnlyAnimateWhenNotClicked(true)") {{
+            getTextNode().setTextAlignment(TextAlignment.CENTER);
+        }};
+        onlyAnimateWhenNotClickedButton.setOnlyAnimateWhenNotClicked(true);
+
         var gridPane = new GridPane();
         gridPane.setVgap(50);
         gridPane.setHgap(50);
         FXUtils.observeWidthCenter(getContentPane(), gridPane);
-        gridPane.setLayoutY(200);
+        gridPane.setLayoutY(100);
 
         gridPane.add(buttonButton, 0, 0);
         gridPane.add(alertButton, 1, 0);
         gridPane.add(stacktraceAlertButton, 2, 0);
         gridPane.add(dialogButton, 0, 1);
         gridPane.add(keyChooserBtn, 1, 1);
+        gridPane.add(noAnimationButton, 0, 2, 2, 1);
+        gridPane.add(onlyAnimateWhenNotClickedButton, 0, 3, 2, 1);
 
         getContentPane().getChildren().add(gridPane);
     }

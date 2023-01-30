@@ -94,6 +94,7 @@ public class IntroFXMain extends Application {
         var prevButton = new FusionButton("<< Previous") {{
             setPrefWidth(150);
             setPrefHeight(navigatePane.getNode().getPrefHeight() - FusionPane.PADDING_V * 2);
+            setOnlyAnimateWhenNotClicked(true);
 
             var current = sceneGroup.getCurrentMainScene();
             //noinspection SuspiciousMethodCalls
@@ -105,6 +106,7 @@ public class IntroFXMain extends Application {
         var nextButton = new FusionButton("Next >>") {{
             setPrefWidth(150);
             setPrefHeight(navigatePane.getNode().getPrefHeight() - FusionPane.PADDING_V * 2);
+            setOnlyAnimateWhenNotClicked(true);
 
             var current = sceneGroup.getCurrentMainScene();
             //noinspection SuspiciousMethodCalls

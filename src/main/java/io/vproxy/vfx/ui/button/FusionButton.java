@@ -8,10 +8,8 @@ import javafx.animation.AnimationTimer;
 import javafx.beans.value.ChangeListener;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
-import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
-import javafx.scene.shape.Circle;
 import javafx.stage.Window;
 
 public class FusionButton extends AbstractFusionButton {
@@ -80,7 +78,7 @@ public class FusionButton extends AbstractFusionButton {
             new BorderWidths(1.5)
         )));
         borderLightPane.setBackground(Background.EMPTY);
-        borderLightPane.setClip(new Group(borderLightCut1, borderLightCut2));
+        borderLightPane.setOpacity(0);
         getChildren().add(borderLightPane);
 
         setPrefWidth(64);
@@ -116,6 +114,7 @@ public class FusionButton extends AbstractFusionButton {
 
     @Override
     protected void onMouseClicked() {
+        alreadyClicked = true;
         var actionHandler = this.actionHandler;
         if (actionHandler == null) {
             return;
@@ -133,15 +132,11 @@ public class FusionButton extends AbstractFusionButton {
     }
 
     private Animation timer = null;
-    private final Circle borderLightCut1 = new Circle(12) {{
-        setOpacity(0);
-    }};
-    private final Circle borderLightCut2 = new Circle(12) {{
-        setOpacity(0);
-    }};
     private final Pane borderLightPane = new Pane();
     private boolean disableAnimation = !Theme.current().enableFusionButtonAnimation();
     private boolean internalDisableAnimation = false;
+    private boolean alreadyClicked = false;
+    private boolean onlyAnimateWhenNotClicked = false;
 
     // return true if it's animating after calling this method
     public boolean startAnimating() {
@@ -167,62 +162,35 @@ public class FusionButton extends AbstractFusionButton {
                 beginTs = now;
                 return;
             }
-            var w = getWidth();
-            var h = getHeight();
-            var total = (w + h) * 2;
             var delta = (now - beginTs) / 1_000_000;
-            final long period = 1_500;
-            final long fullPeriod = 20_000;
+            final long noAnimate = 2_000;
+            final long showTime = 3_500;
+            final long glowTime = 4_000;
+            final long hideTime = 5_500;
+            final long fullPeriod = 10_000;
             if (delta > fullPeriod) {
                 while (delta > fullPeriod) {
                     delta -= fullPeriod;
                 }
                 beginTs = now - delta * 1_000_000;
             }
-            if (delta > 3 * period) {
-                borderLightCut1.setOpacity(0);
-                borderLightCut2.setOpacity(0);
+            if (delta < noAnimate) {
+                borderLightPane.setOpacity(0);
+            }
+            if (delta < showTime) {
+                var p = (delta - noAnimate) / (double) (showTime - noAnimate);
+                borderLightPane.setOpacity(p);
+            } else if (delta < glowTime) {
+                borderLightPane.setOpacity(1);
+            } else if (delta < hideTime) {
+                var p = (delta - glowTime) / (double) (hideTime - glowTime);
+                borderLightPane.setOpacity(1 - p);
+            } else {
+                borderLightPane.setOpacity(0);
                 if (isDisableAnimation0()) {
                     timer = null;
                     stop();
                 }
-                return;
-            }
-            if (delta < period) {
-                var p = delta / (double) period;
-                borderLightCut1.setOpacity(p);
-                borderLightCut2.setOpacity(p);
-            } else if (delta > period * 2) {
-                var p = (delta % period) / (double) period;
-                borderLightCut1.setOpacity(1 - p);
-                borderLightCut2.setOpacity(1 - p);
-            } else {
-                borderLightCut1.setOpacity(1);
-                borderLightCut2.setOpacity(1);
-            }
-            delta %= period;
-            var p = delta / (double) period;
-            var l = total * p;
-            if (l < getWidth()) {
-                borderLightCut1.setLayoutX(l);
-                borderLightCut1.setLayoutY(0);
-                borderLightCut2.setLayoutX(w - l);
-                borderLightCut2.setLayoutY(h);
-            } else if (l < w + h) {
-                borderLightCut1.setLayoutX(w);
-                borderLightCut1.setLayoutY(l - w);
-                borderLightCut2.setLayoutX(0);
-                borderLightCut2.setLayoutY(h - (l - w));
-            } else if (l < w + h + w) {
-                borderLightCut1.setLayoutX(w - (l - w - h));
-                borderLightCut1.setLayoutY(h);
-                borderLightCut2.setLayoutX(l - w - h);
-                borderLightCut2.setLayoutY(0);
-            } else {
-                borderLightCut1.setLayoutX(0);
-                borderLightCut1.setLayoutY(h - (l - w - h - w));
-                borderLightCut2.setLayoutX(w);
-                borderLightCut2.setLayoutY(l - w - h - w);
             }
         }
     }
@@ -233,8 +201,7 @@ public class FusionButton extends AbstractFusionButton {
         if (timer != null) {
             timer.stop();
         }
-        borderLightCut1.setOpacity(0);
-        borderLightCut2.setOpacity(0);
+        borderLightPane.setOpacity(0);
     }
 
     public boolean isDisableAnimation() {
@@ -242,7 +209,7 @@ public class FusionButton extends AbstractFusionButton {
     }
 
     public boolean isDisableAnimation0() {
-        return disableAnimation || internalDisableAnimation || isDisabled();
+        return disableAnimation || internalDisableAnimation || isDisabled() || (alreadyClicked && onlyAnimateWhenNotClicked);
     }
 
     public void setDisableAnimation(boolean disableAnimation) {
@@ -252,6 +219,14 @@ public class FusionButton extends AbstractFusionButton {
         } else {
             startAnimating();
         }
+    }
+
+    public boolean isOnlyAnimateWhenNotClicked() {
+        return onlyAnimateWhenNotClicked;
+    }
+
+    public void setOnlyAnimateWhenNotClicked(boolean onlyAnimateWhenNotClicked) {
+        this.onlyAnimateWhenNotClicked = onlyAnimateWhenNotClicked;
     }
 
     private void setInternalDisableAnimation(boolean internalDisableAnimation) {

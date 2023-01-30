@@ -5,12 +5,12 @@ import javafx.scene.paint.Color;
 
 public class TransparentFusionButton extends FusionButton {
     public TransparentFusionButton() {
-        setDisableAnimation(true);
+        setOnlyAnimateWhenNotClicked(true);
     }
 
     public TransparentFusionButton(String text) {
         super(text);
-        setDisableAnimation(true);
+        setOnlyAnimateWhenNotClicked(true);
     }
 
     @Override
