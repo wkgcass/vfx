@@ -6,6 +6,7 @@ import io.vproxy.vfx.manager.font.FontUsages;
 import io.vproxy.vfx.theme.Theme;
 import io.vproxy.vfx.ui.scene.VScene;
 import io.vproxy.vfx.ui.scene.VSceneGroup;
+import io.vproxy.vfx.ui.scene.VSceneGroupInitParams;
 import io.vproxy.vfx.ui.scene.VSceneRole;
 import io.vproxy.vfx.util.FXUtils;
 import io.vproxy.vfx.util.OSUtils;
@@ -24,12 +25,20 @@ public class VStage {
     public static final int TITLE_BAR_HEIGHT = 28;
 
     private final Stage stage;
-    private final Pane root = new Pane();
     private final Pane rootContainer = new Pane();
+    private final VScene rootContent = new VScene(VSceneRole.MAIN) {{
+        enableAutoContentWidthHeight();
+    }};
+    private final VSceneGroup rootSceneGroup = new VSceneGroup(rootContent,
+        new VSceneGroupInitParams()
+            .setUseClip(false));
     private final VScene content = new VScene(VSceneRole.MAIN);
-    private final VSceneGroup sceneGroup = new VSceneGroup(content);
+    private final VSceneGroup sceneGroup = new VSceneGroup(content,
+        new VSceneGroupInitParams()
+            .setGradientCover(true)
+            .setUseClip(false));
     private final Label title = new Label() {{
-        FontManager.get().setFont(FontUsages.windowTitle, this, Theme.current().windowTitleFontSize());
+        FontManager.get().setFont(FontUsages.windowTitle, this);
         setTextFill(Theme.current().normalTextColor());
         setMouseTransparent(true);
     }};
@@ -62,25 +71,25 @@ public class VStage {
         var scene = new Scene(rootContainer);
         scene.setFill(Color.TRANSPARENT);
         stage.setScene(scene);
-        root.setLayoutX(0.5);
-        root.setLayoutY(0.5);
+        rootSceneGroup.getNode().setLayoutX(0.5);
+        rootSceneGroup.getNode().setLayoutY(0.5);
 
-        FXUtils.makeCutFor(root, 8);
+        FXUtils.makeClipFor(rootSceneGroup.getNode(), 8);
 
         stage.widthProperty().addListener((ob, old, now) -> {
             if (now == null) return;
             var w = now.doubleValue();
             rootContainer.setPrefWidth(w);
-            root.setPrefWidth(w - 1);
+            rootSceneGroup.getNode().setPrefWidth(w - 1);
         });
         stage.heightProperty().addListener((ob, old, now) -> {
             if (now == null) return;
             var h = now.doubleValue();
             rootContainer.setPrefHeight(h);
-            root.setPrefHeight(h - 1);
+            rootSceneGroup.getNode().setPrefHeight(h - 1);
         });
         rootContainer.setBackground(Background.EMPTY);
-        useNormalBorder();
+        useDefaultBorder();
         setBackground(Theme.current().sceneBackgroundColor());
 
         var movingPane = new Pane();
@@ -102,25 +111,22 @@ public class VStage {
         };
         movingPane.setOnMousePressed(moveWindowHandler);
         movingPane.setOnMouseDragged(moveWindowHandler);
-        root.getChildren().add(movingPane);
+        rootContent.getContentPane().getChildren().add(movingPane);
 
         var closeBtn = new CloseButton(this, initParams);
-        closeBtn.setLayoutY(0.5);
-        if (initParams.closeButton) root.getChildren().add(closeBtn);
+        if (initParams.closeButton) rootContent.getContentPane().getChildren().add(closeBtn);
 
         maxrstBtn = new MaxResetButton(this, initParams);
-        maxrstBtn.setLayoutY(0.5);
-        if (initParams.maximizeAndResetButton) root.getChildren().add(maxrstBtn);
+        if (initParams.maximizeAndResetButton) rootContent.getContentPane().getChildren().add(maxrstBtn);
 
         var iconifyBtn = new IconifyButton(this, initParams);
-        iconifyBtn.setLayoutY(0.5);
-        if (initParams.iconifyButton) root.getChildren().add(iconifyBtn);
+        if (initParams.iconifyButton) rootContent.getContentPane().getChildren().add(iconifyBtn);
 
         sceneGroup.getNode().setLayoutX(0.5);
         sceneGroup.getNode().setLayoutY(TITLE_BAR_HEIGHT);
-        root.getChildren().add(sceneGroup.getNode());
+        rootContent.getContentPane().getChildren().add(sceneGroup.getNode());
 
-        root.getChildren().add(title);
+        rootContent.getContentPane().getChildren().add(title);
 
         var resizeHandler = new DragHandler() {
             @Override
@@ -150,7 +156,7 @@ public class VStage {
         stage.widthProperty().addListener((ob, old, now) -> {
             if (now == null) return;
             var w = now.doubleValue();
-            final double padRight = 0.5;
+            final double padRight = 0;
             var controlButtonsOffset = w - padRight;
             if (initParams.closeButton) {
                 controlButtonsOffset -= CloseButton.WIDTH;
@@ -165,34 +171,39 @@ public class VStage {
                 iconifyBtn.setLayoutX(controlButtonsOffset);
             }
             movingPane.setPrefWidth(w);
-            sceneGroup.getNode().setPrefWidth(w - 1);
+            rootSceneGroup.getNode().setPrefWidth(w - 1);
             resizeButton.setLayoutX(w - 8);
             updateTitlePosition();
         });
         stage.heightProperty().addListener((ob, old, now) -> {
             if (now == null) return;
             var h = now.doubleValue();
-            sceneGroup.getNode().setPrefHeight(h - TITLE_BAR_HEIGHT - 0.5);
+            rootSceneGroup.getNode().setPrefHeight(h - 1);
             resizeButton.setLayoutY(h - 8);
         });
+        FXUtils.observeWidthHeight(rootContent.getContentPane(), sceneGroup.getNode(), 0, -TITLE_BAR_HEIGHT);
 
-        rootContainer.getChildren().add(root);
+        rootContainer.getChildren().add(rootSceneGroup.getNode());
         if (initParams.resizable) {
             rootContainer.getChildren().add(resizeButton);
         }
     }
 
-    public void useNormalBorder() {
+    public void useDefaultBorder() {
+        useLightBorder();
+    }
+
+    public void useLightBorder() {
         rootContainer.setBorder(new Border(new BorderStroke(
-            Theme.current().windowBorderColor(),
+            Theme.current().windowBorderColorLight(),
             BorderStrokeStyle.SOLID,
             new CornerRadii(8),
             new BorderWidths(0.5))));
     }
 
-    public void useInverseBorder() {
+    public void useDarkBorder() {
         rootContainer.setBorder(new Border(new BorderStroke(
-            Theme.current().windowBorderColorInverse(),
+            Theme.current().windowBorderColorDark(),
             BorderStrokeStyle.SOLID,
             new CornerRadii(8),
             new BorderWidths(0.5))));
@@ -213,7 +224,7 @@ public class VStage {
     }
 
     public void setBackground(Paint paint) {
-        root.setBackground(new Background(new BackgroundFill(
+        rootSceneGroup.getNode().setBackground(new Background(new BackgroundFill(
             paint,
             new CornerRadii(8),
             Insets.EMPTY)));
@@ -223,8 +234,12 @@ public class VStage {
         return stage;
     }
 
-    public Pane getRoot() {
-        return root;
+    public VSceneGroup getRootSceneGroup() {
+        return rootSceneGroup;
+    }
+
+    public VScene getRoot() {
+        return rootContent;
     }
 
     public VSceneGroup getSceneGroup() {
@@ -237,6 +252,7 @@ public class VStage {
 
     public void setTitle(String title) {
         this.title.setText(title);
+        stage.setTitle(title);
     }
 
     public void setIconified(boolean iconified) {

@@ -2,13 +2,12 @@ package io.vproxy.vfx.ui.loading;
 
 import io.vproxy.vfx.manager.task.TaskManager;
 import io.vproxy.vfx.theme.Theme;
+import io.vproxy.vfx.ui.shapes.VLine;
 import io.vproxy.vfx.util.Callback;
 import io.vproxy.vfx.util.FXUtils;
 import io.vproxy.vfx.util.MiscUtils;
 import javafx.application.Platform;
 import javafx.scene.Group;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Line;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -21,32 +20,16 @@ public class VProgressBar extends Group {
 
     private double length;
     private double progress;
-    private final Circle backgroundRightDot = new Circle(radius);
-    private final Line backgroundLine = new Line();
-    private final Circle progressRightDot = new Circle(radius);
-    private final Line progressLine = new Line();
+    private final VLine backgroundLine = new VLine(width);
+    private final VLine progressLine = new VLine(width);
 
     public VProgressBar() {
-        var progressLeftDot = new Circle(radius);
-        var backgroundLeftDot = new Circle(radius);
-        getChildren().addAll(
-            backgroundLine, backgroundLeftDot, backgroundRightDot,
-            progressLine, progressLeftDot, progressRightDot);
-        backgroundLine.setStrokeWidth(width);
+        getChildren().addAll(backgroundLine, progressLine);
         backgroundLine.setStartX(radius);
-        backgroundLeftDot.setLayoutX(radius);
-        backgroundRightDot.setLayoutX(radius);
         backgroundLine.setStroke(Theme.current().progressBarBackgroundColor());
-        backgroundLeftDot.setFill(Theme.current().progressBarBackgroundColor());
-        backgroundRightDot.setFill(Theme.current().progressBarBackgroundColor());
 
-        progressLine.setStrokeWidth(width);
         progressLine.setStartX(radius);
-        progressLeftDot.setLayoutX(radius);
-        progressRightDot.setLayoutX(radius);
         progressLine.setStroke(Theme.current().progressBarProgressColor());
-        progressLeftDot.setStroke(Theme.current().progressBarProgressColor());
-        progressRightDot.setStroke(Theme.current().progressBarProgressColor());
     }
 
     public double getLength() {
@@ -56,7 +39,6 @@ public class VProgressBar extends Group {
     public void setLength(double length) {
         this.length = length;
         backgroundLine.setEndX(length - radius);
-        backgroundRightDot.setLayoutX(length - radius);
         updateProgressLine();
     }
 
@@ -77,7 +59,6 @@ public class VProgressBar extends Group {
     private void updateProgressLine() {
         var l = length * progress;
         progressLine.setEndX(l - radius);
-        progressRightDot.setLayoutX(l - radius);
     }
 
     private List<LoadingItem> items = new ArrayList<>();

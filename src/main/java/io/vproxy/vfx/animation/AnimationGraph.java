@@ -8,25 +8,28 @@ import io.vproxy.vfx.util.graph.GraphPath;
 import javafx.animation.AnimationTimer;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 public class AnimationGraph<T extends AlgebraData<T>> {
     private final Graph<AnimationNode<T>> graph;
-    private final Consumer<T> apply;
+    private final AnimationApplyFunction<T> apply;
+    private final AnimationStateTransferBeginCallback<T> stateTransferBeginCallback;
     private AnimationNode<T> currentNode;
 
     private AnimationEdge<T> currentEdge = null;
     private Iterator<AnimationEdge<T>> iterator = null;
     private Animation timer = null;
 
-    AnimationGraph(Graph<AnimationNode<T>> graph, Consumer<T> apply, AnimationNode<T> initialNode) {
+    AnimationGraph(Graph<AnimationNode<T>> graph,
+                   AnimationApplyFunction<T> apply, AnimationStateTransferBeginCallback<T> stateTransferBeginCallback,
+                   AnimationNode<T> initialNode) {
         this.graph = graph;
         this.apply = apply;
+        this.stateTransferBeginCallback = stateTransferBeginCallback;
         if (!graph.containsNode(initialNode)) {
             throw new IllegalArgumentException("`initialNode` is not contained in `nodes`");
         }
         this.currentNode = initialNode;
-        apply(initialNode.value);
+        apply(null, initialNode);
     }
 
     public boolean isPlaying() {
@@ -49,10 +52,10 @@ public class AnimationGraph<T extends AlgebraData<T>> {
         var timer = this.timer;
         this.timer = null;
         if (timer != null) timer.stop();
-        apply(currentNode.value);
+        apply(null, currentNode);
     }
 
-    public void revertToLastNode(Callback<Void, Exception> cb) {
+    private void revertToLastNode(Callback<Void, Exception> cb) {
         var timer = this.timer;
         if (timer == null) {
             cb.succeeded();
@@ -70,39 +73,42 @@ public class AnimationGraph<T extends AlgebraData<T>> {
         return currentEdge.to;
     }
 
-    private void apply(T data) {
-        apply.accept(data);
+    private void apply(AnimationNode<T> from, AnimationNode<T> to, T data) {
+        apply.apply(from, to, data);
+    }
+
+    private void apply(AnimationNode<T> from, AnimationNode<T> to) {
+        apply.apply(from, to, to.value);
+        to.stateTransferFinish.animationStateTransferFinish(from, to);
+    }
+
+    public void play(AnimationNode<T> key) {
+        play(key, new Callback<>() {
+            @Override
+            protected void succeeded0(Void value) {
+            }
+        });
     }
 
     public void play(AnimationNode<T> key, Callback<Void, Exception> cb) {
-        if (isPlaying()) {
-            if (currentNode.equals(key)) {
-                revertToLastNode(cb);
-            } else {
-                timer.cb = Callback.handler((v, ex) ->
-                    play(key, cb));
-            }
-            return;
-        }
-        if (currentNode.equals(key)) {
-            cb.succeeded();
-            return;
-        }
         play(List.of(key), cb);
     }
 
     public void play(List<AnimationNode<T>> keys, Callback<Void, Exception> cb) {
-        if (isPlaying()) {
-            if (keys.isEmpty()) {
-                cb.succeeded();
-                return;
-            }
-            if (currentNode.equals(keys.get(0))) {
-                revertToLastNode(Callback.handler((v, ex) -> play(keys.subList(1, keys.size()), cb)));
-            } else {
-                timer.stopAtNext(Callback.handler((v, ex) -> play(keys, cb)));
-            }
+        if (keys.isEmpty()) {
+            cb.succeeded();
             return;
+        }
+        if (isPlaying()) {
+            cancelAndPlay(keys, cb);
+            return;
+        }
+        if (keys.get(0).equals(currentNode)) {
+            var linked = new LinkedList<>(keys);
+            keys = linked;
+            while (!linked.isEmpty() && linked.peekFirst().equals(currentNode)) {
+                linked.remove(currentNode);
+            }
         }
         if (keys.isEmpty()) {
             cb.succeeded();
@@ -123,7 +129,7 @@ public class AnimationGraph<T extends AlgebraData<T>> {
             try {
                 newPath = prepareForPlaying(lastNode, key, path, keys);
             } catch (Exception e) {
-                Logger.warn("unable to find path for playing animation " + keys);
+                Logger.warn("unable to find path for playing animation " + keys + ": from " + lastNode + " to " + key);
                 cb.failed(e);
                 return;
             }
@@ -139,6 +145,76 @@ public class AnimationGraph<T extends AlgebraData<T>> {
         iterator = (Iterator) path.path.iterator();
         timer = new Animation(cb);
         timer.start();
+    }
+
+    @SuppressWarnings("DuplicatedCode")
+    private void cancelAndPlay(List<AnimationNode<T>> keys, Callback<Void, Exception> cb) {
+        if (currentEdge == null) {
+            stopAndSetNode(currentNode);
+            play(keys, cb);
+            return;
+        }
+
+        var firstNode = keys.get(0);
+        var currentNode = this.currentNode;
+        if (currentNode == firstNode) {
+            playAfterRevert(currentNode, keys, cb);
+            return;
+        }
+        var nextNode = currentEdge.to;
+        if (nextNode == firstNode) {
+            playAtNext(nextNode, keys, cb);
+            return;
+        }
+        GraphPath<AnimationNode<T>> currentNodePath;
+        try {
+            currentNodePath = findShortestPaths(currentNode, firstNode, Collections.emptySet());
+        } catch (Exception e) {
+            Logger.warn("unable to find path for playing animation from " + currentNode + " to " + firstNode);
+            cb.failed(e);
+            return;
+        }
+        GraphPath<AnimationNode<T>> nextNodePath;
+        try {
+            nextNodePath = findShortestPaths(nextNode, firstNode, Collections.emptySet());
+        } catch (Exception e) {
+            Logger.warn("unable to find path for playing animation from " + nextNode + " to " + firstNode);
+            cb.failed(e);
+            return;
+        }
+        if (currentNodePath.length > nextNodePath.length) {
+            playAtNext(nextNode, keys, cb);
+        } else {
+            playAfterRevert(currentNode, keys, cb);
+        }
+    }
+
+    private void playAtNext(AnimationNode<T> n, List<AnimationNode<T>> keys, Callback<Void, Exception> cb) {
+        if (isReverting()) {
+            timer.cancelRevertAndStopAtNext(cb);
+            return;
+        }
+        timer.stopAtNext(new Callback<>() {
+            @Override
+            protected void succeeded0(Void value) {
+                stopAndSetNode(n);
+                play(keys, cb);
+            }
+        });
+    }
+
+    private void playAfterRevert(AnimationNode<T> n, List<AnimationNode<T>> keys, Callback<Void, Exception> cb) {
+        if (isReverting()) {
+            timer.setCB(cb);
+            return;
+        }
+        revertToLastNode(new Callback<>() {
+            @Override
+            protected void succeeded0(Void value) {
+                stopAndSetNode(n);
+                play(keys, cb);
+            }
+        });
     }
 
     private GraphPath<AnimationNode<T>> findShortestPaths(AnimationNode<T> from, AnimationNode<T> to, Set<AnimationNode<T>> skip) {
@@ -190,17 +266,15 @@ public class AnimationGraph<T extends AlgebraData<T>> {
                 }
             }
             if (currentEdge == null) {
-                if (terminateAtNext || !iterator.hasNext()) {
-                    iterator = null;
-                    timer = null;
-                    stop();
-                    cb.succeeded();
+                if (checkEnd()) {
                     return;
                 }
                 currentEdge = iterator.next();
+                stateTransferBeginCallback.animationStateTransferBegin(currentEdge.from, currentEdge.to);
                 beginTs = now - lastOverflow;
             }
             T data;
+            var currentEdge0 = currentEdge;
             if (!isReverting) {
                 var delta = (now - beginTs) / 1_000_000;
                 if (delta >= currentEdge.durationMillis) {
@@ -208,6 +282,8 @@ public class AnimationGraph<T extends AlgebraData<T>> {
                     lastOverflow = delta - currentEdge.durationMillis;
                     currentNode = currentEdge.to;
                     currentEdge = null;
+                    currentNode.stateTransferFinish.animationStateTransferFinish(currentEdge0.from, currentEdge0.to);
+                    checkEnd();
                 } else {
                     var p = delta / (double) currentEdge.durationMillis;
                     data =
@@ -224,6 +300,8 @@ public class AnimationGraph<T extends AlgebraData<T>> {
                     data = currentEdge.from.value;
                     currentNode = currentEdge.from;
                     currentEdge = null;
+                    currentNode.stateTransferFinish.animationStateTransferFinish(currentEdge0.to, currentEdge0.from);
+                    checkEnd();
                 } else {
                     var p = (elapsed - delta) / (double) currentEdge.durationMillis;
                     data =
@@ -234,18 +312,44 @@ public class AnimationGraph<T extends AlgebraData<T>> {
                         );
                 }
             }
-            apply(data);
+            apply(currentEdge0.from, currentEdge0.to, data);
+        }
+
+        private boolean checkEnd() {
+            if (terminateAtNext || !iterator.hasNext()) {
+                currentEdge = null;
+                iterator = null;
+                timer = null;
+                stop();
+                cb.succeeded();
+                return true;
+            }
+            return false;
         }
 
         public void revertCurrentAnimation(Callback<Void, Exception> cb) {
             isReverting = true;
             terminateAtNext = true;
-            this.cb = cb;
+            currentNode.stateTransferFinish.animationStateTransferFinish(currentEdge.to, currentEdge.from);
+            setCB(cb);
         }
 
         public void stopAtNext(Callback<Void, Exception> cb) {
             terminateAtNext = true;
+            setCB(cb);
+        }
+
+        public void setCB(Callback<Void, Exception> cb) {
+            this.cb.failed(new AnimationInterruptedException());
             this.cb = cb;
+        }
+
+        public void cancelRevertAndStopAtNext(Callback<Void, Exception> cb) {
+            isReverting = false;
+            terminateAtNext = true;
+            var currentEdge = AnimationGraph.this.currentEdge;
+            stateTransferBeginCallback.animationStateTransferBegin(currentEdge.from, currentEdge.to);
+            setCB(cb);
         }
     }
 }

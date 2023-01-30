@@ -4,6 +4,14 @@ import io.vproxy.vfx.theme.Theme;
 import javafx.scene.paint.Color;
 
 public class TransparentFusionPane extends FusionPane {
+    public TransparentFusionPane() {
+        super();
+    }
+
+    public TransparentFusionPane(boolean manuallyHandleOuterRegion) {
+        super(manuallyHandleOuterRegion);
+    }
+
     @Override
     protected AbstractFusionPane buildRootNode() {
         return new TransparentFusionPaneImpl();

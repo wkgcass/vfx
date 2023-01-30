@@ -1,5 +1,7 @@
 package io.vproxy.vfx.ui.table;
 
+import io.vproxy.vfx.manager.font.FontManager;
+import io.vproxy.vfx.manager.font.FontUsages;
 import io.vproxy.vfx.theme.Theme;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -131,6 +133,7 @@ public class VTableRow<S> implements RowInformer {
             else
                 return new Label(v.toString()) {{
                     setTextFill(Theme.current().tableTextColor());
+                    FontManager.get().setFont(FontUsages.tableCellText, this);
                 }};
         } else {
             //noinspection unchecked,rawtypes

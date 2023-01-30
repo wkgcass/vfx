@@ -7,7 +7,7 @@ abstract public class Callback<T, EX> {
     }
 
     public static <T, EX> Callback<T, EX> handler(BiConsumer<T, EX> cb) {
-        return new Callback<T, EX>() {
+        return new Callback<>() {
             @Override
             protected void succeeded0(T value) {
                 cb.accept(value, null);
@@ -37,8 +37,20 @@ abstract public class Callback<T, EX> {
     }
 
     protected void failed0(EX ex) {
+        if (ex instanceof SuppressError) {
+            Logger.debug("callback failed with " + ex);
+            return;
+        }
+        if (!(ex instanceof Throwable)) {
+            Logger.error("callback failed with " + ex);
+            return;
+        }
+        Logger.error("unhandled exception in callback", (Throwable) ex);
     }
 
     protected void finally0() {
+    }
+
+    public interface SuppressError {
     }
 }

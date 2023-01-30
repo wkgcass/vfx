@@ -4,7 +4,6 @@ import io.vproxy.vfx.animation.AnimationGraph;
 import io.vproxy.vfx.animation.AnimationGraphBuilder;
 import io.vproxy.vfx.animation.AnimationNode;
 import io.vproxy.vfx.control.drag.DragHandler;
-import io.vproxy.vfx.util.Callback;
 import io.vproxy.vfx.util.algebradata.DoubleData;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
@@ -26,7 +25,7 @@ public class VScrollPane {
     private final AnimationNode<DoubleData> animationShow = new AnimationNode<>("show", new DoubleData(1));
     private final AnimationGraph<DoubleData> animationHideShow = AnimationGraphBuilder
         .simpleTwoNodeGraph(animationHide, animationShow, 300)
-        .setApply(d -> scrollBarV.setOpacity(d.value))
+        .setApply((from, to, d) -> scrollBarV.setOpacity(d.value))
         .build(animationHide);
 
     public VScrollPane() {
@@ -83,10 +82,8 @@ public class VScrollPane {
 
         root.getChildren().addAll(viewport.getNode(), scrollBarV);
 
-        root.setOnMouseEntered(e -> animationHideShow.play(animationShow, Callback.handler((v, ex) -> {
-        })));
-        root.setOnMouseExited(e -> animationHideShow.play(animationHide, Callback.handler((v, ex) -> {
-        })));
+        root.setOnMouseEntered(e -> animationHideShow.play(animationShow));
+        root.setOnMouseExited(e -> animationHideShow.play(animationHide));
     }
 
     private void updateScrollVHeightAndPosition() {

@@ -29,6 +29,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
+import static io.vproxy.vfx.test.TUtils.randomString;
+
 public class VTableTest extends Application {
     private static final DecimalFormat roughFloatValueFormat = new DecimalFormat("0.0");
 
@@ -92,7 +94,7 @@ public class VTableTest extends Application {
         hbox.getChildren().add(table.getNode());
         hbox.getChildren().add(new HPadding(15));
         var buttons = new VBox();
-        var buttonsPane = new FusionPane();
+        var buttonsPane = new FusionPane(false);
         buttonsPane.getContentPane().getChildren().add(buttons);
         hbox.getChildren().add(buttonsPane.getNode());
 
@@ -181,6 +183,7 @@ public class VTableTest extends Application {
         bottomButtonsPane.getNode().setPrefHeight(44);
 
         var bottomScene = new VScene(VSceneRole.DRAWER_HORIZONTAL);
+        bottomScene.getNode().setPrefHeight(40);
         sceneGroup.addScene(bottomScene, VSceneHideMethod.TO_BOTTOM);
         bottomScene.getContentPane().getChildren().add(bottomButtonsPane.getNode());
 
@@ -191,7 +194,7 @@ public class VTableTest extends Application {
             setLayoutX(2);
             setLayoutY(3);
         }};
-        stage.getRoot().getChildren().add(menuBtn);
+        stage.getRoot().getContentPane().getChildren().add(menuBtn);
         menuBtn.setOnAction(e -> {
             if (sceneGroup.isShowing(bottomScene)) {
                 sceneGroup.hide(bottomScene, VSceneHideMethod.TO_BOTTOM);
@@ -263,19 +266,6 @@ class Data implements RowInformerAware, CellAware<Data> {
     public void setNodeF(Node nodeF) {
         this.nodeF = nodeF;
         informer.informRowUpdate();
-    }
-
-    private static String randomString(int len) {
-        int leftLimit = 97; // letter 'a'
-        int rightLimit = 122; // letter 'z'
-        var random = ThreadLocalRandom.current();
-        StringBuilder buffer = new StringBuilder(len);
-        for (int i = 0; i < len; i++) {
-            int randomLimitedInt = leftLimit + (int)
-                (random.nextFloat() * (rightLimit - leftLimit + 1));
-            buffer.append((char) randomLimitedInt);
-        }
-        return buffer.toString();
     }
 
     @SuppressWarnings("ConstantConditions")

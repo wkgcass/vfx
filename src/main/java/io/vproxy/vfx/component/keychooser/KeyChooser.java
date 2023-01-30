@@ -10,6 +10,7 @@ import io.vproxy.vfx.entity.input.Key;
 import io.vproxy.vfx.entity.input.KeyCode;
 import io.vproxy.vfx.manager.internal_i18n.InternalI18n;
 import javafx.application.Platform;
+import javafx.scene.input.MouseButton;
 
 import java.util.LinkedHashMap;
 import java.util.Optional;
@@ -51,8 +52,8 @@ public class KeyChooser extends VDialog<Key> {
     public KeyChooser(boolean withMouse) {
         if (withMouse) {
             setButtons(new LinkedHashMap<>() {{
-                put(InternalI18n.get().keyChooserLeftMouseButton(), new VDialogValueProvider<>());
-                put(InternalI18n.get().keyChooserRightMouseButton(), new VDialogValueProvider<>());
+                put(InternalI18n.get().keyChooserLeftMouseButton(), new VDialogValueProvider<>(new Key(MouseButton.PRIMARY)));
+                put(InternalI18n.get().keyChooserRightMouseButton(), new VDialogValueProvider<>(new Key(MouseButton.SECONDARY)));
                 put(InternalI18n.get().cancelButton(), new VDialogValueProvider<>(() -> null));
             }});
         } else {

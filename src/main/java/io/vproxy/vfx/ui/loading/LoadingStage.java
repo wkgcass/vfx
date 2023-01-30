@@ -33,7 +33,7 @@ public class LoadingStage extends VStage {
                 loadingPane
             )
         ));
-        loadingPane.setLength(630);
+        loadingPane.setLength(640);
     }
 
     @Override

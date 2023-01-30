@@ -4,7 +4,9 @@ import io.vproxy.vfx.manager.font.FontProvider;
 import io.vproxy.vfx.theme.impl.DarkTheme;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
 
 public abstract class Theme {
     private static Theme currentTheme;
@@ -34,23 +36,34 @@ public abstract class Theme {
 
     public abstract Color normalTextColor();
 
-    public abstract int windowTitleFontSize();
-
     public abstract Color borderColor();
 
-    public Color borderColorInverse() {
-        return sceneBackgroundColor();
-    }
+    public abstract Color borderColorLight();
+
+    public abstract Color borderColorDark();
 
     public Color windowBorderColor() {
         return borderColor();
     }
 
-    public Color windowBorderColorInverse() {
-        return borderColorInverse();
+    public Color windowBorderColorLight() {
+        return borderColorLight();
+    }
+
+    public Color windowBorderColorDark() {
+        return borderColorDark();
     }
 
     public abstract Color sceneBackgroundColor();
+
+    public abstract Color subSceneBackgroundColor();
+
+    public LinearGradient makeVerticalSubSceneBackgroundGradient() {
+        return new LinearGradient(0, 0, 0, 1, true,
+            CycleMethod.NO_CYCLE,
+            new Stop(0, Theme.current().sceneBackgroundColor()),
+            new Stop(1, Theme.current().subSceneBackgroundColor()));
+    }
 
     public abstract Image windowCloseButtonNormalImage();
 
@@ -114,7 +127,18 @@ public abstract class Theme {
 
     public abstract Color fusionButtonDisabledTextColor();
 
-    public abstract Paint coverBackgroundColor();
+    public abstract Color coverBackgroundColor();
+
+    public LinearGradient makeCoverGradientBackground() {
+        var color = coverBackgroundColor();
+        var initial = new Color(color.getRed(), color.getGreen(), color.getBlue(), 0);
+        return new LinearGradient(
+            0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
+            new Stop(0, initial),
+            new Stop(0.6, color),
+            new Stop(1, color)
+        );
+    }
 
     public Color tableTextColor() {
         return normalTextColor();

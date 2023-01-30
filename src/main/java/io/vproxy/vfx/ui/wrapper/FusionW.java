@@ -4,7 +4,6 @@ import io.vproxy.vfx.animation.AnimationGraph;
 import io.vproxy.vfx.animation.AnimationGraphBuilder;
 import io.vproxy.vfx.animation.AnimationNode;
 import io.vproxy.vfx.theme.Theme;
-import io.vproxy.vfx.util.Callback;
 import io.vproxy.vfx.util.algebradata.DoubleData;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -64,7 +63,7 @@ public class FusionW extends Pane {
 
         animation = AnimationGraphBuilder
             .simpleTwoNodeGraph(showLabel, showNode, 300)
-            .setApply(d -> {
+            .setApply((from, to, d) -> {
                 node.setOpacity(d.value);
                 label.setOpacity(1 - d.value);
             })
@@ -73,12 +72,8 @@ public class FusionW extends Pane {
         getChildren().add(label);
         getChildren().add(node);
 
-        setOnMouseEntered(e ->
-            animation.play(showNode, Callback.handler((v, ex) -> {
-            })));
-        setOnMouseExited(e ->
-            animation.play(showLabel, Callback.handler((v, ex) -> {
-            })));
+        setOnMouseEntered(e -> animation.play(showNode));
+        setOnMouseExited(e -> animation.play(showLabel));
 
         label.setText(property.get());
     }

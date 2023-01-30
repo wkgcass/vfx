@@ -4,11 +4,11 @@ import io.vproxy.vfx.util.algebradata.AlgebraData;
 import io.vproxy.vfx.util.algebradata.DoubleDoubleFunction;
 import io.vproxy.vfx.util.graph.GraphEdge;
 
-class AnimationEdge<T extends AlgebraData<T>> extends GraphEdge<AnimationNode<T>> {
-    final AnimationNode<T> from;
-    final AnimationNode<T> to;
-    final long durationMillis;
-    final DoubleDoubleFunction function;
+public class AnimationEdge<T extends AlgebraData<T>> extends GraphEdge<AnimationNode<T>> {
+    public final AnimationNode<T> from;
+    public final AnimationNode<T> to;
+    public final long durationMillis;
+    public final DoubleDoubleFunction function;
 
     AnimationEdge(AnimationNode<T> from, AnimationNode<T> to, long durationMillis, DoubleDoubleFunction function) {
         super(from, to, durationMillis);

@@ -50,7 +50,7 @@ public class FontManager {
     }
 
     public void setFont(Labeled labeled) {
-        labeled.setFont(Font.font(getProvider().name(FontUsages.defaultUsage), 16));
+        labeled.setFont(Font.font(getProvider().name(FontUsages.defaultUsage), getProvider().defaultFontSize(FontUsages.defaultUsage)));
     }
 
     public void setFont(Labeled labeled, int size) {
@@ -73,7 +73,7 @@ public class FontManager {
     // -------------
 
     public void setFont(FontUsage usage, Labeled labeled) {
-        labeled.setFont(Font.font(getProvider().name(usage), 16));
+        labeled.setFont(Font.font(getProvider().name(usage), getProvider().defaultFontSize(usage)));
     }
 
     public void setFont(FontUsage usage, Labeled labeled, int size) {
@@ -96,7 +96,7 @@ public class FontManager {
     // =============
 
     public void setFont(TextInputControl input) {
-        input.setFont(Font.font(getProvider().name(FontUsages.defaultUsage), 16));
+        input.setFont(Font.font(getProvider().name(FontUsages.defaultUsage), getProvider().defaultFontSize(FontUsages.defaultUsage)));
     }
 
     public void setFont(TextInputControl input, int size) {
@@ -119,7 +119,7 @@ public class FontManager {
     // -------------
 
     public void setFont(FontUsage usage, TextInputControl input) {
-        input.setFont(Font.font(getProvider().name(usage), 16));
+        input.setFont(Font.font(getProvider().name(usage), getProvider().defaultFontSize(usage)));
     }
 
     public void setFont(FontUsage usage, TextInputControl input, int size) {
@@ -141,7 +141,7 @@ public class FontManager {
 
     // =============
     public void setFont(Text text) {
-        text.setFont(Font.font(getProvider().name(FontUsages.defaultUsage)));
+        text.setFont(Font.font(getProvider().name(FontUsages.defaultUsage), getProvider().defaultFontSize(FontUsages.defaultUsage)));
     }
 
     public void setFont(Text text, int size) {
@@ -164,7 +164,7 @@ public class FontManager {
     // -------------
 
     public void setFont(FontUsage usage, Text text) {
-        text.setFont(Font.font(getProvider().name(usage)));
+        text.setFont(Font.font(getProvider().name(usage), getProvider().defaultFontSize(usage)));
     }
 
     public void setFont(FontUsage usage, Text text, int size) {

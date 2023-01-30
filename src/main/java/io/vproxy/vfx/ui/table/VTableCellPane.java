@@ -24,6 +24,7 @@ public class VTableCellPane<S> extends StackPane {
         if (node != null) {
             getChildren().add(node);
         }
+        setMinHeight(30);
         setAlignment(Pos.CENTER_LEFT);
         setPadding(new Insets(2, 5, 2, 5));
 

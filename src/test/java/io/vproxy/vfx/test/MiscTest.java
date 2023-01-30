@@ -16,6 +16,8 @@ import io.vproxy.vfx.ui.loading.LoadingStage;
 import io.vproxy.vfx.ui.pane.FusionPane;
 import io.vproxy.vfx.ui.pane.TransparentFusionPane;
 import io.vproxy.vfx.ui.scene.*;
+import io.vproxy.vfx.ui.shapes.BrokenLine;
+import io.vproxy.vfx.ui.shapes.EndpointStyle;
 import io.vproxy.vfx.ui.stage.VStage;
 import io.vproxy.vfx.util.Callback;
 import io.vproxy.vfx.util.FXUtils;
@@ -23,6 +25,7 @@ import javafx.application.Application;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
@@ -37,7 +40,7 @@ public class MiscTest extends Application {
 
         var stage = new VStage(primaryStage) {
             {
-                useInverseBorder();
+                useDarkBorder();
             }
 
             @Override
@@ -50,7 +53,7 @@ public class MiscTest extends Application {
         var transparentPane = new TransparentFusionPane();
         root.getChildren().add(transparentPane.getNode());
 
-        stage.getRoot().setBackground(new Background(new BackgroundImage(
+        stage.getRoot().getNode().setBackground(new Background(new BackgroundImage(
             ImageManager.get().load("images/bg1.png"),
             BackgroundRepeat.NO_REPEAT,
             BackgroundRepeat.NO_REPEAT,
@@ -118,15 +121,12 @@ public class MiscTest extends Application {
                     .setCoverClickable(false)
             );
 
-            var vPane = new FusionPane();
+            var vPane = new FusionPane(false);
             var load = new LoadingPane("加载中...");
             vPane.getContentPane().getChildren().add(load);
             vScene.getContentPane().getChildren().add(vPane.getNode());
 
-            vPane.getNode().setPrefWidth(700);
-            vPane.getNode().setPrefHeight(250);
-            vScene.getNode().setPrefWidth(700);
-            vScene.getNode().setPrefHeight(250);
+            FXUtils.observeWidthHeight(vPane.getNode(), vScene.getNode());
             load.setLength(600);
             FXUtils.observeWidthHeightCenter(vPane.getContentPane(), load);
 
@@ -176,7 +176,18 @@ public class MiscTest extends Application {
         topHBox.setLayoutX(5);
         topHBox.setLayoutY(4);
 
-        stage.getRoot().getChildren().add(topHBox);
+        stage.getRoot().getContentPane().getChildren().add(topHBox);
+
+        var brokenLine = new BrokenLine(2,
+            90, 120,
+            240, 180,
+            300, 90,
+            600, 750,
+            900, 200);
+        brokenLine.setStroke(Color.RED);
+        brokenLine.setStartStyle(EndpointStyle.ARROW);
+        brokenLine.setEndStyle(EndpointStyle.ARROW);
+        stage.getRoot().getContentPane().getChildren().add(brokenLine.getNode());
 
         primaryStage.setWidth(1024);
         primaryStage.setHeight(768);

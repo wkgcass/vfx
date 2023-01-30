@@ -5,7 +5,6 @@ import io.vproxy.vfx.manager.font.FontManager;
 import io.vproxy.vfx.manager.font.FontUsages;
 import io.vproxy.vfx.manager.internal_i18n.InternalI18n;
 import io.vproxy.vfx.theme.Theme;
-import io.vproxy.vfx.ui.pane.FusionPane;
 import io.vproxy.vfx.util.FXUtils;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -13,14 +12,17 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.layout.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class VTableView<S> {
-    private final FusionPane root = new FusionPane();
+    private final Pane root = new Pane();
     private final VBox rootVBox = new VBox();
     final HBox columnPane = new HBox();
     private final Pane fixColumnWidthColum = new Pane() {{
@@ -49,8 +51,8 @@ public class VTableView<S> {
         columns.addListener(colsListener);
         items.addListener(itemsListener);
 
-        root.getContentPane().getChildren().add(rootVBox);
-        FXUtils.observeWidthHeightWithPreferred(root.getContentPane(), rootVBox);
+        root.getChildren().add(rootVBox);
+        FXUtils.observeWidthHeightWithPreferred(root, rootVBox);
 
         var columnPane = new HBox();
         rootVBox.getChildren().addAll(columnPane, scrollPane.getNode());
@@ -84,11 +86,12 @@ public class VTableView<S> {
 
         columnPane.getChildren().addAll(this.columnPane, fixColumnWidthColum);
 
-        FXUtils.makeBottomOnlyCutFor(dataPane, 4);
+        FXUtils.makeTopOnlyClipFor(columnPane, 4);
+        FXUtils.makeBottomOnlyClipFor(dataPane, 4);
     }
 
     public Region getNode() {
-        return root.getNode();
+        return root;
     }
 
     public ObservableList<VTableColumn<S, ?>> getColumns() {

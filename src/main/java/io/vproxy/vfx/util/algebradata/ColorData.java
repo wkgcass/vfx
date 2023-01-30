@@ -3,53 +3,60 @@ package io.vproxy.vfx.util.algebradata;
 import io.vproxy.vfx.util.FXUtils;
 import javafx.scene.paint.Color;
 
-import java.util.Arrays;
-
 public class ColorData implements AlgebraData<ColorData> {
     private Color color;
-    private final float[] hsb;
+    private final float h;
+    private final float s;
+    private final float b;
     private final double alpha;
 
     public ColorData(Color color) {
         this.color = color;
-        hsb = FXUtils.toHSB(color);
+        var hsb = FXUtils.toHSB(color);
+        h = hsb[0];
+        s = hsb[1];
+        b = hsb[2];
         alpha = color.getOpacity();
     }
 
     public ColorData(float h, float s, float b, double alpha) {
-        this.hsb = new float[]{h, s, b};
+        this.h = h;
+        this.s = s;
+        this.b = b;
         this.alpha = alpha;
     }
 
     public ColorData(float[] hsb, double alpha) {
-        this.hsb = Arrays.copyOf(hsb, 3);
+        h = hsb[0];
+        s = hsb[1];
+        b = hsb[2];
         this.alpha = alpha;
     }
 
     public Color getColor() {
         if (color == null) {
-            color = FXUtils.fromHSB(hsb, alpha);
+            color = FXUtils.fromHSB(h, s, b, alpha);
         }
         return color;
     }
 
     @Override
     public ColorData plus(ColorData other) {
-        return new ColorData(hsb[0] + other.hsb[0], hsb[1] + other.hsb[1], hsb[2] + other.hsb[2], alpha + other.alpha);
+        return new ColorData(h + other.h, s + other.s, b + other.b, alpha + other.alpha);
     }
 
     @Override
     public ColorData minus(ColorData other) {
-        return new ColorData(hsb[0] - other.hsb[0], hsb[1] - other.hsb[1], hsb[2] - other.hsb[2], alpha - other.alpha);
+        return new ColorData(h - other.h, s - other.s, b - other.b, alpha - other.alpha);
     }
 
     @Override
     public ColorData multiply(double v) {
-        return new ColorData((float) (hsb[0] * v), (float) (hsb[1] * v), (float) (hsb[2] * v), alpha * v);
+        return new ColorData((float) (h * v), (float) (s * v), (float) (b * v), alpha * v);
     }
 
     @Override
     public ColorData dividedBy(double v) {
-        return new ColorData((float) (hsb[0] / v), (float) (hsb[1] / v), (float) (hsb[2] / v), alpha / v);
+        return new ColorData((float) (h / v), (float) (s / v), (float) (b / v), alpha / v);
     }
 }

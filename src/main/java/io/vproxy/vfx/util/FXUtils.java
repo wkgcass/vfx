@@ -7,8 +7,10 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -20,6 +22,7 @@ import javafx.stage.Window;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.List;
 import java.util.function.Supplier;
 
 public class FXUtils {
@@ -70,7 +73,7 @@ public class FXUtils {
                 }
                 ptr[0].stop();
 
-                r.run();
+                Platform.runLater(r);
             }
         };
         ptr[0].start();
@@ -122,6 +125,10 @@ public class FXUtils {
         return new Color(r / 255d, g / 255d, b / 255d, alpha);
     }
 
+    public static Color fromHSB(float h, float s, float b, double alpha) {
+        return fromHSB(new float[]{h, s, b}, alpha);
+    }
+
     public static Screen getScreenOf(Window window) {
         if (window == null) return null;
         var screenOb = Screen.getScreensForRectangle(window.getX(), window.getY(), window.getWidth(), window.getHeight());
@@ -147,14 +154,16 @@ public class FXUtils {
         return bImage;
     }
 
-    public static void observeWidthHeight(Region observed, Region modified) {
-        observeWidthHeight(observed, modified, 0, 0);
+    public static List<ChangeListener<? super Number>> observeWidthHeight(Region observed, Region modified) {
+        return observeWidthHeight(observed, modified, 0, 0);
     }
 
     @SuppressWarnings("DuplicatedCode")
-    public static void observeWidthHeight(Region observed, Region modified, double wDelta, double hDelta) {
-        observeWidth(observed, modified, wDelta);
-        observeHeight(observed, modified, hDelta);
+    public static List<ChangeListener<? super Number>> observeWidthHeight(Region observed, Region modified, double wDelta, double hDelta) {
+        return List.of(
+            observeWidth(observed, modified, wDelta),
+            observeHeight(observed, modified, hDelta)
+        );
     }
 
     public static ChangeListener<? super Number> observeWidth(Region observed, Region modified) {
@@ -169,6 +178,7 @@ public class FXUtils {
             modified.setPrefWidth(w + wDelta);
         };
         observed.widthProperty().addListener(lsn);
+        lsn.changed(null, null, observed.getWidth());
         return lsn;
     }
 
@@ -184,25 +194,28 @@ public class FXUtils {
             modified.setPrefHeight(h + hDelta);
         };
         observed.heightProperty().addListener(lsn);
+        lsn.changed(null, null, observed.getHeight());
         return lsn;
     }
 
-    public static void observeWidthHeightWithPreferred(Region observed, Region modified) {
-        observeWidthHeightWithPreferred(observed, modified, 0, 0);
+    public static List<ChangeListener<? super Number>> observeWidthHeightWithPreferred(Region observed, Region modified) {
+        return observeWidthHeightWithPreferred(observed, modified, 0, 0);
     }
 
     @SuppressWarnings("DuplicatedCode")
-    public static void observeWidthHeightWithPreferred(Region observed, Region modified, double wDelta, double hDelta) {
-        observeWidthWithPreferred(observed, modified, wDelta);
-        observeHeightWithPreferred(observed, modified, hDelta);
+    public static List<ChangeListener<? super Number>> observeWidthHeightWithPreferred(Region observed, Region modified, double wDelta, double hDelta) {
+        return List.of(
+            observeWidthWithPreferred(observed, modified, wDelta),
+            observeHeightWithPreferred(observed, modified, hDelta)
+        );
     }
 
-    public static void observeWidthWithPreferred(Region observed, Region modified) {
-        observeWidthWithPreferred(observed, modified, 0);
+    public static ChangeListener<? super Number> observeWidthWithPreferred(Region observed, Region modified) {
+        return observeWidthWithPreferred(observed, modified, 0);
     }
 
     @SuppressWarnings("DuplicatedCode")
-    public static void observeWidthWithPreferred(Region observed, Region modified, double wDelta) {
+    public static ChangeListener<? super Number> observeWidthWithPreferred(Region observed, Region modified, double wDelta) {
         ChangeListener<? super Number> lsn = (ob, old, now) -> {
             if (now == null) return;
             var w = now.doubleValue();
@@ -210,14 +223,16 @@ public class FXUtils {
         };
         observed.widthProperty().addListener(lsn);
         observed.prefWidthProperty().addListener(lsn);
+        lsn.changed(null, null, observed.getWidth());
+        return lsn;
     }
 
-    public static void observeHeightWithPreferred(Region observed, Region modified) {
-        observeHeightWithPreferred(observed, modified, 0);
+    public static ChangeListener<? super Number> observeHeightWithPreferred(Region observed, Region modified) {
+        return observeHeightWithPreferred(observed, modified, 0);
     }
 
     @SuppressWarnings("DuplicatedCode")
-    public static void observeHeightWithPreferred(Region observed, Region modified, double hDelta) {
+    public static ChangeListener<? super Number> observeHeightWithPreferred(Region observed, Region modified, double hDelta) {
         ChangeListener<? super Number> lsn = (ob, old, now) -> {
             if (now == null) return;
             var h = now.doubleValue();
@@ -225,11 +240,15 @@ public class FXUtils {
         };
         observed.heightProperty().addListener(lsn);
         observed.prefHeightProperty().addListener(lsn);
+        lsn.changed(null, null, observed.getHeight());
+        return lsn;
     }
 
-    public static void observeWidthHeightCenter(Region observed, Region modified) {
-        observeWidthCenter(observed, modified);
-        observeHeightCenter(observed, modified);
+    public static List<ChangeListener<? super Number>> observeWidthHeightCenter(Region observed, Region modified) {
+        return List.of(
+            observeWidthCenter(observed, modified),
+            observeHeightCenter(observed, modified)
+        );
     }
 
     public static ChangeListener<? super Number> observeWidthCenter(Region observed, Region modified) {
@@ -237,6 +256,7 @@ public class FXUtils {
             modified.setLayoutX((observed.getWidth() - modified.getWidth()) / 2);
         observed.widthProperty().addListener(lsn);
         modified.widthProperty().addListener(lsn);
+        lsn.changed(null, null, null);
         return lsn;
     }
 
@@ -245,12 +265,30 @@ public class FXUtils {
             modified.setLayoutY((observed.getHeight() - modified.getHeight()) / 2);
         observed.heightProperty().addListener(lsn);
         modified.heightProperty().addListener(lsn);
+        lsn.changed(null, null, null);
         return lsn;
     }
 
-    @SuppressWarnings("DuplicatedCode")
+    public static Node makeClipFor(Region node) {
+        var cut = new Rectangle();
+        node.setClip(cut);
+        node.widthProperty().addListener((ob, old, now) -> {
+            if (now == null) return;
+            var w = now.doubleValue();
+            cut.setWidth(w);
+        });
+        node.heightProperty().addListener((ob, old, now) -> {
+            if (now == null) return;
+            var h = now.doubleValue();
+            cut.setHeight(h);
+        });
+        cut.setWidth(node.getWidth());
+        cut.setHeight(node.getHeight());
+        return cut;
+    }
 
-    public static Group makeCutFor(Region node, double cornerRadii) {
+    @SuppressWarnings("DuplicatedCode")
+    public static Group makeClipFor(Region node, double cornerRadii) {
         var nodeCutTL = new Circle() {{
             setLayoutX(cornerRadii);
             setLayoutY(cornerRadii);
@@ -280,7 +318,7 @@ public class FXUtils {
         }};
         var nodeCut = new Group(nodeCutTL, nodeCutTR, nodeCutTopMid, nodeCutBL, nodeCutBR, nodeCutBotMid, nodeCutMid);
         node.setClip(nodeCut);
-        node.widthProperty().addListener((ob, old, now) -> {
+        ChangeListener<? super Number> widthListener = (ob, old, now) -> {
             if (now == null) return;
             var w = now.doubleValue();
             nodeCutTR.setLayoutX(w - cornerRadii);
@@ -288,20 +326,24 @@ public class FXUtils {
             nodeCutBR.setLayoutX(w - cornerRadii);
             nodeCutBotMid.setWidth(w - cornerRadii * 2);
             nodeCutMid.setWidth(w);
-        });
-        node.heightProperty().addListener((ob, old, now) -> {
+        };
+        node.widthProperty().addListener(widthListener);
+        ChangeListener<? super Number> heightListener = (ob, old, now) -> {
             if (now == null) return;
             var h = now.doubleValue();
             nodeCutBL.setLayoutY(h - cornerRadii);
             nodeCutBR.setLayoutY(h - cornerRadii);
             nodeCutBotMid.setLayoutY(h - cornerRadii);
             nodeCutMid.setHeight(h - cornerRadii * 2);
-        });
+        };
+        node.heightProperty().addListener(heightListener);
+        widthListener.changed(null, null, node.getWidth());
+        heightListener.changed(null, null, node.getHeight());
         return nodeCut;
     }
 
     @SuppressWarnings("DuplicatedCode")
-    public static Group makeBottomOnlyCutFor(Region node, double cornerRadii) {
+    public static Group makeBottomOnlyClipFor(Region node, double cornerRadii) {
         var nodeCutBL = new Circle() {{
             setLayoutX(cornerRadii);
             setRadius(cornerRadii);
@@ -316,22 +358,77 @@ public class FXUtils {
         var nodeCutMid = new Rectangle();
         var nodeCut = new Group(nodeCutBL, nodeCutBR, nodeCutBotMid, nodeCutMid);
         node.setClip(nodeCut);
-        node.widthProperty().addListener((ob, old, now) -> {
+        ChangeListener<? super Number> widthListener = (ob, old, now) -> {
             if (now == null) return;
             var w = now.doubleValue();
             nodeCutBR.setLayoutX(w - cornerRadii);
             nodeCutBotMid.setWidth(w - cornerRadii * 2);
             nodeCutMid.setWidth(w);
-        });
-        node.heightProperty().addListener((ob, old, now) -> {
+        };
+        node.widthProperty().addListener(widthListener);
+        ChangeListener<? super Number> heightListener = (ob, old, now) -> {
             if (now == null) return;
             var h = now.doubleValue();
             nodeCutBL.setLayoutY(h - cornerRadii);
             nodeCutBR.setLayoutY(h - cornerRadii);
             nodeCutBotMid.setLayoutY(h - cornerRadii);
             nodeCutMid.setHeight(h - cornerRadii);
-        });
+        };
+        node.heightProperty().addListener(heightListener);
+        widthListener.changed(null, null, node.getWidth());
+        heightListener.changed(null, null, node.getHeight());
         return nodeCut;
+    }
+
+    @SuppressWarnings("DuplicatedCode")
+    public static Group makeTopOnlyClipFor(Region node, double cornerRadii) {
+        var nodeCutTL = new Circle() {{
+            setLayoutX(cornerRadii);
+            setLayoutY(cornerRadii);
+            setRadius(cornerRadii);
+        }};
+        var nodeCutTR = new Circle() {{
+            setLayoutY(cornerRadii);
+            setRadius(cornerRadii);
+        }};
+        var nodeCutTopMid = new javafx.scene.shape.Rectangle() {{
+            setLayoutX(cornerRadii);
+            setHeight(cornerRadii);
+        }};
+        var nodeCutMid = new Rectangle() {{
+            setLayoutY(cornerRadii);
+        }};
+        var nodeCut = new Group(nodeCutTL, nodeCutTR, nodeCutTopMid, nodeCutMid);
+        node.setClip(nodeCut);
+        ChangeListener<? super Number> widthListener = (ob, old, now) -> {
+            if (now == null) return;
+            var w = now.doubleValue();
+            nodeCutTR.setLayoutX(w - cornerRadii);
+            nodeCutTopMid.setWidth(w - cornerRadii * 2);
+            nodeCutMid.setWidth(w);
+        };
+        node.widthProperty().addListener(widthListener);
+        ChangeListener<? super Number> heightListener = (ob, old, now) -> {
+            if (now == null) return;
+            var h = now.doubleValue();
+            nodeCutMid.setHeight(h - cornerRadii);
+        };
+        node.heightProperty().addListener(heightListener);
+        widthListener.changed(null, null, node.getWidth());
+        heightListener.changed(null, null, node.getHeight());
+        return nodeCut;
+    }
+
+    public static double getWidthOrPref(Region r) {
+        var w = r.getWidth();
+        if (w == 0) return r.getPrefWidth();
+        return w;
+    }
+
+    public static double getHeightOrPref(Region r) {
+        var h = r.getHeight();
+        if (h == 0) return r.getPrefHeight();
+        return h;
     }
 
     public static void forceUpdate(Stage stage) {
@@ -340,5 +437,41 @@ public class FXUtils {
             stage.setWidth(w + 0.001);
             FXUtils.runDelay(50, () -> stage.setWidth(w));
         });
+    }
+
+    public static void forceUpdate(Region region) {
+        FXUtils.runDelay(50, () -> {
+            var w = region.getPrefWidth();
+            region.setPrefWidth(w + 0.001);
+            FXUtils.runDelay(50, () -> region.setPrefWidth(w));
+        });
+    }
+
+    public static WritableImage changeColorOfBlackImage(javafx.scene.image.Image img, int setArgb) {
+        var w = (int) img.getWidth();
+        var h = (int) img.getHeight();
+        var reader = img.getPixelReader();
+
+        var wImg = new WritableImage(w, h);
+        var writer = wImg.getPixelWriter();
+        for (int x = 0; x < w; ++x) {
+            for (int y = 0; y < h; ++y) {
+                var argb = reader.getArgb(x, y);
+                if (argb != 0) {
+                    var color = reader.getColor(x, y);
+                    var r = (setArgb >> 16) & 0xff;
+                    var g = (setArgb >> 8) & 0xff;
+                    var b = (setArgb) & 0xff;
+                    writer.setArgb(x, y, ((int) color.getOpacity() * 255) << 24
+                                         | ((int) (r * (1 - color.getRed())) << 16)
+                                         | ((int) (g * (1 - color.getGreen())) << 8)
+                                         | (int) (b * (1 - color.getBlue()))
+                    );
+                } else {
+                    writer.setArgb(x, y, argb);
+                }
+            }
+        }
+        return wImg;
     }
 }

@@ -49,6 +49,11 @@ task runTest(type: JavaExec) {
     args = ["io.vproxy.vfx.test." + System.getProperty("TestClass")]
 }
 
+task runIntro(type: JavaExec) {
+    classpath = sourceSets.test.runtimeClasspath
+    main = "io.vproxy.vfx.intro.IntroMain"
+}
+
 tasks.withType(GenerateModuleMetadata) {
     enabled = false
 }

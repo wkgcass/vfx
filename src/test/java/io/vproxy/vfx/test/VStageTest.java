@@ -49,7 +49,7 @@ public class VStageTest extends Application {
             setPrefWidth(120);
             setPrefHeight(VStage.TITLE_BAR_HEIGHT - 4);
         }};
-        stage.getRoot().getChildren().add(new HBox(
+        stage.getRoot().getContentPane().getChildren().add(new HBox(
             new HPadding(10), menuBtn, new HPadding(5), addBtn, new HPadding(5), delBtn
         ) {{
             setLayoutY(4);

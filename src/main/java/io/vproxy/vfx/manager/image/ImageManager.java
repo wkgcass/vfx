@@ -1,11 +1,12 @@
 package io.vproxy.vfx.manager.image;
 
+import io.vproxy.vfx.util.FXUtils;
 import io.vproxy.vfx.util.Logger;
 import javafx.scene.image.Image;
-import javafx.scene.image.WritableImage;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 public class ImageManager {
     private static final ImageManager instance = new ImageManager();
@@ -19,6 +20,7 @@ public class ImageManager {
         loadBlackAndChangeColor("io/vproxy/vfx/res/image/maximize.png", Map.of("white", 0xffffffff, "green", 0xff61c454));
         loadBlackAndChangeColor("io/vproxy/vfx/res/image/reset-window-size.png", Map.of("white", 0xffffffff, "green", 0xff61c454));
         loadBlackAndChangeColor("io/vproxy/vfx/res/image/iconify.png", Map.of("white", 0xffffffff, "yellow", 0xfff4bd4f));
+        loadBlackAndChangeColor("io/vproxy/vfx/res/image/arrow.png", Map.of("white", 0xffffffff));
     }
 
     private final Map<String, Image> map = new ConcurrentHashMap<>();
@@ -63,35 +65,37 @@ public class ImageManager {
         if (img == null) {
             return;
         }
-        var w = (int) img.getWidth();
-        var h = (int) img.getHeight();
-        var reader = img.getPixelReader();
-
         for (var entry : argbs.entrySet()) {
             var name = entry.getKey();
             int setArgb = entry.getValue();
-            var wImg = new WritableImage(w, h);
-            var writer = wImg.getPixelWriter();
-            for (int x = 0; x < w; ++x) {
-                for (int y = 0; y < h; ++y) {
-                    var argb = reader.getArgb(x, y);
-                    if (argb != 0) {
-                        var color = reader.getColor(x, y);
-                        var r = (setArgb >> 16) & 0xff;
-                        var g = (setArgb >> 8) & 0xff;
-                        var b = (setArgb) & 0xff;
-                        writer.setArgb(x, y, ((int) color.getOpacity() * 255) << 24
-                                             | ((int) (r * (1 - color.getRed())) << 16)
-                                             | ((int) (g * (1 - color.getGreen())) << 8)
-                                             | (int) (b * (1 - color.getBlue()))
-                        );
-                    } else {
-                        writer.setArgb(x, y, argb);
-                    }
-                }
-            }
+            var wImg = FXUtils.changeColorOfBlackImage(img, setArgb);
             var newPath = path + ":" + name;
+            Logger.debug("new image loaded: " + newPath);
             map.put(newPath, wImg);
         }
+    }
+
+    public Image loadSubImageOrMake(String baseName, String subName, Function<Image, Image> makeFunc) {
+        if (!baseName.startsWith("/")) {
+            baseName = "/" + baseName;
+        }
+        var img = map.get(baseName + ":" + subName);
+        if (img != null) {
+            Logger.debug("using cached image: " + baseName + ":" + subName);
+            return img;
+        }
+        img = map.get(baseName);
+        if (img == null) {
+            Logger.warn("unable to find base image " + baseName + ", cannot make sub image for it");
+            return null;
+        }
+        img = makeFunc.apply(img);
+        if (img == null) {
+            Logger.warn("failed making image for " + baseName + ":" + subName + ", the make function returns null");
+            return null;
+        }
+        map.put(baseName + ":" + subName, img);
+        Logger.debug("new image loaded: " + baseName + ":" + subName);
+        return img;
     }
 }

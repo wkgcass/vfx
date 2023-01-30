@@ -72,6 +72,10 @@ public class VDialog<T> {
         ));
     }
 
+    public void setText(String text) {
+        messageLabel.setText(text);
+    }
+
     public Label getMessageNode() {
         return messageLabel;
     }

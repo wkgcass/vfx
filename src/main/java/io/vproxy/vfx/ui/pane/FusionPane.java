@@ -21,6 +21,10 @@ public class FusionPane {
     private final Pane content = new Pane();
 
     public FusionPane() {
+        this(true);
+    }
+
+    public FusionPane(boolean manuallyHandleOuterRegion) {
         root.getChildren().add(new VBox(
             new VPadding(PADDING_V),
             new HBox(
@@ -30,17 +34,10 @@ public class FusionPane {
             ),
             new VPadding(PADDING_V)
         ));
-        root.prefWidthProperty().addListener((ob, old, now) -> {
-            if (now == null) return;
-            var w = now.doubleValue();
-            content.setPrefWidth(w - PADDING_H * 2);
-        });
-        root.prefHeightProperty().addListener((ob, old, now) -> {
-            if (now == null) return;
-            var h = now.doubleValue();
-            content.setPrefHeight(h - PADDING_V * 2);
-        });
-        FXUtils.makeCutFor(content, 4);
+        if (manuallyHandleOuterRegion) {
+            FXUtils.observeWidthHeightWithPreferred(root, content, -PADDING_H * 2, -PADDING_V * 2);
+        }
+        FXUtils.makeClipFor(content, 4);
     }
 
     protected AbstractFusionPane buildRootNode() {
@@ -68,7 +65,7 @@ public class FusionPane {
             ));
         private final AnimationGraph<ColorData> borderAnimation = AnimationGraphBuilder
             .simpleTwoNodeGraph(noBorder, border, 300)
-            .setApply(data ->
+            .setApply((from, to, data) ->
                 setBorder(new Border(new BorderStroke(
                     data.getColor(), BorderStrokeStyle.SOLID,
                     cornerRadii, new BorderWidths(0.5)
@@ -78,14 +75,18 @@ public class FusionPane {
         @Override
         protected void onMouseEntered() {
             super.onMouseEntered();
-            borderAnimation.play(border, Callback.handler((v, ex) -> {
-            }));
+            borderAnimation.play(border);
         }
 
         @Override
         protected void onMouseExited() {
             super.onMouseExited();
-            borderAnimation.play(noBorder, Callback.handler((v, ex) -> setBorder(Border.EMPTY)));
+            borderAnimation.play(noBorder, new Callback<>() {
+                @Override
+                protected void succeeded0(Void value) {
+                    setBorder(Border.EMPTY);
+                }
+            });
         }
 
         @Override

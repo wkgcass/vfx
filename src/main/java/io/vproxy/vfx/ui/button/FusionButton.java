@@ -62,9 +62,12 @@ public class FusionButton extends AbstractFusionButton {
                 var newWindow = now.getWindow();
                 watchingWindow = newWindow;
                 newWindow.focusedProperty().addListener(windowFocusPlayAnimationListener);
-                windowFocusPlayAnimationListener.changed(null, null, newWindow.isFocused());
+                setInternalDisableAnimation(!newWindow.isFocused());
+            } else {
+                setInternalDisableAnimation(true);
             }
         });
+        setInternalDisableAnimation(true);
         disabledProperty().addListener((ob, old, now) -> {
             if (now == null) return;
             handleDisable(now);
@@ -144,9 +147,6 @@ public class FusionButton extends AbstractFusionButton {
     public boolean startAnimating() {
         var timer = this.timer;
         if (timer != null) {
-            if (timer.stopAtNext) {
-                timer.stopAtNext = false;
-            }
             return true; // is already animating
         }
         if (isDisableAnimation0()) {
@@ -159,7 +159,6 @@ public class FusionButton extends AbstractFusionButton {
     }
 
     private class Animation extends AnimationTimer {
-        public boolean stopAtNext = false;
         private long beginTs = 0;
 
         @Override
@@ -180,10 +179,10 @@ public class FusionButton extends AbstractFusionButton {
                 }
                 beginTs = now - delta * 1_000_000;
             }
-            if (delta > 5 * period) {
+            if (delta > 3 * period) {
                 borderLightCut1.setOpacity(0);
                 borderLightCut2.setOpacity(0);
-                if (isDisableAnimation0() || stopAtNext) {
+                if (isDisableAnimation0()) {
                     timer = null;
                     stop();
                 }
@@ -193,7 +192,7 @@ public class FusionButton extends AbstractFusionButton {
                 var p = delta / (double) period;
                 borderLightCut1.setOpacity(p);
                 borderLightCut2.setOpacity(p);
-            } else if (delta > period * 4) {
+            } else if (delta > period * 2) {
                 var p = (delta % period) / (double) period;
                 borderLightCut1.setOpacity(1 - p);
                 borderLightCut2.setOpacity(1 - p);
@@ -232,8 +231,10 @@ public class FusionButton extends AbstractFusionButton {
         var timer = this.timer;
         this.timer = null;
         if (timer != null) {
-            timer.stopAtNext = true;
+            timer.stop();
         }
+        borderLightCut1.setOpacity(0);
+        borderLightCut2.setOpacity(0);
     }
 
     public boolean isDisableAnimation() {
@@ -246,14 +247,18 @@ public class FusionButton extends AbstractFusionButton {
 
     public void setDisableAnimation(boolean disableAnimation) {
         this.disableAnimation = disableAnimation;
-        if (!disableAnimation) {
+        if (disableAnimation) {
+            stopAnimating();
+        } else {
             startAnimating();
         }
     }
 
     private void setInternalDisableAnimation(boolean internalDisableAnimation) {
         this.internalDisableAnimation = internalDisableAnimation;
-        if (!internalDisableAnimation) {
+        if (internalDisableAnimation) {
+            stopAnimating();
+        } else {
             startAnimating();
         }
     }

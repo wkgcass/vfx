@@ -1,5 +1,7 @@
 package io.vproxy.vfx.ui.table;
 
+import io.vproxy.vfx.manager.font.FontManager;
+import io.vproxy.vfx.manager.font.FontUsages;
 import io.vproxy.vfx.theme.Theme;
 import io.vproxy.vfx.ui.layout.HPadding;
 import javafx.geometry.Insets;
@@ -144,6 +146,7 @@ public class VTableColumn<S, T> {
             var str = textBuilder.apply(t);
             return new Label(str) {{
                 setTextFill(Theme.current().tableTextColor());
+                FontManager.get().setFont(FontUsages.tableCellText, this);
             }};
         });
     }

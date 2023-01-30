@@ -1,17 +1,21 @@
 package io.vproxy.vfx.ui.scene;
 
+import io.vproxy.vfx.animation.AnimationNode;
 import io.vproxy.vfx.theme.Theme;
 import io.vproxy.vfx.util.Callback;
 import io.vproxy.vfx.util.FXUtils;
+import io.vproxy.vfx.util.algebradata.XYZTData;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.layout.*;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
 public class VSceneGroup {
+    private final VSceneGroupInitParams initParams;
     private final Pane root = new Pane();
     private final Set<VScene> scenes = new HashSet<>();
     private final Group mainSceneGroup = new Group();
@@ -21,8 +25,16 @@ public class VSceneGroup {
     private final Set<VScene> animatingHide = new HashSet<>();
 
     public VSceneGroup(VScene initialMainScene) {
+        this(initialMainScene, new VSceneGroupInitParams());
+    }
+
+    public VSceneGroup(VScene initialMainScene, VSceneGroupInitParams initParams) {
         if (initialMainScene.role != VSceneRole.MAIN) {
             throw new IllegalArgumentException(initialMainScene + " is not a MAIN scene");
+        }
+        this.initParams = initParams;
+        if (initParams.useClip) {
+            FXUtils.makeClipFor(root, 4);
         }
         root.getChildren().add(mainSceneGroup);
 
@@ -30,6 +42,8 @@ public class VSceneGroup {
         initialMainScene.bundle = initialMainScene.getNode();
         mainSceneGroup.getChildren().add(initialMainScene.bundle);
         this.currentMainScene = initialMainScene;
+        initialMainScene.parentChildren = mainSceneGroup.getChildren();
+        initialMainScene.progressInformer = this::progressUpdate;
 
         initialMainScene.changeListeners.add(
             FXUtils.observeWidth(root, initialMainScene.getNode())
@@ -37,6 +51,8 @@ public class VSceneGroup {
         initialMainScene.changeListeners.add(
             FXUtils.observeHeight(root, initialMainScene.getNode())
         );
+
+        initialMainScene.animationGraph.stopAndSetNode(initialMainScene.stateCenterShown);
     }
 
     public void addScene(VScene scene) {
@@ -80,7 +96,9 @@ public class VSceneGroup {
         if (scene.role.showCover) {
             var cover = new Pane() {{
                 setBackground(new Background(new BackgroundFill(
-                    Theme.current().coverBackgroundColor(),
+                    initParams.gradientCover
+                        ? Theme.current().makeCoverGradientBackground()
+                        : Theme.current().coverBackgroundColor(),
                     CornerRadii.EMPTY,
                     Insets.EMPTY
                 )));
@@ -90,9 +108,8 @@ public class VSceneGroup {
             }
             scene.cover = cover;
             scene.bundle = new Group(cover, scene.getNode());
-            scene.bundle.visibleProperty().addListener((ob, old, now) -> {
+            scene.bundle.sceneProperty().addListener((ob, old, now) -> {
                 if (now == null) return;
-                if (!now) return;
                 cover.setPrefWidth(root.getWidth());
                 cover.setPrefHeight(root.getHeight());
             });
@@ -100,13 +117,12 @@ public class VSceneGroup {
             scene.bundle = scene.getNode();
         }
         scene.defaultHideMethod = defaultHideMethod;
-
-        setAfterHiding(scene);
         if (scene.role == VSceneRole.MAIN) {
-            mainSceneGroup.getChildren().add(scene.bundle);
+            scene.parentChildren = mainSceneGroup.getChildren();
         } else {
-            root.getChildren().add(scene.bundle);
+            scene.parentChildren = root.getChildren();
         }
+        scene.progressInformer = this::progressUpdate;
     }
 
     public void removeScene(VScene scene) {
@@ -117,9 +133,13 @@ public class VSceneGroup {
             throw new NoSuchElementException("" + scene);
         }
 
+        scene.animationGraph.stopAndSetNode(scene.stateRemoved);
+
         for (var lsn : scene.changeListeners) {
             root.widthProperty().removeListener(lsn);
             root.heightProperty().removeListener(lsn);
+            scene.getNode().widthProperty().removeListener(lsn);
+            scene.getNode().heightProperty().removeListener(lsn);
         }
         scene.changeListeners.clear();
         root.getChildren().remove(scene.bundle);
@@ -127,9 +147,8 @@ public class VSceneGroup {
         scene.bundle = null;
         scene.cover = null;
         scene.defaultHideMethod = null;
-
-        scene.animationFunction = null;
-        scene.progress.stopAndSetNode(scene.state0);
+        scene.parentChildren = null;
+        scene.progressInformer = null;
 
         showingScenes.remove(scene);
         animatingHide.remove(scene);
@@ -137,25 +156,6 @@ public class VSceneGroup {
         scenes.remove(scene);
         scene.getNode().setLayoutX(0);
         scene.getNode().setLayoutY(0);
-    }
-
-    private void setBeforeShowing(VScene scene) {
-        scene.bundle.setVisible(true);
-        scene.bundle.setMouseTransparent(false);
-
-        // move to top
-        if (scene.role == VSceneRole.MAIN) {
-            mainSceneGroup.getChildren().remove(scene.bundle);
-            mainSceneGroup.getChildren().add(scene.bundle);
-        } else {
-            root.getChildren().remove(scene.bundle);
-            root.getChildren().add(scene.bundle);
-        }
-    }
-
-    private void setAfterHiding(VScene scene) {
-        scene.bundle.setVisible(false);
-        scene.bundle.setMouseTransparent(true);
     }
 
     public void show(VScene scene, VSceneShowMethod method) {
@@ -168,28 +168,87 @@ public class VSceneGroup {
         if (animatingHide.contains(scene)) {
             animatingHide.remove(scene);
             animatingShow.add(scene);
-            scene.progress.revertToLastNode(Callback.handler((v, ex) -> postShowing(scene)));
+            scene.animationGraph.play(scene.stateCenterShown, new Callback<>() {
+                @Override
+                protected void succeeded0(Void value) {
+                    postShowing(scene);
+                }
+            });
             return;
         }
         if (animatingShow.contains(scene)) {
             return;
         }
-        setBeforeShowing(scene);
+        Callback<Void, Exception> cb = new Callback<>() {
+            @Override
+            protected void succeeded0(Void value) {
+                showStep2(scene, method);
+            }
+        };
         switch (method) {
             case FROM_TOP:
-                animate(scene, 0, -scene.getNode().getHeight(), 0, 0, true);
+                scene.animationGraph.play(scene.stateTop, cb);
+                if (scene.role == VSceneRole.MAIN) {
+                    hideSkipCheck(currentMainScene, VSceneHideMethod.TO_BOTTOM);
+                }
                 break;
             case FROM_BOTTOM:
-                animate(scene, 0, root.getHeight(), 0, root.getHeight() - scene.getNode().getHeight(), true);
+                scene.animationGraph.play(scene.stateBottom, cb);
+                if (scene.role == VSceneRole.MAIN) {
+                    hideSkipCheck(currentMainScene, VSceneHideMethod.TO_TOP);
+                }
                 break;
             case FROM_LEFT:
-                animate(scene, -scene.getNode().getWidth(), 0, 0, 0, true);
+                scene.animationGraph.play(scene.stateLeft, cb);
+                if (scene.role == VSceneRole.MAIN) {
+                    hideSkipCheck(currentMainScene, VSceneHideMethod.TO_RIGHT);
+                }
                 break;
             case FROM_RIGHT:
-                animate(scene, root.getWidth(), 0, root.getWidth() - scene.getNode().getWidth(), 0, true);
+                scene.animationGraph.play(scene.stateRight, cb);
+                if (scene.role == VSceneRole.MAIN) {
+                    hideSkipCheck(currentMainScene, VSceneHideMethod.TO_LEFT);
+                }
                 break;
             case FADE_IN:
-                animateFade(scene, 0, 1, true);
+                scene.animationGraph.play(scene.stateFaded, cb);
+                if (scene.role == VSceneRole.MAIN) {
+                    hideSkipCheck(currentMainScene, VSceneHideMethod.FADE_OUT);
+                }
+                break;
+        }
+    }
+
+    private void showStep2(VScene scene, VSceneShowMethod method) {
+        switch (method) {
+            case FROM_TOP:
+                scene.x0 = 0;
+                scene.y0 = 0;
+                scene.yN = -scene.getNode().getHeight();
+                doAnimate(scene, null, true);
+                break;
+            case FROM_BOTTOM:
+                scene.x0 = 0;
+                scene.y0 = root.getHeight() - scene.getNode().getHeight();
+                scene.y1 = root.getHeight();
+                doAnimate(scene, null, true);
+                break;
+            case FROM_LEFT:
+                scene.x0 = 0;
+                scene.y0 = 0;
+                scene.xN = -scene.getNode().getWidth();
+                doAnimate(scene, null, true);
+                break;
+            case FROM_RIGHT:
+                scene.x0 = root.getWidth() - scene.getNode().getWidth();
+                scene.y0 = 0;
+                scene.x1 = root.getWidth();
+                doAnimate(scene, null, true);
+                break;
+            case FADE_IN:
+                scene.x0 = scene.getNode().getLayoutX();
+                scene.y0 = scene.getNode().getLayoutY();
+                doAnimate(scene, null, true);
                 break;
         }
     }
@@ -204,83 +263,63 @@ public class VSceneGroup {
         if (scene.role == VSceneRole.MAIN) {
             throw new IllegalArgumentException(scenes + " cannot be hidden manually");
         }
+        hideSkipCheck(scene, method);
+    }
+
+    private void hideSkipCheck(VScene scene, VSceneHideMethod method) {
         if (animatingShow.contains(scene)) {
             animatingShow.remove(scene);
             animatingHide.add(scene);
-            scene.progress.revertToLastNode(Callback.handler((v, ex) -> postHiding(scene)));
+            scene.animationGraph.play(scene.stateRemoved, new Callback<>() {
+                @Override
+                protected void succeeded0(Void value) {
+                    postHiding(scene);
+                }
+            });
             return;
         }
         if (animatingHide.contains(scene)) {
             return;
         }
+        scene.x0 = scene.getNode().getLayoutX();
+        scene.y0 = scene.getNode().getLayoutY();
         switch (method) {
             case TO_TOP:
-                animate(scene,
-                    scene.getNode().getLayoutX(), scene.getNode().getLayoutY(),
-                    scene.getNode().getLayoutX(), -scene.getNode().getHeight(), false);
+                scene.yN = -scene.getNode().getHeight();
+                doAnimate(scene, scene.stateTop, false);
                 break;
             case TO_BOTTOM:
-                animate(scene,
-                    scene.getNode().getLayoutX(), scene.getNode().getLayoutY(),
-                    scene.getNode().getLayoutX(), root.getHeight(), false);
+                scene.y1 = root.getHeight();
+                doAnimate(scene, scene.stateBottom, false);
                 break;
             case TO_LEFT:
-                animate(scene,
-                    scene.getNode().getLayoutX(), scene.getNode().getLayoutY(),
-                    -scene.getNode().getWidth(), scene.getNode().getLayoutY(), false);
+                scene.xN = -scene.getNode().getWidth();
+                doAnimate(scene, scene.stateLeft, false);
                 break;
             case TO_RIGHT:
-                animate(scene,
-                    scene.getNode().getLayoutX(), scene.getNode().getLayoutY(),
-                    root.getWidth(), scene.getNode().getLayoutY(), false);
+                scene.x1 = root.getWidth();
+                doAnimate(scene, scene.stateRight, false);
                 break;
             case FADE_OUT:
-                animateFade(scene, 1, 0, false);
+                doAnimate(scene, scene.stateFaded, false);
                 break;
         }
     }
 
-    private void animate(VScene scene, double startX, double startY, double endX, double endY, boolean isShowing) {
-        scene.animationFunction = (p) -> {
-            var x = (endX - startX) * p + startX;
-            var y = (endY - startY) * p + startY;
-            scene.getNode().setLayoutX(x);
-            scene.getNode().setLayoutY(y);
-            if (scene.cover != null) {
-                if (isShowing) {
-                    scene.cover.setOpacity(p);
-                } else {
-                    scene.cover.setOpacity(1 - p);
-                }
-            }
-        };
-        doAnimate(scene, isShowing);
+    private void progressUpdate(VScene scene, double p) {
+        animateCover(scene, p);
     }
 
-    private void animateFade(VScene scene, int start, int end, boolean isShowing) {
-        scene.animationFunction = (p) -> {
-            var v = (end - start) * p + start;
-            scene.getNode().setOpacity(v);
-            animateCover(scene, p, isShowing);
-        };
-        doAnimate(scene, isShowing);
-    }
-
-    private void animateCover(VScene scene, double p, boolean isShowing) {
+    private void animateCover(VScene scene, double p) {
         if (scene.cover != null) {
-            if (isShowing) {
-                scene.cover.setOpacity(p);
-            } else {
-                scene.cover.setOpacity(1 - p);
-            }
+            scene.cover.setOpacity(p);
         }
     }
 
-    private void doAnimate(VScene scene, boolean isShowing) {
+    private void doAnimate(VScene scene, AnimationNode<XYZTData> keyNode, boolean isShowing) {
         var animatingSet = isShowing ? animatingShow : animatingHide;
         animatingSet.add(scene);
-        scene.progress.stopAndSetNode(scene.state0);
-        scene.progress.play(scene.state1, new Callback<>() {
+        Callback<Void, Exception> cb = new Callback<>() {
             @Override
             protected void succeeded0(Void value) {
                 animatingSet.remove(scene);
@@ -290,13 +329,16 @@ public class VSceneGroup {
                     postHiding(scene);
                 }
             }
-        });
+        };
+        if (isShowing) {
+            scene.animationGraph.play(scene.stateCenterShown, cb);
+        } else {
+            scene.animationGraph.play(List.of(keyNode, scene.stateRemoved), cb);
+        }
     }
 
     private void postShowing(VScene scene) {
-        scene.animationFunction = null;
         if (scene.role == VSceneRole.MAIN) {
-            setAfterHiding(currentMainScene);
             currentMainScene = scene;
         } else {
             showingScenes.add(scene);
@@ -304,9 +346,7 @@ public class VSceneGroup {
     }
 
     private void postHiding(VScene scene) {
-        scene.animationFunction = null;
         showingScenes.remove(scene);
-        setAfterHiding(scene);
     }
 
     public VScene getCurrentMainScene() {
@@ -319,5 +359,9 @@ public class VSceneGroup {
 
     public Region getNode() {
         return root;
+    }
+
+    interface ProgressInformer {
+        void informUpdate(VScene scene, double p);
     }
 }

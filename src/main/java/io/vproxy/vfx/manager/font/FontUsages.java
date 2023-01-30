@@ -19,6 +19,8 @@ public class FontUsages {
     };
     public static final FontUsage dialogText = new FontUsage() {
     };
+    public static final FontUsage tableCellText = new FontUsage() {
+    };
 
     private FontUsages() {
     }

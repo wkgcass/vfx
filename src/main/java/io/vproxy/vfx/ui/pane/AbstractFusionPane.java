@@ -5,7 +5,6 @@ import io.vproxy.vfx.animation.AnimationGraphBuilder;
 import io.vproxy.vfx.animation.AnimationNode;
 import io.vproxy.vfx.control.click.ClickEventHandler;
 import io.vproxy.vfx.theme.Theme;
-import io.vproxy.vfx.util.Callback;
 import io.vproxy.vfx.util.algebradata.ColorData;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -41,7 +40,7 @@ public abstract class AbstractFusionPane extends Pane {
         animation = AnimationGraphBuilder
             .simpleTwoNodeGraph(normalNode, hoverNode, 300)
             .addNode(downNode)
-            .setApply(data -> setBackground(new Background(
+            .setApply((from, to, data) -> setBackground(new Background(
                 new BackgroundFill(data.getColor(), cornerRadii, Insets.EMPTY)
             )))
             .build(normalNode);
@@ -79,13 +78,11 @@ public abstract class AbstractFusionPane extends Pane {
     }
 
     protected void onMouseEntered() {
-        animation.play(hoverNode, Callback.handler((v, ex) -> {
-        }));
+        animation.play(hoverNode);
     }
 
     protected void onMouseExited() {
-        animation.play(normalNode, Callback.handler((v, ex) -> {
-        }));
+        animation.play(normalNode);
     }
 
     protected void onMousePressed() {
@@ -110,6 +107,6 @@ public abstract class AbstractFusionPane extends Pane {
     }
 
     protected Color downColor() {
-        return Theme.current().fusionPaneHoverBackgroundColor();
+        return hoverColor();
     }
 }

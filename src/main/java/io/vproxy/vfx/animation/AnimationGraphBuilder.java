@@ -4,12 +4,11 @@ import io.vproxy.vfx.util.algebradata.AlgebraData;
 import io.vproxy.vfx.util.algebradata.DoubleDoubleFunction;
 import io.vproxy.vfx.util.graph.GraphBuilder;
 
-import java.util.function.Consumer;
-
 public class AnimationGraphBuilder<T extends AlgebraData<T>> {
 
     private final GraphBuilder<AnimationNode<T>> builder = new GraphBuilder<>();
-    private Consumer<T> apply;
+    private AnimationStateTransferBeginCallback<T> stateTransferBeginCallback = null;
+    private AnimationApplyFunction<T> apply;
 
     public AnimationGraphBuilder() {
     }
@@ -55,8 +54,13 @@ public class AnimationGraphBuilder<T extends AlgebraData<T>> {
         return this;
     }
 
-    public AnimationGraphBuilder<T> setApply(Consumer<T> apply) {
+    public AnimationGraphBuilder<T> setApply(AnimationApplyFunction<T> apply) {
         this.apply = apply;
+        return this;
+    }
+
+    public AnimationGraphBuilder<T> setStateTransferBeginCallback(AnimationStateTransferBeginCallback<T> stateTransferBeginCallback) {
+        this.stateTransferBeginCallback = stateTransferBeginCallback;
         return this;
     }
 
@@ -64,6 +68,11 @@ public class AnimationGraphBuilder<T extends AlgebraData<T>> {
         if (apply == null) {
             throw new IllegalArgumentException("`apply` not set");
         }
-        return new AnimationGraph<>(builder.build(), apply, initialNode);
+        var beginCB = stateTransferBeginCallback;
+        if (beginCB == null) {
+            beginCB = (from, to) -> {
+            };
+        }
+        return new AnimationGraph<>(builder.build(), apply, beginCB, initialNode);
     }
 }

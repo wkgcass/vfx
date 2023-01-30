@@ -20,18 +20,28 @@ public class DarkTheme extends Theme {
     }
 
     @Override
-    public int windowTitleFontSize() {
-        return 15;
+    public Color borderColor() {
+        return borderColorLight();
     }
 
     @Override
-    public Color borderColor() {
+    public Color borderColorLight() {
         return new Color(0xc3 / 255d, 0xc3 / 255d, 0xc3 / 255d, 1);
+    }
+
+    @Override
+    public Color borderColorDark() {
+        return sceneBackgroundColor();
     }
 
     @Override
     public Color sceneBackgroundColor() {
         return new Color(0x24 / 255d, 0x29 / 255d, 0x2e / 255d, 1);
+    }
+
+    @Override
+    public Color subSceneBackgroundColor() {
+        return new Color(0x17 / 255d, 0x1b / 255d, 0x1e / 255d, 1);
     }
 
     @Override
@@ -120,13 +130,8 @@ public class DarkTheme extends Theme {
     }
 
     @Override
-    public Paint coverBackgroundColor() {
-        return new LinearGradient(
-            0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
-            new Stop(0, new Color(1, 1, 1, 0)),
-            new Stop(0.6, new Color(1, 1, 1, 0.1)),
-            new Stop(1, new Color(1, 1, 1, 0.1))
-        );
+    public Color coverBackgroundColor() {
+        return new Color(1, 1, 1, 0.1);
     }
 
     @Override

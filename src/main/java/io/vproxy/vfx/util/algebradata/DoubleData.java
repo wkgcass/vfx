@@ -26,4 +26,9 @@ public class DoubleData implements AlgebraData<DoubleData> {
     public DoubleData dividedBy(double v) {
         return new DoubleData(value / v);
     }
+
+    @Override
+    public String toString() {
+        return "DoubleData(" + value + ")";
+    }
 }

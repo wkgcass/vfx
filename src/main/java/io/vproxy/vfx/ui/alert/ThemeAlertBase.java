@@ -42,7 +42,7 @@ public class ThemeAlertBase extends VStage {
         root.heightProperty().addListener((ob, old, now) -> {
             if (now == null) return;
             var h = now.doubleValue();
-            h = VStage.TITLE_BAR_HEIGHT + h + 1;
+            h = VStage.TITLE_BAR_HEIGHT + h + 2;
             if (h > 800) {
                 h = 800;
             }
