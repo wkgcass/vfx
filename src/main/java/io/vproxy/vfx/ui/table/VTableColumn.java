@@ -4,6 +4,7 @@ import io.vproxy.vfx.manager.font.FontManager;
 import io.vproxy.vfx.manager.font.FontUsages;
 import io.vproxy.vfx.theme.Theme;
 import io.vproxy.vfx.ui.layout.HPadding;
+import io.vproxy.vfx.util.FXUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -38,7 +39,6 @@ public class VTableColumn<S, T> {
     final Function<S, T> valueRetriever;
     Comparator<T> comparator;
     final HBox columnNode = new HBox();
-    private final Label nameLabel;
     private final Label sortLabel;
     Function<T, ? extends Node> nodeBuilder = null;
 
@@ -54,12 +54,16 @@ public class VTableColumn<S, T> {
     private VTableSortOrder sortOrder = DESC; // the first time it will be set to ASC
 
     public VTableColumn(String name, Function<S, T> valueRetriever) {
-        this.name = name;
-        this.valueRetriever = valueRetriever;
-        nameLabel = new Label(name) {{
+        this(name, new Label(name) {{
             setAlignment(Pos.CENTER);
             setTextFill(Theme.current().tableHeaderTextColor());
-        }};
+            setPrefHeight(25);
+        }}, valueRetriever);
+    }
+
+    public VTableColumn(String name, Region columnContentNode, Function<S, T> valueRetriever) {
+        this.name = name;
+        this.valueRetriever = valueRetriever;
         sortLabel = new Label() {{
             setPadding(new Insets(0, 4, 0, 4));
             setPrefWidth(sortWidth);
@@ -67,11 +71,11 @@ public class VTableColumn<S, T> {
         }};
         columnNode.getChildren().addAll(
             new HPadding(sortWidth),
-            nameLabel,
+            columnContentNode,
             sortLabel
         );
         columnNode.setBackground(BG);
-        columnNode.setPrefHeight(25);
+        FXUtils.observeHeight(columnContentNode, columnNode);
         columnNode.setAlignment(Pos.CENTER);
 
         columnNode.setOnMouseClicked(e -> {
@@ -92,7 +96,7 @@ public class VTableColumn<S, T> {
 
         columnNode.widthProperty().addListener((ob, old, now) -> {
             if (now == null) return;
-            nameLabel.setPrefWidth(now.doubleValue() - 2 * sortWidth);
+            columnContentNode.setPrefWidth(now.doubleValue() - 2 * sortWidth);
         });
         vbox.widthProperty().addListener((ob, old, now) -> {
             if (now == null) return;

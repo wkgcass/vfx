@@ -24,6 +24,8 @@ module io.vproxy.vfx {
     exports io.vproxy.vfx.manager.image;
     exports io.vproxy.vfx.manager.internal_i18n;
     exports io.vproxy.vfx.manager.task;
+    exports io.vproxy.vfx.res.font;
+    exports io.vproxy.vfx.res.image;
     exports io.vproxy.vfx.robot;
     exports io.vproxy.vfx.theme;
     exports io.vproxy.vfx.theme.impl;
@@ -34,8 +36,10 @@ module io.vproxy.vfx {
     exports io.vproxy.vfx.ui.pane;
     exports io.vproxy.vfx.ui.scene;
     exports io.vproxy.vfx.ui.shapes;
+    exports io.vproxy.vfx.ui.slider;
     exports io.vproxy.vfx.ui.stage;
     exports io.vproxy.vfx.ui.table;
+    exports io.vproxy.vfx.ui.toggle;
     exports io.vproxy.vfx.ui.wrapper;
     exports io.vproxy.vfx.util;
     exports io.vproxy.vfx.util.algebradata;

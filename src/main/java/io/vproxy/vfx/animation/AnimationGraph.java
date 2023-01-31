@@ -340,7 +340,7 @@ public class AnimationGraph<T extends AlgebraData<T>> {
         }
 
         public void setCB(Callback<Void, Exception> cb) {
-            this.cb.failed(new AnimationInterruptedException());
+            this.cb.failed(new AnimationInterrupted());
             this.cb = cb;
         }
 

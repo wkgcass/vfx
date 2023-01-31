@@ -4,15 +4,17 @@ import io.vproxy.vfx.animation.AnimationGraph;
 import io.vproxy.vfx.animation.AnimationGraphBuilder;
 import io.vproxy.vfx.animation.AnimationNode;
 import io.vproxy.vfx.control.drag.DragHandler;
+import io.vproxy.vfx.util.FXUtils;
 import io.vproxy.vfx.util.algebradata.DoubleData;
+import javafx.beans.property.DoubleProperty;
 import javafx.scene.Node;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 
-public class VScrollPane {
-    static final int SCROLL_V_WIDTH = 4;
-    private static final int SCROLL_V_MIN_HEIGHT = 25;
+public class VScrollPane implements NodeWithVScrollPane {
+    public static final int SCROLL_WIDTH = 4;
+    public static final int SCROLL_PADDING = 2;
+    private static final int SCROLL_MIN_LENGTH = 25;
 
     private double scrollSpeed = 5;
 
@@ -21,48 +23,48 @@ public class VScrollPane {
     private final VerticalScrollBarImpl scrollBarV = new VerticalScrollBarImpl() {{
         setMouseTransparent(true);
     }};
+    private final HorizontalScrollBarImpl scrollBarH = new HorizontalScrollBarImpl() {{
+        setMouseTransparent(true);
+    }};
+    private Double verticalScrollBarLayoutX;
+    private Double horizontalScrollBarLayoutY;
     private final AnimationNode<DoubleData> animationHide = new AnimationNode<>("hide", new DoubleData(0));
     private final AnimationNode<DoubleData> animationShow = new AnimationNode<>("show", new DoubleData(1));
     private final AnimationGraph<DoubleData> animationHideShow = AnimationGraphBuilder
         .simpleTwoNodeGraph(animationHide, animationShow, 300)
-        .setApply((from, to, d) -> scrollBarV.setOpacity(d.value))
+        .setApply((from, to, d) -> {
+            scrollBarV.setOpacity(d.value);
+            scrollBarH.setOpacity(d.value);
+        })
         .build(animationHide);
 
     public VScrollPane() {
+        this(ScrollDirection.VERTICAL);
+    }
+
+    @SuppressWarnings("ReplaceNullCheck")
+    public VScrollPane(ScrollDirection scrollDirection) {
         viewport.getNode().setOnScroll(e -> {
-            var h = viewport.getContentHeight();
-            if (h == 0) return;
-            double dy = e.getDeltaY() * scrollSpeed / h;
-            setVvalue(getVvalue() - dy);
+            var ll = scrollDirection == ScrollDirection.HORIZONTAL ? viewport.getContentWidth() : viewport.getContentHeight();
+            if (ll == 0) return;
+            double dd = e.getDeltaY() * scrollSpeed / ll;
+            if (scrollDirection == ScrollDirection.HORIZONTAL) {
+                setHvalue(getHvalue() - dd);
+            } else {
+                setVvalue(getVvalue() - dd);
+            }
             e.consume();
         });
         var dragScrollHandler = new DragHandler() {
             @Override
             protected void set(double x, double y) {
-                if (y < 0) {
-                    y = 0;
-                } else if (y > viewport.getContentHeight()) {
-                    y = viewport.getContentHeight();
-                }
-                setVvalue(y / viewport.getContentHeight());
+                setHpos(x);
+                setVpos(y);
             }
 
             @Override
             protected double[] get() {
-                return new double[]{0, getVvalue() * viewport.getContentHeight()};
-            }
-
-            @Override
-            protected double calculateDeltaY(double deltaX, double deltaY) {
-                return deltaY * 4;
-            }
-
-            @Override
-            protected double[] getOffset(MouseEvent e) {
-                var ret = super.getOffset(e);
-                ret[0] = -ret[0];
-                ret[1] = -ret[1];
-                return ret;
+                return new double[]{viewport.getHpos(), viewport.getVpos()};
             }
         };
         viewport.getNode().setOnMousePressed(dragScrollHandler);
@@ -71,16 +73,26 @@ public class VScrollPane {
             if (now == null) return;
             var w = now.doubleValue();
             viewport.getNode().setPrefWidth(w);
-            scrollBarV.setLayoutX(w - SCROLL_V_WIDTH - 2);
+            updateScrollHWidthAndPosition();
+            if (verticalScrollBarLayoutX == null) {
+                scrollBarV.setLayoutX(w - SCROLL_WIDTH - SCROLL_PADDING);
+            } else {
+                scrollBarH.setLayoutX(verticalScrollBarLayoutX);
+            }
         });
         root.heightProperty().addListener((ob, old, now) -> {
             if (now == null) return;
             var h = now.doubleValue();
             viewport.getNode().setPrefHeight(h);
             updateScrollVHeightAndPosition();
+            if (horizontalScrollBarLayoutY == null) {
+                scrollBarH.setLayoutY(h - SCROLL_WIDTH - SCROLL_PADDING);
+            } else {
+                scrollBarH.setLayoutY(horizontalScrollBarLayoutY);
+            }
         });
 
-        root.getChildren().addAll(viewport.getNode(), scrollBarV);
+        root.getChildren().addAll(viewport.getNode(), scrollBarV, scrollBarH);
 
         root.setOnMouseEntered(e -> animationHideShow.play(animationShow));
         root.setOnMouseExited(e -> animationHideShow.play(animationHide));
@@ -103,8 +115,8 @@ public class VScrollPane {
         }
         var p = h / bounds.getHeight();
         var length = p * h;
-        if (length < SCROLL_V_MIN_HEIGHT) {
-            length = SCROLL_V_MIN_HEIGHT;
+        if (length < SCROLL_MIN_LENGTH) {
+            length = SCROLL_MIN_LENGTH;
         }
         scrollBarV.setLength(length);
         updateScrollVPosition(h, length);
@@ -125,6 +137,45 @@ public class VScrollPane {
         scrollBarV.setLayoutY(y);
     }
 
+    private void updateScrollHWidthAndPosition() {
+        var w = root.getWidth();
+        if (w == 0) { // ignore invalid value
+            return;
+        }
+        var content = viewport.getContent();
+        if (content == null) {
+            scrollBarH.setVisible(false);
+            return;
+        }
+        var bounds = content.getLayoutBounds();
+        if (bounds.getWidth() <= w) {
+            scrollBarH.setVisible(false);
+            return;
+        }
+        var p = w / bounds.getWidth();
+        var length = p * w;
+        if (length < SCROLL_MIN_LENGTH) {
+            length = SCROLL_MIN_LENGTH;
+        }
+        scrollBarH.setLength(length);
+        updateScrollHPosition(w, length);
+        scrollBarH.setVisible(true);
+    }
+
+    private void updateScrollHPosition() {
+        var w = root.getWidth();
+        if (w == 0) { // ignore invalid value
+            return;
+        }
+        updateScrollHPosition(w, scrollBarH.getLength());
+    }
+
+    private void updateScrollHPosition(double scrollPaneWidth, double scrollBarLength) {
+        double p = getHvalue();
+        var x = (scrollPaneWidth - scrollBarLength) * p;
+        scrollBarH.setLayoutX(x);
+    }
+
     public double getScrollSpeed() {
         return scrollSpeed;
     }
@@ -141,9 +192,44 @@ public class VScrollPane {
         return viewport.getVvalue();
     }
 
+    public double getHvalue() {
+        return viewport.getHvalue();
+    }
+
     public void setVvalue(double vvalue) {
         viewport.setVvalue(vvalue);
         updateScrollVPosition();
+    }
+
+    public void setHvalue(double hvalue) {
+        viewport.setHvalue(hvalue);
+        updateScrollHPosition();
+    }
+
+    public DoubleProperty vposProperty() {
+        return viewport.vposProperty();
+    }
+
+    public double getVpos() {
+        return viewport.getVpos();
+    }
+
+    public void setVpos(double vpos) {
+        viewport.setVpos(vpos);
+        updateScrollVPosition();
+    }
+
+    public DoubleProperty hposProperty() {
+        return viewport.hposProperty();
+    }
+
+    public double getHpos() {
+        return viewport.getHpos();
+    }
+
+    public void setHpos(double hpos) {
+        viewport.setHpos(hpos);
+        updateScrollHPosition();
     }
 
     public void setContent(Node node) {
@@ -151,6 +237,39 @@ public class VScrollPane {
         node.layoutBoundsProperty().addListener((ob, old, now) -> {
             if (now == null) return;
             updateScrollVHeightAndPosition();
+            updateScrollHWidthAndPosition();
         });
+    }
+
+    public void setVerticalScrollBarLayoutX(Double verticalScrollBarLayoutX) {
+        this.verticalScrollBarLayoutX = verticalScrollBarLayoutX;
+        scrollBarV.setLayoutX(verticalScrollBarLayoutX);
+    }
+
+    public void setHorizontalScrollBarLayoutY(Double horizontalScrollBarLayoutY) {
+        this.horizontalScrollBarLayoutY = horizontalScrollBarLayoutY;
+        scrollBarH.setLayoutY(horizontalScrollBarLayoutY);
+    }
+
+    @Override
+    public VScrollPane getScrollPane() {
+        return this;
+    }
+
+    @Override
+    public Region getSelfNode() {
+        return getNode();
+    }
+
+    public static VScrollPane makeHorizontalScrollPaneToManage(NodeWithVScrollPane node) {
+        var pane = new VScrollPane(ScrollDirection.HORIZONTAL);
+        pane.setContent(node.getSelfNode());
+        Runnable update = () ->
+            node.getScrollPane().setVerticalScrollBarLayoutX(
+                -pane.getHpos() + pane.getNode().getWidth() - VScrollPane.SCROLL_WIDTH - VScrollPane.SCROLL_PADDING);
+        pane.getNode().widthProperty().addListener((ob, old, now) -> update.run());
+        pane.hposProperty().addListener((ob, old, now) -> update.run());
+        FXUtils.observeHeight(node.getSelfNode(), pane.getNode());
+        return pane;
     }
 }

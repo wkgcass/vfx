@@ -1,5 +1,6 @@
 package io.vproxy.vfx.ui.table;
 
+import io.vproxy.vfx.control.scroll.NodeWithVScrollPane;
 import io.vproxy.vfx.control.scroll.VScrollPane;
 import io.vproxy.vfx.manager.font.FontManager;
 import io.vproxy.vfx.manager.font.FontUsages;
@@ -21,7 +22,7 @@ import javafx.scene.paint.Color;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class VTableView<S> {
+public class VTableView<S> implements NodeWithVScrollPane {
     private final Pane root = new Pane();
     private final VBox rootVBox = new VBox();
     final HBox columnPane = new HBox();
@@ -434,11 +435,13 @@ public class VTableView<S> {
         refresh();
     }
 
-    public void setScrollSpeed(double scrollSpeed) {
-        scrollPane.setScrollSpeed(scrollSpeed);
+    @Override
+    public VScrollPane getScrollPane() {
+        return scrollPane;
     }
 
-    public double getScrollSpeed() {
-        return scrollPane.getScrollSpeed();
+    @Override
+    public Region getSelfNode() {
+        return getNode();
     }
 }

@@ -3,10 +3,7 @@ package io.vproxy.vfx.theme;
 import io.vproxy.vfx.manager.font.FontProvider;
 import io.vproxy.vfx.theme.impl.DarkTheme;
 import javafx.scene.image.Image;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.Stop;
+import javafx.scene.paint.*;
 
 public abstract class Theme {
     private static Theme currentTheme;
@@ -165,4 +162,40 @@ public abstract class Theme {
     public abstract Color progressBarProgressColor();
 
     public abstract Color progressBarBackgroundColor();
+
+    public Color toggleSwitchBorderColor() {
+        return borderColor();
+    }
+
+    public Color toggleSwitchUnselectedButtonColor() {
+        return fusionButtonNormalBackgroundColor();
+    }
+
+    public Color toggleSwitchUnselectedButtonHoverColor() {
+        return fusionButtonHoverBackgroundColor();
+    }
+
+    public Color toggleSwitchSelectedButtonColor() {
+        return fusionButtonDownBackgroundColor();
+    }
+
+    public abstract Color toggleSwitchUnselectedTrayColor();
+
+    public abstract Color toggleSwitchSelectedTrayColor();
+
+    public Color sliderButtonNormalColor() {
+        return fusionButtonNormalBackgroundColor();
+    }
+
+    public Color sliderButtonHoverColor() {
+        return fusionButtonHoverBackgroundColor();
+    }
+
+    public Color sliderButtonDownColor() {
+        return fusionButtonDownBackgroundColor();
+    }
+
+    public Color sliderButtonBorderColor() {
+        return borderColor();
+    }
 }

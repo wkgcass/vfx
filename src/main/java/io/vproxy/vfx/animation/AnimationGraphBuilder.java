@@ -26,8 +26,8 @@ public class AnimationGraphBuilder<T extends AlgebraData<T>> {
     }
 
     public AnimationGraphBuilder<T> addEdge(AnimationNode<T> from, AnimationNode<T> to,
-                                            long preferredMillis) {
-        return addEdge(from, to, preferredMillis, t -> t);
+                                            long durationMillis) {
+        return addEdge(from, to, durationMillis, t -> t);
     }
 
     public AnimationGraphBuilder<T> addEdge(AnimationNode<T> from, AnimationNode<T> to,

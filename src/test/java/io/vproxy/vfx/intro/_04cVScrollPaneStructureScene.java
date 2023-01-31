@@ -20,7 +20,7 @@ public class _04cVScrollPaneStructureScene extends DemoVScene {
             new VPadding(30),
             new ThemeLabel(
                 "" +
-                "VScrollPane uses a root pane to contain the Viewport and the scrollbar.\n" +
+                "VScrollPane uses a root pane to contain the Viewport and the scrollbars.\n" +
                 "The Viewport is simply a pane which uses 'setClip' to show only ui within the pane.\n" +
                 "Inside the viewport, there is a jfx Group which manages the content position.\n" +
                 "\n" +

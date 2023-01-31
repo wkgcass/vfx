@@ -4,6 +4,7 @@ import io.vproxy.vfx.animation.AnimationGraph;
 import io.vproxy.vfx.animation.AnimationGraphBuilder;
 import io.vproxy.vfx.animation.AnimationNode;
 import io.vproxy.vfx.control.scroll.VScrollPane;
+import io.vproxy.vfx.control.scroll.NodeWithVScrollPane;
 import io.vproxy.vfx.util.FXUtils;
 import io.vproxy.vfx.util.algebradata.XYZTData;
 import javafx.beans.value.ChangeListener;
@@ -15,7 +16,7 @@ import javafx.scene.layout.Region;
 import java.util.HashSet;
 import java.util.Set;
 
-public class VScene {
+public class VScene implements NodeWithVScrollPane {
     public static final int ANIMATION_DURATION_MILLIS = 300;
     private static final int SHOW_DELAY_MILLIS = 50;
 
@@ -89,8 +90,14 @@ public class VScene {
         return root;
     }
 
+    @Override
     public VScrollPane getScrollPane() {
         return scrollPane;
+    }
+
+    @Override
+    public Region getSelfNode() {
+        return getNode();
     }
 
     public Pane getContentPane() {

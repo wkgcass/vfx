@@ -61,8 +61,9 @@ public class IntroFXMain extends Application {
         mainScenes.add(new _05cFusionPaneStructureScene());
         mainScenes.add(new _06aVTableViewIntroScene());
         mainScenes.add(new _06bVTableViewDemoScene());
-        mainScenes.add(new _06cVTableViewStructureScene());
-        mainScenes.add(new _06dVTableViewSpecialUsageScene());
+        mainScenes.add(new _06cVTableViewDemo2Scene());
+        mainScenes.add(new _06dVTableViewStructureScene());
+        mainScenes.add(new _06eVTableViewSpecialUsageScene());
         mainScenes.add(new _07aAnimationSystemIntroScene());
         mainScenes.add(new _07bAnimationSystemDemoScene());
         mainScenes.add(new _07cAnimationSystemDescScene());

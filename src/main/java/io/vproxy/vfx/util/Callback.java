@@ -38,7 +38,7 @@ abstract public class Callback<T, EX> {
 
     protected void failed0(EX ex) {
         if (ex instanceof SuppressError) {
-            Logger.debug("callback failed with " + ex);
+            Logger.debug("the callback is not finishing with succeeded0: " + ex);
             return;
         }
         if (!(ex instanceof Throwable)) {

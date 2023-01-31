@@ -7,6 +7,8 @@ import io.vproxy.vfx.util.Callback;
 import io.vproxy.vfx.util.FXUtils;
 import io.vproxy.vfx.util.MiscUtils;
 import javafx.application.Platform;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.DoublePropertyBase;
 import javafx.scene.Group;
 
 import java.util.ArrayList;
@@ -42,6 +44,27 @@ public class VProgressBar extends Group {
         updateProgressLine();
     }
 
+    private final DoublePropertyBase progressProperty = new DoublePropertyBase() {
+        @Override
+        protected void invalidated() {
+            setProgress(progressProperty.get());
+        }
+
+        @Override
+        public Object getBean() {
+            return VProgressBar.this;
+        }
+
+        @Override
+        public String getName() {
+            return "progressProperty";
+        }
+    };
+
+    public DoubleProperty progressProperty() {
+        return progressProperty;
+    }
+
     public double getProgress() {
         return progress;
     }
@@ -53,6 +76,7 @@ public class VProgressBar extends Group {
             progress = 1;
         }
         this.progress = progress;
+        progressProperty.set(progress);
         updateProgressLine();
     }
 

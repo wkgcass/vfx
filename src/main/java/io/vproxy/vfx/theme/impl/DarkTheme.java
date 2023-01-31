@@ -168,4 +168,19 @@ public class DarkTheme extends Theme {
     public Color progressBarBackgroundColor() {
         return new Color(0x40 / 255d, 0x49 / 255d, 0x52 / 255d, 1);
     }
+
+    @Override
+    public Color toggleSwitchSelectedButtonColor() {
+        return toggleSwitchBorderColor();
+    }
+
+    @Override
+    public Color toggleSwitchUnselectedTrayColor() {
+        return new Color(0x40 / 255d, 0x49 / 255d, 0x52 / 255d, 1);
+    }
+
+    @Override
+    public Color toggleSwitchSelectedTrayColor() {
+        return new Color(0x5d / 255d, 0x66 / 255d, 0x6e / 255d, 1);
+    }
 }

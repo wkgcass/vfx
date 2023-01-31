@@ -1,7 +1,7 @@
 package io.vproxy.vfx.intro;
 
 import io.vproxy.vfx.animation.AnimationGraphBuilder;
-import io.vproxy.vfx.animation.AnimationInterruptedException;
+import io.vproxy.vfx.animation.AnimationInterrupted;
 import io.vproxy.vfx.animation.AnimationNode;
 import io.vproxy.vfx.manager.font.FontManager;
 import io.vproxy.vfx.ui.alert.SimpleAlert;
@@ -139,7 +139,7 @@ public class _07bAnimationSystemDemoScene extends DemoVScene {
 
                 @Override
                 protected void failed0(Exception e) {
-                    if (e instanceof AnimationInterruptedException) {
+                    if (e instanceof AnimationInterrupted) {
                         return;
                     }
                     resetAll.run();

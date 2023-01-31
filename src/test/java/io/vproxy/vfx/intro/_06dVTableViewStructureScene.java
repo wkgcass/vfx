@@ -8,8 +8,8 @@ import io.vproxy.vfx.util.FXUtils;
 import javafx.geometry.Pos;
 import javafx.scene.layout.VBox;
 
-public class _06cVTableViewStructureScene extends DemoVScene {
-    public _06cVTableViewStructureScene() {
+public class _06dVTableViewStructureScene extends DemoVScene {
+    public _06dVTableViewStructureScene() {
         super(VSceneRole.MAIN);
         enableAutoContentWidthHeight();
 

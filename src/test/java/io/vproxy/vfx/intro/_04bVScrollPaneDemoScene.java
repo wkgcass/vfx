@@ -1,5 +1,6 @@
 package io.vproxy.vfx.intro;
 
+import io.vproxy.vfx.control.scroll.ScrollDirection;
 import io.vproxy.vfx.control.scroll.VScrollPane;
 import io.vproxy.vfx.ui.scene.VSceneRole;
 import io.vproxy.vfx.ui.wrapper.ThemeLabel;
@@ -18,13 +19,13 @@ public class _04bVScrollPaneDemoScene extends DemoVScene {
         msgLabel.setLayoutY(100);
 
         var scrollPaneWithLittleContent = new VScrollPane();
-        scrollPaneWithLittleContent.getNode().setPrefWidth(400);
+        scrollPaneWithLittleContent.getNode().setPrefWidth(250);
         scrollPaneWithLittleContent.getNode().setPrefHeight(400);
         var littleContentLabel = new ThemeLabel("Hello World");
         scrollPaneWithLittleContent.setContent(littleContentLabel);
 
         var scrollPaneWithMuchContent = new VScrollPane();
-        scrollPaneWithMuchContent.getNode().setPrefWidth(400);
+        scrollPaneWithMuchContent.getNode().setPrefWidth(250);
         scrollPaneWithMuchContent.getNode().setPrefHeight(400);
         var muchContentLabel = new ThemeLabel(
             "" +
@@ -40,8 +41,14 @@ public class _04bVScrollPaneDemoScene extends DemoVScene {
             "If only she could light a match! But what would her father say at such a waste. " +
             "Falteringly she took out a match and lit it.\n\n");
         muchContentLabel.setWrapText(true);
-        FXUtils.observeWidth(scrollPaneWithLittleContent.getNode(), muchContentLabel, -1);
+        FXUtils.observeWidth(scrollPaneWithMuchContent.getNode(), muchContentLabel, -1);
         scrollPaneWithMuchContent.setContent(muchContentLabel);
+
+        var horizontalLabel = new ThemeLabel("Use 'new VScrollPane(ScrollDirection.HORIZONTAL)' to instantiate the VScrollPane.");
+        var scrollPaneHorizontal = new VScrollPane(ScrollDirection.HORIZONTAL);
+        scrollPaneHorizontal.getNode().setPrefWidth(250);
+        scrollPaneHorizontal.getNode().setPrefHeight(400);
+        scrollPaneHorizontal.setContent(horizontalLabel);
 
         var gridPane = new GridPane();
         gridPane.setLayoutY(250);
@@ -50,6 +57,7 @@ public class _04bVScrollPaneDemoScene extends DemoVScene {
         FXUtils.observeWidthCenter(getContentPane(), gridPane);
         gridPane.add(scrollPaneWithLittleContent.getNode(), 0, 0);
         gridPane.add(scrollPaneWithMuchContent.getNode(), 1, 0);
+        gridPane.add(scrollPaneHorizontal.getNode(), 2, 0);
 
         getContentPane().getChildren().addAll(
             msgLabel,

@@ -178,7 +178,10 @@ public class FXUtils {
             modified.setPrefWidth(w + wDelta);
         };
         observed.widthProperty().addListener(lsn);
-        lsn.changed(null, null, observed.getWidth());
+        var current = observed.getWidth();
+        if (current > 0) {
+            lsn.changed(null, null, current);
+        }
         return lsn;
     }
 
@@ -194,7 +197,10 @@ public class FXUtils {
             modified.setPrefHeight(h + hDelta);
         };
         observed.heightProperty().addListener(lsn);
-        lsn.changed(null, null, observed.getHeight());
+        var current = observed.getHeight();
+        if (current > 0) {
+            lsn.changed(null, null, current);
+        }
         return lsn;
     }
 
@@ -223,7 +229,13 @@ public class FXUtils {
         };
         observed.widthProperty().addListener(lsn);
         observed.prefWidthProperty().addListener(lsn);
-        lsn.changed(null, null, observed.getWidth());
+        var current = observed.getWidth();
+        if (current <= 0) {
+            current = observed.getPrefWidth();
+        }
+        if (current > 0) {
+            lsn.changed(null, null, current);
+        }
         return lsn;
     }
 
@@ -240,7 +252,13 @@ public class FXUtils {
         };
         observed.heightProperty().addListener(lsn);
         observed.prefHeightProperty().addListener(lsn);
-        lsn.changed(null, null, observed.getHeight());
+        var current = observed.getHeight();
+        if (current <= 0) {
+            current = observed.getWidth();
+        }
+        if (current > 0) {
+            lsn.changed(null, null, current);
+        }
         return lsn;
     }
 

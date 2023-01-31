@@ -7,8 +7,12 @@ import io.vproxy.vfx.ui.alert.SimpleAlert;
 import io.vproxy.vfx.ui.alert.StackTraceAlert;
 import io.vproxy.vfx.ui.button.FusionButton;
 import io.vproxy.vfx.ui.scene.VSceneRole;
+import io.vproxy.vfx.ui.slider.VSlider;
+import io.vproxy.vfx.ui.toggle.ToggleSwitch;
 import io.vproxy.vfx.util.FXUtils;
+import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.TextAlignment;
 
@@ -51,6 +55,8 @@ public class _xxbComponentsDemoScene extends DemoVScene {
             SimpleAlert.showAndWait(Alert.AlertType.INFORMATION, "the chosen key is " + keyOpt);
         });
 
+        var toggleSwitch = new ToggleSwitch();
+
         var noAnimationButton = new Btn("FusionButton\n" +
                                         "setDisableAnimation(true)") {{
             getTextNode().setTextAlignment(TextAlignment.CENTER);
@@ -63,19 +69,26 @@ public class _xxbComponentsDemoScene extends DemoVScene {
         }};
         onlyAnimateWhenNotClickedButton.setOnlyAnimateWhenNotClicked(true);
 
+        var slider = new VSlider();
+        slider.setLength(500);
+
         var gridPane = new GridPane();
         gridPane.setVgap(50);
         gridPane.setHgap(50);
         FXUtils.observeWidthCenter(getContentPane(), gridPane);
-        gridPane.setLayoutY(100);
+        gridPane.setLayoutY(60);
+        gridPane.setAlignment(Pos.CENTER);
 
         gridPane.add(buttonButton, 0, 0);
         gridPane.add(alertButton, 1, 0);
         gridPane.add(stacktraceAlertButton, 2, 0);
         gridPane.add(dialogButton, 0, 1);
         gridPane.add(keyChooserBtn, 1, 1);
+        gridPane.add(toggleSwitch.getNode(), 2, 1);
         gridPane.add(noAnimationButton, 0, 2, 2, 1);
         gridPane.add(onlyAnimateWhenNotClickedButton, 0, 3, 2, 1);
+        gridPane.add(slider, 0, 4, 3, 1);
+        gridPane.add(new Label(), 0, 5);
 
         getContentPane().getChildren().add(gridPane);
     }
