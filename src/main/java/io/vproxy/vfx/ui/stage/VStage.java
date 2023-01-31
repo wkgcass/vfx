@@ -256,7 +256,11 @@ public class VStage {
     }
 
     public void setIconified(boolean iconified) {
-        stage.setIconified(iconified);
+        if (OSUtils.isMac()) {
+            stage.toBack();
+        } else {
+            stage.setIconified(iconified);
+        }
     }
 
     private double stageOriginalX;

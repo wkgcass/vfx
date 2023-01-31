@@ -87,8 +87,8 @@ public class VTableView<S> implements NodeWithVScrollPane {
 
         columnPane.getChildren().addAll(this.columnPane, fixColumnWidthColum);
 
-        FXUtils.makeTopOnlyClipFor(columnPane, 4);
-        FXUtils.makeBottomOnlyClipFor(dataPane, 4);
+        FXUtils.makeTopOnlyRoundedClipFor(columnPane, 4);
+        FXUtils.makeBottomOnlyRoundedClipFor(dataPane, 4);
     }
 
     public Region getNode() {

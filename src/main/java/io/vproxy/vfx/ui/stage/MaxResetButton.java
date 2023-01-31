@@ -77,11 +77,13 @@ public class MaxResetButton extends WindowControlButton {
             imageView.setFitHeight(22);
             imageView.setLayoutX((WIDTH - 22) / 2d);
             imageView.setLayoutY((HEIGHT - 22) / 2d);
+            imageView.setScaleX(-1);
         } else {
-            imageView.setFitWidth(12);
-            imageView.setFitHeight(12);
-            imageView.setLayoutX((WIDTH - 12) / 2d);
-            imageView.setLayoutY((HEIGHT - 12) / 2d);
+            imageView.setFitWidth(20);
+            imageView.setFitHeight(20);
+            imageView.setLayoutX((WIDTH - 20) / 2d);
+            imageView.setLayoutY((HEIGHT - 20) / 2d);
+            imageView.setScaleX(-1);
         }
         if (clickHandler.isMouseEntered()) {
             imageView.setImage(currentImageGroup()[1]);

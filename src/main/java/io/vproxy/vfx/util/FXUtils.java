@@ -305,6 +305,8 @@ public class FXUtils {
         return cut;
     }
 
+    private static final int overlapLen = 1;
+
     @SuppressWarnings("DuplicatedCode")
     public static Group makeClipFor(Region node, double cornerRadii) {
         var nodeCutTL = new Circle() {{
@@ -318,7 +320,7 @@ public class FXUtils {
         }};
         var nodeCutTopMid = new javafx.scene.shape.Rectangle() {{
             setLayoutX(cornerRadii);
-            setHeight(cornerRadii);
+            setHeight(cornerRadii + overlapLen);
         }};
         var nodeCutBL = new Circle() {{
             setLayoutX(cornerRadii);
@@ -329,7 +331,7 @@ public class FXUtils {
         }};
         var nodeCutBotMid = new javafx.scene.shape.Rectangle() {{
             setLayoutX(cornerRadii);
-            setHeight(cornerRadii);
+            setHeight(cornerRadii + overlapLen);
         }};
         var nodeCutMid = new Rectangle() {{
             setLayoutY(cornerRadii);
@@ -351,7 +353,7 @@ public class FXUtils {
             var h = now.doubleValue();
             nodeCutBL.setLayoutY(h - cornerRadii);
             nodeCutBR.setLayoutY(h - cornerRadii);
-            nodeCutBotMid.setLayoutY(h - cornerRadii);
+            nodeCutBotMid.setLayoutY(h - cornerRadii - overlapLen);
             nodeCutMid.setHeight(h - cornerRadii * 2);
         };
         node.heightProperty().addListener(heightListener);
@@ -361,7 +363,7 @@ public class FXUtils {
     }
 
     @SuppressWarnings("DuplicatedCode")
-    public static Group makeBottomOnlyClipFor(Region node, double cornerRadii) {
+    public static Group makeBottomOnlyRoundedClipFor(Region node, double cornerRadii) {
         var nodeCutBL = new Circle() {{
             setLayoutX(cornerRadii);
             setRadius(cornerRadii);
@@ -371,7 +373,7 @@ public class FXUtils {
         }};
         var nodeCutBotMid = new javafx.scene.shape.Rectangle() {{
             setLayoutX(cornerRadii);
-            setHeight(cornerRadii);
+            setHeight(cornerRadii + overlapLen);
         }};
         var nodeCutMid = new Rectangle();
         var nodeCut = new Group(nodeCutBL, nodeCutBR, nodeCutBotMid, nodeCutMid);
@@ -389,7 +391,7 @@ public class FXUtils {
             var h = now.doubleValue();
             nodeCutBL.setLayoutY(h - cornerRadii);
             nodeCutBR.setLayoutY(h - cornerRadii);
-            nodeCutBotMid.setLayoutY(h - cornerRadii);
+            nodeCutBotMid.setLayoutY(h - cornerRadii - overlapLen);
             nodeCutMid.setHeight(h - cornerRadii);
         };
         node.heightProperty().addListener(heightListener);
@@ -399,7 +401,7 @@ public class FXUtils {
     }
 
     @SuppressWarnings("DuplicatedCode")
-    public static Group makeTopOnlyClipFor(Region node, double cornerRadii) {
+    public static Group makeTopOnlyRoundedClipFor(Region node, double cornerRadii) {
         var nodeCutTL = new Circle() {{
             setLayoutX(cornerRadii);
             setLayoutY(cornerRadii);
@@ -411,7 +413,7 @@ public class FXUtils {
         }};
         var nodeCutTopMid = new javafx.scene.shape.Rectangle() {{
             setLayoutX(cornerRadii);
-            setHeight(cornerRadii);
+            setHeight(cornerRadii + overlapLen);
         }};
         var nodeCutMid = new Rectangle() {{
             setLayoutY(cornerRadii);
