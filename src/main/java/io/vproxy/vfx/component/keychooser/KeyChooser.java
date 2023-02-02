@@ -4,7 +4,7 @@ import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import io.vproxy.vfx.control.dialog.VDialog;
-import io.vproxy.vfx.control.dialog.VDialogValueProvider;
+import io.vproxy.vfx.control.dialog.VDialogButton;
 import io.vproxy.vfx.control.globalscreen.GlobalScreenUtils;
 import io.vproxy.vfx.entity.input.Key;
 import io.vproxy.vfx.entity.input.KeyCode;
@@ -12,7 +12,8 @@ import io.vproxy.vfx.manager.internal_i18n.InternalI18n;
 import javafx.application.Platform;
 import javafx.scene.input.MouseButton;
 
-import java.util.LinkedHashMap;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Optional;
 
 import static com.github.kwhat.jnativehook.keyboard.NativeKeyEvent.*;
@@ -51,15 +52,15 @@ public class KeyChooser extends VDialog<Key> {
 
     public KeyChooser(boolean withMouse) {
         if (withMouse) {
-            setButtons(new LinkedHashMap<>() {{
-                put(InternalI18n.get().keyChooserLeftMouseButton(), new VDialogValueProvider<>(new Key(MouseButton.PRIMARY)));
-                put(InternalI18n.get().keyChooserRightMouseButton(), new VDialogValueProvider<>(new Key(MouseButton.SECONDARY)));
-                put(InternalI18n.get().cancelButton(), new VDialogValueProvider<>(() -> null));
-            }});
+            setButtons(Arrays.asList(
+                new VDialogButton<>(InternalI18n.get().keyChooserLeftMouseButton(), new Key(MouseButton.PRIMARY)),
+                new VDialogButton<>(InternalI18n.get().keyChooserRightMouseButton(), new Key(MouseButton.SECONDARY)),
+                new VDialogButton<>(InternalI18n.get().cancelButton(), () -> null)
+            ));
         } else {
-            setButtons(new LinkedHashMap<>() {{
-                put(InternalI18n.get().cancelButton(), new VDialogValueProvider<>(() -> null));
-            }});
+            setButtons(Collections.singletonList(
+                new VDialogButton<>(InternalI18n.get().cancelButton(), () -> null)
+            ));
         }
 
         getMessageNode().setText(withMouse ? InternalI18n.get().keyChooserDesc() : InternalI18n.get().keyChooserDescWithoutMouse());

@@ -4,7 +4,7 @@ import javafx.geometry.Insets;
 import javafx.scene.layout.Pane;
 
 public class VPadding extends Pane {
-    public VPadding(int padding) {
+    public VPadding(double padding) {
         setVisible(false);
         setWidth(0);
         setPrefWidth(0);

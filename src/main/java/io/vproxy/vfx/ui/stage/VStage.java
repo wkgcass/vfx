@@ -32,11 +32,8 @@ public class VStage {
     private final VSceneGroup rootSceneGroup = new VSceneGroup(rootContent,
         new VSceneGroupInitParams()
             .setUseClip(false));
-    private final VScene content = new VScene(VSceneRole.MAIN);
-    private final VSceneGroup sceneGroup = new VSceneGroup(content,
-        new VSceneGroupInitParams()
-            .setGradientCover(true)
-            .setUseClip(false));
+    private final VScene content;
+    private final VSceneGroup sceneGroup;
     private final Label title = new Label() {{
         FontManager.get().setFont(FontUsages.windowTitle, this);
         setTextFill(Theme.current().normalTextColor());
@@ -67,6 +64,17 @@ public class VStage {
     public VStage(Stage stage, VStageInitParams initParams) {
         this.stage = stage;
         stage.initStyle(StageStyle.TRANSPARENT);
+
+        //noinspection ReplaceNullCheck
+        if (initParams.initialScene == null) {
+            content = new VScene(VSceneRole.MAIN);
+        } else {
+            content = initParams.initialScene;
+        }
+        sceneGroup = new VSceneGroup(content,
+            new VSceneGroupInitParams()
+                .setGradientCover(true)
+                .setUseClip(false));
 
         var scene = new Scene(rootContainer);
         scene.setFill(Color.TRANSPARENT);

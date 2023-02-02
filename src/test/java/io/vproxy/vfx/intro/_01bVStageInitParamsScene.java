@@ -111,6 +111,18 @@ public class _01bVStageInitParamsScene extends DemoVScene {
             stage.show();
         });
 
+        var initialSceneButton = new FusionButton("setInitialScene(...)") {{
+            setPrefWidth(320);
+            setPrefHeight(150);
+        }};
+        initialSceneButton.setOnAction(e -> {
+            var stage = new VStage(new VStageInitParams()
+                .setInitialScene(new _00IntroScene()));
+            stage.getStage().setWidth(400);
+            stage.getStage().setHeight(400);
+            stage.show();
+        });
+
         var gridPane = new GridPane();
         gridPane.setLayoutY(300);
         gridPane.setHgap(50);
@@ -121,6 +133,7 @@ public class _01bVStageInitParamsScene extends DemoVScene {
         gridPane.add(noMaximizeAndResetButton, 2, 0);
         gridPane.add(noCloseButton, 0, 1);
         gridPane.add(notResizableButton, 1, 1);
+        gridPane.add(initialSceneButton, 2, 1);
 
         getContentPane().getChildren().addAll(
             msgLabel,

@@ -2,7 +2,7 @@ package io.vproxy.vfx.intro;
 
 import io.vproxy.vfx.component.keychooser.KeyChooser;
 import io.vproxy.vfx.control.dialog.VDialog;
-import io.vproxy.vfx.control.dialog.VDialogValueProvider;
+import io.vproxy.vfx.control.dialog.VDialogButton;
 import io.vproxy.vfx.ui.alert.SimpleAlert;
 import io.vproxy.vfx.ui.alert.StackTraceAlert;
 import io.vproxy.vfx.ui.button.FusionButton;
@@ -16,7 +16,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.TextAlignment;
 
-import java.util.LinkedHashMap;
+import java.util.Arrays;
 
 public class _xxbComponentsDemoScene extends DemoVScene {
     public _xxbComponentsDemoScene() {
@@ -39,12 +39,11 @@ public class _xxbComponentsDemoScene extends DemoVScene {
         dialogButton.setOnAction(e -> {
             var dialog = new VDialog<Integer>();
             dialog.setText("Choose a number");
-            dialog.setButtons(new LinkedHashMap<>() {{
-                put("1", new VDialogValueProvider<>(1));
-                put("2", new VDialogValueProvider<>(2));
-                put("3", new VDialogValueProvider<>(3));
-                put("Cancel", new VDialogValueProvider<>());
-            }});
+            dialog.setButtons(Arrays.asList(
+                new VDialogButton<>("1", 1),
+                new VDialogButton<>("2", 2),
+                new VDialogButton<>("3", 3)
+            ));
             var result = dialog.showAndWait();
             SimpleAlert.showAndWait(Alert.AlertType.INFORMATION, "dialog result is " + result);
         });

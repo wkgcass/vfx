@@ -16,7 +16,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Optional;
 
 public class VDialog<T> {
@@ -80,13 +80,12 @@ public class VDialog<T> {
         return messageLabel;
     }
 
-    public void setButtons(LinkedHashMap<String, VDialogValueProvider<T>> buttons) {
+    public void setButtons(List<VDialogButton<T>> buttons) {
         buttonHBox.getChildren().clear();
         var ls = new ArrayList<Node>();
         var isFirst = true;
-        for (var entry : buttons.entrySet()) {
-            var name = entry.getKey();
-            var value = entry.getValue();
+        for (var btn : buttons) {
+            var name = btn.name;
             var button = new FusionButton(name);
             if (isFirst) {
                 isFirst = false;
@@ -98,8 +97,8 @@ public class VDialog<T> {
             button.setPrefHeight(BUTTON_HEIGHT);
             ls.add(button);
             button.setOnAction(e -> {
-                if (!value.directlySetValue) {
-                    returnValue = value.provider.get();
+                if (btn.provider != null) {
+                    returnValue = btn.provider.get();
                 }
                 stage.close();
             });

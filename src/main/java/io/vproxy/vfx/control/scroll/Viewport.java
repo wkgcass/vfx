@@ -86,14 +86,14 @@ public class Viewport {
             return;
         }
         var width = lastContentWidth;
-        var viewportW = root.getHeight();
+        var viewportW = root.getWidth();
         if (viewportW >= width) {
             container.setLayoutX(0);
             return;
         }
         var x = container.getLayoutX(); // <= 0
         if (width - viewportW + x < 0) {
-            container.setLayoutY(viewportW - width);
+            container.setLayoutX(viewportW - width);
         }
     }
 

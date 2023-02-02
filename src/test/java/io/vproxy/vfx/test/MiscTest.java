@@ -1,7 +1,7 @@
 package io.vproxy.vfx.test;
 
 import io.vproxy.vfx.control.dialog.VDialog;
-import io.vproxy.vfx.control.dialog.VDialogValueProvider;
+import io.vproxy.vfx.control.dialog.VDialogButton;
 import io.vproxy.vfx.manager.font.FontManager;
 import io.vproxy.vfx.manager.image.ImageManager;
 import io.vproxy.vfx.manager.task.TaskManager;
@@ -30,7 +30,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.Arrays;
 import java.util.Map;
 
 public class MiscTest extends Application {
@@ -151,11 +151,11 @@ public class MiscTest extends Application {
         transparentButton3.setOnAction(e -> {
             var dialog = new VDialog<Integer>();
             dialog.getMessageNode().setText("a b c d e f g h i j k l m n o p q r s t u v w x y z ".repeat(10));
-            dialog.setButtons(new LinkedHashMap<>() {{
-                put("1", new VDialogValueProvider<>(1));
-                put("2", new VDialogValueProvider<>(2));
-                put("3", new VDialogValueProvider<>(3));
-            }});
+            dialog.setButtons(Arrays.asList(
+                new VDialogButton<>("1", 1),
+                new VDialogButton<>("2", 2),
+                new VDialogButton<>("3", 3)
+            ));
             var result = dialog.showAndWait();
             if (result.isPresent()) {
                 SimpleAlert.showAndWait(Alert.AlertType.INFORMATION, "点击的按钮是：" + result);
