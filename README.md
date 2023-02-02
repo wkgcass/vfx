@@ -3,14 +3,14 @@
 ## Add Dependency
 
 ```groovy
-implementation 'io.vproxy:vfx:1.1.2'
+implementation 'io.vproxy:vfx:1.2.0'
 ```
 
 ```xml
 <dependency>
   <groupId>io.vproxy</groupId>
   <artifactId>vfx</artifactId>
-  <version>1.1.2</version>
+  <version>1.2.0</version>
 </dependency>
 ```
 
