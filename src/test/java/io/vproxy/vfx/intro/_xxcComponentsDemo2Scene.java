@@ -20,7 +20,7 @@ public class _xxcComponentsDemo2Scene extends DemoVScene {
             "" +
             "Some components are suitable for image backgrounds."
         ) {{
-            FontManager.get().setFont(this, 30);
+            FontManager.get().setFont(this, settings -> settings.setSize(30));
         }};
         FXUtils.observeWidthCenter(getContentPane(), msgLabel);
         msgLabel.setLayoutY(100);

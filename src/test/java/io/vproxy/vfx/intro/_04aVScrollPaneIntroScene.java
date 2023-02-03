@@ -15,7 +15,7 @@ public class _04aVScrollPaneIntroScene extends DemoVScene {
 
         var pane = new VBox(
             new ThemeLabel("04. VScrollPane") {{
-                FontManager.get().setFont(this, 40);
+                FontManager.get().setFont(this, settings -> settings.setSize(40));
             }},
             new VPadding(30),
             new ThemeLabel("VScrollPane is the VFX version ScrollPane.")

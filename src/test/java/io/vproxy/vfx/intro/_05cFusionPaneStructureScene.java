@@ -15,7 +15,7 @@ public class _05cFusionPaneStructureScene extends DemoVScene {
 
         var pane = new VBox(
             new ThemeLabel("FusionPane Internal Structure") {{
-                FontManager.get().setFont(this, 40);
+                FontManager.get().setFont(this, settings -> settings.setSize(40));
             }},
             new VPadding(30),
             new ThemeLabel(

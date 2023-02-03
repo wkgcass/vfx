@@ -494,4 +494,8 @@ public class FXUtils {
         }
         return wImg;
     }
+
+    public static void disableFocusColor(Node node) {
+        node.setStyle("-fx-focus-color: transparent; -fx-faint-focus-color: transparent;");
+    }
 }

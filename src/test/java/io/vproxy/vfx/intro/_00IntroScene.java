@@ -11,7 +11,7 @@ public class _00IntroScene extends DemoVScene {
         enableAutoContentWidthHeight();
 
         var label = new ThemeLabel("Welcome to VFX") {{
-            FontManager.get().setFont(this, 40);
+            FontManager.get().setFont(this, settings -> settings.setSize(40));
         }};
         getContentPane().getChildren().add(label);
         FXUtils.observeWidthHeightCenter(getContentPane(), label);

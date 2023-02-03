@@ -27,7 +27,7 @@ public class _02bVSceneGroupDisplayScene extends DemoVScene {
             "This pane is inside a VSceneGroup.\n" +
             "The bottom 'previous' and 'next' buttons uses its functions to switch the 'MAIN' scenes."
         ) {{
-            FontManager.get().setFont(this, 20);
+            FontManager.get().setFont(this, settings -> settings.setSize(20));
         }};
         getContentPane().getChildren().add(pane);
         pane.getChildren().add(label);

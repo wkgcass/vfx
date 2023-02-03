@@ -5,9 +5,9 @@ import io.vproxy.vfx.util.Logger;
 import javafx.scene.control.Labeled;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+
+import java.util.function.Function;
 
 public class FontManager {
     private static final FontManager instance = new FontManager();
@@ -50,137 +50,75 @@ public class FontManager {
     }
 
     public void setFont(Labeled labeled) {
-        labeled.setFont(Font.font(getProvider().name(FontUsages.defaultUsage), getProvider().defaultFontSize(FontUsages.defaultUsage)));
+        setFont(FontUsages.defaultUsage, labeled);
     }
 
-    public void setFont(Labeled labeled, int size) {
-        labeled.setFont(Font.font(getProvider().name(FontUsages.defaultUsage), size));
-    }
-
-    public void setFont(Labeled labeled, FontPosture posture, double size) {
-        labeled.setFont(Font.font(getProvider().name(FontUsages.defaultUsage), posture, size));
-    }
-
-    public void setFont(Labeled labeled, FontWeight weight, double size) {
-        labeled.setFont(Font.font(getProvider().name(FontUsages.defaultUsage), weight, size));
-    }
-
-    public void setFont(Labeled labeled, FontWeight weight,
-                        FontPosture posture, double size) {
-        labeled.setFont(Font.font(getProvider().name(FontUsages.defaultUsage), weight, posture, size));
+    public void setFont(Labeled labeled, Function<FontSettings, FontSettings> apply) {
+        setFont(FontUsages.defaultUsage, labeled, apply);
     }
 
     // -------------
 
     public void setFont(FontUsage usage, Labeled labeled) {
-        labeled.setFont(Font.font(getProvider().name(usage), getProvider().defaultFontSize(usage)));
+        var settings = new FontSettings();
+        getProvider().apply(usage, settings);
+        labeled.setFont(settings.build());
     }
 
-    public void setFont(FontUsage usage, Labeled labeled, int size) {
-        labeled.setFont(Font.font(getProvider().name(usage), size));
-    }
-
-    public void setFont(FontUsage usage, Labeled labeled, FontPosture posture, double size) {
-        labeled.setFont(Font.font(getProvider().name(usage), posture, size));
-    }
-
-    public void setFont(FontUsage usage, Labeled labeled, FontWeight weight, double size) {
-        labeled.setFont(Font.font(getProvider().name(usage), weight, size));
-    }
-
-    public void setFont(FontUsage usage, Labeled labeled, FontWeight weight,
-                        FontPosture posture, double size) {
-        labeled.setFont(Font.font(getProvider().name(usage), weight, posture, size));
+    public void setFont(FontUsage usage, Labeled labeled, Function<FontSettings, FontSettings> apply) {
+        var settings = new FontSettings();
+        getProvider().apply(usage, settings);
+        apply.apply(settings);
+        labeled.setFont(settings.build());
     }
 
     // =============
 
     public void setFont(TextInputControl input) {
-        input.setFont(Font.font(getProvider().name(FontUsages.defaultUsage), getProvider().defaultFontSize(FontUsages.defaultUsage)));
+        setFont(FontUsages.defaultUsage, input);
     }
 
-    public void setFont(TextInputControl input, int size) {
-        input.setFont(Font.font(getProvider().name(FontUsages.defaultUsage), size));
-    }
-
-    public void setFont(TextInputControl input, FontPosture posture, double size) {
-        input.setFont(Font.font(getProvider().name(FontUsages.defaultUsage), posture, size));
-    }
-
-    public void setFont(TextInputControl input, FontWeight weight, double size) {
-        input.setFont(Font.font(getProvider().name(FontUsages.defaultUsage), weight, size));
-    }
-
-    public void setFont(TextInputControl input, FontWeight weight,
-                        FontPosture posture, double size) {
-        input.setFont(Font.font(getProvider().name(FontUsages.defaultUsage), weight, posture, size));
+    public void setFont(TextInputControl input, Function<FontSettings, FontSettings> apply) {
+        setFont(FontUsages.defaultUsage, input, apply);
     }
 
     // -------------
 
     public void setFont(FontUsage usage, TextInputControl input) {
-        input.setFont(Font.font(getProvider().name(usage), getProvider().defaultFontSize(usage)));
+        var settings = new FontSettings();
+        getProvider().apply(usage, settings);
+        input.setFont(settings.build());
     }
 
-    public void setFont(FontUsage usage, TextInputControl input, int size) {
-        input.setFont(Font.font(getProvider().name(usage), size));
-    }
-
-    public void setFont(FontUsage usage, TextInputControl input, FontPosture posture, double size) {
-        input.setFont(Font.font(getProvider().name(usage), posture, size));
-    }
-
-    public void setFont(FontUsage usage, TextInputControl input, FontWeight weight, double size) {
-        input.setFont(Font.font(getProvider().name(usage), weight, size));
-    }
-
-    public void setFont(FontUsage usage, TextInputControl input, FontWeight weight,
-                        FontPosture posture, double size) {
-        input.setFont(Font.font(getProvider().name(usage), weight, posture, size));
+    public void setFont(FontUsage usage, TextInputControl input, Function<FontSettings, FontSettings> apply) {
+        var settings = new FontSettings();
+        getProvider().apply(usage, settings);
+        apply.apply(settings);
+        input.setFont(settings.build());
     }
 
     // =============
+
     public void setFont(Text text) {
-        text.setFont(Font.font(getProvider().name(FontUsages.defaultUsage), getProvider().defaultFontSize(FontUsages.defaultUsage)));
+        setFont(FontUsages.defaultUsage, text);
     }
 
-    public void setFont(Text text, int size) {
-        text.setFont(Font.font(getProvider().name(FontUsages.defaultUsage), size));
-    }
-
-    public void setFont(Text text, FontPosture posture, double size) {
-        text.setFont(Font.font(getProvider().name(FontUsages.defaultUsage), posture, size));
-    }
-
-    public void setFont(Text text, FontWeight weight, double size) {
-        text.setFont(Font.font(getProvider().name(FontUsages.defaultUsage), weight, size));
-    }
-
-    public void setFont(Text text, FontWeight weight,
-                        FontPosture posture, double size) {
-        text.setFont(Font.font(getProvider().name(FontUsages.defaultUsage), weight, posture, size));
+    public void setFont(Text text, Function<FontSettings, FontSettings> apply) {
+        setFont(FontUsages.defaultUsage, text, apply);
     }
 
     // -------------
 
     public void setFont(FontUsage usage, Text text) {
-        text.setFont(Font.font(getProvider().name(usage), getProvider().defaultFontSize(usage)));
+        var settings = new FontSettings();
+        getProvider().apply(usage, settings);
+        text.setFont(settings.build());
     }
 
-    public void setFont(FontUsage usage, Text text, int size) {
-        text.setFont(Font.font(getProvider().name(usage), size));
-    }
-
-    public void setFont(FontUsage usage, Text text, FontPosture posture, double size) {
-        text.setFont(Font.font(getProvider().name(usage), posture, size));
-    }
-
-    public void setFont(FontUsage usage, Text text, FontWeight weight, double size) {
-        text.setFont(Font.font(getProvider().name(usage), weight, size));
-    }
-
-    public void setFont(FontUsage usage, Text text, FontWeight weight,
-                        FontPosture posture, double size) {
-        text.setFont(Font.font(getProvider().name(usage), weight, posture, size));
+    public void setFont(FontUsage usage, Text text, Function<FontSettings, FontSettings> apply) {
+        var settings = new FontSettings();
+        getProvider().apply(usage, settings);
+        apply.apply(settings);
+        text.setFont(settings.build());
     }
 }

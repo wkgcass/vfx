@@ -15,7 +15,7 @@ public class _07aAnimationSystemIntroScene extends DemoVScene {
 
         var pane = new VBox(
             new ThemeLabel("07. Animation System") {{
-                FontManager.get().setFont(this, 40);
+                FontManager.get().setFont(this, settings -> settings.setSize(40));
             }},
             new VPadding(30),
             new ThemeLabel("A powerful animation graph system.")

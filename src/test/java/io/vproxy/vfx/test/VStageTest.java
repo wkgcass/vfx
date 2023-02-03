@@ -40,12 +40,12 @@ public class VStageTest extends Application {
             getImageView().setFitHeight(15);
         }};
         var addBtn = new FusionButton("Add") {{
-            FontManager.get().setFont(getTextNode(), 18);
+            FontManager.get().setFont(getTextNode(), settings -> settings.setSize(18));
             setPrefWidth(120);
             setPrefHeight(VStage.TITLE_BAR_HEIGHT - 4);
         }};
         var delBtn = new FusionButton("Del") {{
-            FontManager.get().setFont(getTextNode(), 18);
+            FontManager.get().setFont(getTextNode(), settings -> settings.setSize(18));
             setPrefWidth(120);
             setPrefHeight(VStage.TITLE_BAR_HEIGHT - 4);
         }};
@@ -55,7 +55,7 @@ public class VStageTest extends Application {
             setLayoutY(4);
         }});
         label.setTextFill(Theme.current().normalTextColor());
-        FontManager.get().setFont(label, 90);
+        FontManager.get().setFont(label, settings -> settings.setSize(90));
         stage.getInitialScene().getContentPane().getChildren().add(label);
 
         setValue(n);

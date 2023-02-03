@@ -15,7 +15,7 @@ public class _01aVStageIntroScene extends DemoVScene {
 
         var pane = new VBox(
             new ThemeLabel("01. VStage") {{
-                FontManager.get().setFont(this, 40);
+                FontManager.get().setFont(this, settings -> settings.setSize(40));
             }},
             new VPadding(30),
             new ThemeLabel("VStage is the VFX version Stage.")

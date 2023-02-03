@@ -4,6 +4,7 @@ import io.vproxy.vfx.animation.AnimationGraph;
 import io.vproxy.vfx.animation.AnimationGraphBuilder;
 import io.vproxy.vfx.animation.AnimationNode;
 import io.vproxy.vfx.theme.Theme;
+import io.vproxy.vfx.util.FXUtils;
 import io.vproxy.vfx.util.algebradata.DoubleData;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -52,7 +53,7 @@ public class FusionW extends Pane {
     public <T extends Node> FusionW(T node, Function<T, StringProperty> fluentPropertyGetter) {
         this.node = node;
         this.property = fluentPropertyGetter.apply(node);
-        this.node.setStyle("-fx-focus-color: transparent; -fx-faint-focus-color: transparent;");
+        FXUtils.disableFocusColor(this.node);
 
         node.layoutBoundsProperty().addListener((ob, old, now) -> update());
         property.addListener((ob, old, now) -> {

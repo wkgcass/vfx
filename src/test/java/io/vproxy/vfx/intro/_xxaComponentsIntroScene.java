@@ -15,7 +15,7 @@ public class _xxaComponentsIntroScene extends DemoVScene {
 
         var pane = new VBox(
             new ThemeLabel("Other Components") {{
-                FontManager.get().setFont(this, 40);
+                FontManager.get().setFont(this, settings -> settings.setSize(40));
             }},
             new VPadding(30),
             new ThemeLabel("VFX provides so many useful components.")

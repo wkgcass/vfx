@@ -33,7 +33,7 @@ public class _02dVSceneGroupMenuScene extends DemoVScene {
         var pane = new VBox(
             new ThemeLabel("The menu is a DRAWER_VERTICAL scene\n" +
                            "shows using FROM_LEFT, and hides using TO_LEFT") {{
-                FontManager.get().setFont(this, 35);
+                FontManager.get().setFont(this, settings -> settings.setSize(35));
             }},
             new VPadding(30),
             new ThemeLabel("Click the button to show the menu.")

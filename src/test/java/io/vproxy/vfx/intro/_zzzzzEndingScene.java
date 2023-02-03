@@ -15,7 +15,7 @@ public class _zzzzzEndingScene extends DemoVScene {
 
         var pane = new VBox(
             new ThemeLabel("This is the end of this demo") {{
-                FontManager.get().setFont(this, 40);
+                FontManager.get().setFont(this, settings -> settings.setSize(40));
             }},
             new VPadding(30),
             new ThemeLabel("This demo only shows how the UI elements work,\n" +

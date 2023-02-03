@@ -37,6 +37,7 @@ public class _09bLogConsoleDemoScene extends DemoVScene {
         var scrollCheckBox = new CheckBox("Always scroll to end") {{
             setTextFill(Theme.current().normalTextColor());
             FontManager.get().setFont(this);
+            FXUtils.disableFocusColor(this);
         }};
         scrollCheckBox.setSelected(console.isAlwaysScrollToEnd());
         scrollCheckBox.setOnAction(e -> console.setAlwaysScrollToEnd(scrollCheckBox.isSelected()));

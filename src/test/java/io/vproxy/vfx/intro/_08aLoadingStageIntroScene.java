@@ -15,7 +15,7 @@ public class _08aLoadingStageIntroScene extends DemoVScene {
 
         var pane = new VBox(
             new ThemeLabel("08. ProgressBar & LoadingStage") {{
-                FontManager.get().setFont(this, 40);
+                FontManager.get().setFont(this, settings -> settings.setSize(40));
             }},
             new VPadding(30),
             new ThemeLabel("A useful tool for visualizing loading process.")

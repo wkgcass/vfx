@@ -15,7 +15,7 @@ public class _02aVSceneGroupIntroScene extends DemoVScene {
 
         var pane = new VBox(
             new ThemeLabel("02. VSceneGroup") {{
-                FontManager.get().setFont(this, 40);
+                FontManager.get().setFont(this, settings -> settings.setSize(40));
             }},
             new VPadding(30),
             new ThemeLabel("VSceneGroup handles scene switching.")
