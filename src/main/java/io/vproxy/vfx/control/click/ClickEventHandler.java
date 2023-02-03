@@ -40,6 +40,9 @@ public abstract class ClickEventHandler implements EventHandler<MouseEvent> {
 
     private void eventOnMouseEntered() {
         mouseEntered = true;
+        if (mousePressed) {
+            return;
+        }
         onMouseEntered();
     }
 

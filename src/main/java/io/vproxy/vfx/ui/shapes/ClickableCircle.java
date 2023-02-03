@@ -34,9 +34,6 @@ public class ClickableCircle extends Circle {
         var clickHandler = new ClickEventHandler() {
             @Override
             protected void onMouseEntered() {
-                if (animation.getCurrentNode() == down) {
-                    animation.stopAndSetNode(normal);
-                }
                 animation.play(hover);
             }
 

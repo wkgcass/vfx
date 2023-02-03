@@ -3,16 +3,13 @@ package io.vproxy.vfx.ui.alert;
 import io.vproxy.vfx.manager.font.FontManager;
 import io.vproxy.vfx.manager.font.FontUsages;
 import io.vproxy.vfx.manager.internal_i18n.InternalI18n;
-import io.vproxy.vfx.theme.Theme;
 import io.vproxy.vfx.ui.layout.VPadding;
-import io.vproxy.vfx.ui.pane.AbstractFusionPane;
+import io.vproxy.vfx.ui.pane.ClickableFusionPane;
 import io.vproxy.vfx.ui.pane.FusionPane;
 import io.vproxy.vfx.ui.wrapper.ThemeLabel;
 import io.vproxy.vfx.util.FXUtils;
-import javafx.scene.Cursor;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.DataFormat;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
 import java.io.PrintWriter;
@@ -42,28 +39,12 @@ public class StackTraceAlert extends ThemeAlertBase {
         throwable.printStackTrace(pw);
         String exceptionText = sw.toString();
 
-        var stacktracePane = new FusionPane() {
-            @Override
-            protected AbstractFusionPane buildRootNode() {
-                return new FusionPaneImpl() {
-                    {
-                        setCursor(Cursor.HAND);
-                    }
-
-                    @Override
-                    protected void onMouseClicked() {
-                        Clipboard.getSystemClipboard().setContent(
-                            Map.of(DataFormat.PLAIN_TEXT, exceptionText)
-                        );
-                    }
-
-                    @Override
-                    protected Color downColor() {
-                        return Theme.current().fusionButtonDownBackgroundColor();
-                    }
-                };
-            }
-        };
+        var stacktracePane = new ClickableFusionPane();
+        stacktracePane.setOnAction(e -> {
+            Clipboard.getSystemClipboard().setContent(
+                Map.of(DataFormat.PLAIN_TEXT, exceptionText)
+            );
+        });
         stacktracePane.getNode().setPrefWidth(getStage().getWidth() - 2 * PADDING_H - 5);
         var stacktraceText = new ThemeLabel(exceptionText) {{
             setFont(new Font(FontManager.FONT_NAME_JetBrainsMono, 14));

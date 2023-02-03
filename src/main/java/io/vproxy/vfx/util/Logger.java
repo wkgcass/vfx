@@ -1,5 +1,7 @@
 package io.vproxy.vfx.util;
 
+import io.vproxy.vfx.util.logger.ObservableLogHandler;
+
 import java.io.OutputStream;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
@@ -9,27 +11,55 @@ abstract public class Logger {
     private static Logger logger;
 
     private static final java.util.logging.Logger defaultLogger = java.util.logging.Logger.getLogger("vfx");
+    public static final ObservableLogHandler observableLogHandler;
 
     static {
         // %1:date, %2:source, %3:logger, %4:level, %5:message, %6:thrown
         System.setProperty("java.util.logging.SimpleFormatter.format",
             "%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS %4$s %5$s%6$s%n");
+        var logLevel = System.getProperty("io.vproxy.vfx.logLevel");
+        Level level;
+        Level consoleLevel;
+        if (logLevel == null || logLevel.isBlank()) {
+            level = Level.INFO;
+            consoleLevel = Level.ALL;
+        } else {
+            level = MiscUtils.javaLoggingLevelValueOf(logLevel);
+            consoleLevel = level;
+        }
+        var consoleLogLevel = System.getProperty("io.vproxy.vfx.consoleLogLevel");
+        if (consoleLogLevel != null && !consoleLogLevel.isBlank()) {
+            consoleLevel = MiscUtils.javaLoggingLevelValueOf(consoleLogLevel);
+        }
+        var preserveLogCountStr = System.getProperty("io.vproxy.vfx.preserveLogCount", "100");
+        int preserveLogCount;
+        try {
+            preserveLogCount = Integer.parseInt(preserveLogCountStr);
+        } catch (NumberFormatException e) {
+            System.out.println("invalid io.vproxy.vfx.preserveLogCount value: " + preserveLogCountStr + ", using 100 instead");
+            preserveLogCount = 100;
+        }
+
         defaultLogger.setLevel(Level.ALL);
-        var handler = new ConsoleHandler() {
+        var consoleHandler = new ConsoleHandler() {
             @Override
             protected synchronized void setOutputStream(OutputStream out) throws SecurityException {
                 super.setOutputStream(System.out);
             }
         };
-        handler.setFormatter(new SimpleFormatter());
-        var logLevel = System.getProperty("io.vproxy.vfx.logLevel", "ALL");
-        Level level = MiscUtils.javaLoggingLevelValueOf(logLevel);
-        handler.setLevel(level);
-        defaultLogger.addHandler(handler);
+        consoleHandler.setFormatter(new SimpleFormatter());
+        consoleHandler.setLevel(consoleLevel);
+
+        observableLogHandler = new ObservableLogHandler(preserveLogCount);
+        observableLogHandler.setFormatter(new SimpleFormatter());
+        observableLogHandler.setLevel(level);
+
+        defaultLogger.addHandler(consoleHandler);
+        defaultLogger.addHandler(observableLogHandler);
         defaultLogger.setUseParentHandlers(false);
     }
 
-    public Logger() {
+    private Logger() {
     }
 
     public static void setLogger(Logger logger) {

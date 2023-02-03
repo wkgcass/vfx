@@ -70,6 +70,8 @@ public class IntroFXMain extends Application {
         mainScenes.add(new _08aLoadingStageIntroScene());
         mainScenes.add(new _08bLoadingStageDemoScene());
         mainScenes.add(new _08cLoadingStageStructureScene());
+        mainScenes.add(new _09aLogConsoleIntroScene());
+        mainScenes.add(new _09bLogConsoleDemoScene());
         mainScenes.add(new _xxaComponentsIntroScene());
         mainScenes.add(new _xxbComponentsDemoScene());
         mainScenes.add(new _xxcComponentsDemo2Scene());

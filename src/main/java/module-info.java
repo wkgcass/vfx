@@ -12,6 +12,7 @@ module io.vproxy.vfx {
 
     exports io.vproxy.vfx.animation;
     exports io.vproxy.vfx.component.keychooser;
+    exports io.vproxy.vfx.component.logconsole;
     exports io.vproxy.vfx.control.click;
     exports io.vproxy.vfx.control.dialog;
     exports io.vproxy.vfx.control.drag;
@@ -45,6 +46,7 @@ module io.vproxy.vfx {
     exports io.vproxy.vfx.util.algebradata;
     exports io.vproxy.vfx.util.graph;
     exports io.vproxy.vfx.util.imagewrapper;
+    exports io.vproxy.vfx.util.logger;
 
     opens io.vproxy.vfx.res.font;
     opens io.vproxy.vfx.res.image;

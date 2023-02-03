@@ -45,8 +45,14 @@ public class VScrollPane implements NodeWithVScrollPane {
     @SuppressWarnings("ReplaceNullCheck")
     public VScrollPane(ScrollDirection scrollDirection) {
         viewport.getNode().setOnScroll(e -> {
+            if (scrollDirection == ScrollDirection.NONE) return;
             var ll = scrollDirection == ScrollDirection.HORIZONTAL ? viewport.getContentWidth() : viewport.getContentHeight();
             if (ll == 0) return;
+            if (scrollDirection == ScrollDirection.HORIZONTAL) {
+                if (ll <= root.getWidth()) return;
+            } else {
+                if (ll <= root.getHeight()) return;
+            }
             double dd = e.getDeltaY() * scrollSpeed / ll;
             if (scrollDirection == ScrollDirection.HORIZONTAL) {
                 setHvalue(getHvalue() - dd);
