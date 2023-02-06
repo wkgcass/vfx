@@ -87,7 +87,8 @@ public class LogConsole {
         FXUtils.runOnFX(() -> add0(log));
     }
 
-    private void add0(String log) {
+    private void add0(String log0) {
+        var log = log0.trim();
         var label = new ThemeLabel(log) {{
             setFont(new Font(FontManager.FONT_NAME_JetBrainsMono, 16));
         }};
