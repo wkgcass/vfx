@@ -17,6 +17,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class LogConsole {
@@ -77,7 +78,7 @@ public class LogConsole {
 
     private void addAll(List<? extends String> added) {
         FXUtils.runOnFX(() -> {
-            for (var log : added) {
+            for (var log : new ArrayList<>(added)) {
                 add(log);
             }
         });
