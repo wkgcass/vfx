@@ -198,4 +198,8 @@ public abstract class Theme {
     public Color sliderButtonBorderColor() {
         return borderColor();
     }
+
+    public Color fusionWrapperBackgroundColor() {
+        return sceneBackgroundColor();
+    }
 }

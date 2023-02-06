@@ -112,6 +112,10 @@ public class FusionButton extends AbstractFusionButton {
         this.actionHandler = handler;
     }
 
+    public EventHandler<?> getOnAction() {
+        return actionHandler;
+    }
+
     @Override
     protected void onMouseClicked() {
         alreadyClicked = true;

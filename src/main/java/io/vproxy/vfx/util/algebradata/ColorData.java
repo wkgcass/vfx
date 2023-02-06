@@ -35,6 +35,12 @@ public class ColorData implements AlgebraData<ColorData> {
 
     public Color getColor() {
         if (color == null) {
+            double alpha = this.alpha;
+            if (alpha > 1) {
+                alpha = 1;
+            } else if (alpha < 0) {
+                alpha = 0;
+            }
             color = FXUtils.fromHSB(h, s, b, alpha);
         }
         return color;

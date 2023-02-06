@@ -35,6 +35,14 @@ public abstract class InternalI18n {
         return "Ok";
     }
 
+    public String confirmationYesButton() {
+        return "Yes";
+    }
+
+    public String confirmationNoButton() {
+        return "No";
+    }
+
     public String cannotFindAnyDisplay() {
         return "cannot find any display";
     }

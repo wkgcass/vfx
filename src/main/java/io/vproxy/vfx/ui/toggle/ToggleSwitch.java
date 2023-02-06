@@ -150,7 +150,7 @@ public class ToggleSwitch {
         return selected;
     }
 
-    private void setSelected(boolean selected) {
+    public void setSelected(boolean selected) {
         this.selected = selected;
         selectedProperty.set(selected);
         animate();

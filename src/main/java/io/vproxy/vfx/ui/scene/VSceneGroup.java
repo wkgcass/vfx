@@ -9,10 +9,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.layout.*;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 
 public class VSceneGroup {
     private final VSceneGroupInitParams initParams;
@@ -20,6 +17,7 @@ public class VSceneGroup {
     private final Set<VScene> scenes = new HashSet<>();
     private final Group mainSceneGroup = new Group();
     private VScene currentMainScene;
+    private VScene nextMainScene = null;
     private final Set<VScene> showingScenes = new HashSet<>();
     private final Set<VScene> animatingShow = new HashSet<>();
     private final Set<VScene> animatingHide = new HashSet<>();
@@ -178,6 +176,9 @@ public class VSceneGroup {
         }
         if (animatingShow.contains(scene)) {
             return;
+        }
+        if (scene.role == VSceneRole.MAIN) {
+            nextMainScene = scene;
         }
         Callback<Void, Exception> cb = new Callback<>() {
             @Override
@@ -340,21 +341,40 @@ public class VSceneGroup {
     private void postShowing(VScene scene) {
         if (scene.role == VSceneRole.MAIN) {
             currentMainScene = scene;
+            nextMainScene = null;
         } else {
             showingScenes.add(scene);
         }
+        scene.getContentPane().requestFocus();
     }
 
     private void postHiding(VScene scene) {
         showingScenes.remove(scene);
+        if (scene.role != VSceneRole.MAIN) {
+            currentMainScene.getContentPane().requestFocus();
+        }
     }
 
     public VScene getCurrentMainScene() {
         return currentMainScene;
     }
 
+    public VScene getNextMainScene() {
+        return nextMainScene;
+    }
+
+    public VScene getNextOrCurrentMainScene() {
+        var nx = getNextMainScene();
+        if (nx == null) return getCurrentMainScene();
+        return nx;
+    }
+
     public boolean isShowing(VScene scene) {
         return scene == currentMainScene || showingScenes.contains(scene) || animatingShow.contains(scene);
+    }
+
+    public Set<VScene> getScenes() {
+        return Collections.unmodifiableSet(scenes);
     }
 
     public Region getNode() {

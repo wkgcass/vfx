@@ -13,7 +13,7 @@ public abstract class ThemeFontProvider implements FontProvider {
         } else if (usage == FontUsages.tableCellText) {
             tableCellText(settings);
         } else {
-            _default(settings);
+            _default(usage, settings);
         }
     }
 
@@ -21,5 +21,5 @@ public abstract class ThemeFontProvider implements FontProvider {
 
     protected abstract void tableCellText(FontSettings settings);
 
-    protected abstract void _default(FontSettings settings);
+    protected abstract void _default(FontUsage usage, FontSettings settings);
 }

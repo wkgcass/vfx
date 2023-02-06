@@ -9,6 +9,7 @@ import io.vproxy.vfx.ui.layout.VPadding;
 import io.vproxy.vfx.util.Callback;
 import io.vproxy.vfx.util.FXUtils;
 import io.vproxy.vfx.util.algebradata.ColorData;
+import javafx.scene.Node;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
@@ -24,7 +25,15 @@ public class FusionPane {
         this(true);
     }
 
+    public FusionPane(Node... nodes) {
+        this(true, nodes);
+    }
+
     public FusionPane(boolean manuallyHandleOuterRegion) {
+        this(manuallyHandleOuterRegion, new Node[0]);
+    }
+
+    public FusionPane(boolean manuallyHandleOuterRegion, Node... nodes) {
         root.getChildren().add(new VBox(
             new VPadding(PADDING_V),
             new HBox(
@@ -38,6 +47,7 @@ public class FusionPane {
             FXUtils.observeWidthHeightWithPreferred(root, content, -PADDING_H * 2, -PADDING_V * 2);
         }
         FXUtils.makeClipFor(content, 4);
+        getContentPane().getChildren().addAll(nodes);
     }
 
     protected AbstractFusionPane buildRootNode() {

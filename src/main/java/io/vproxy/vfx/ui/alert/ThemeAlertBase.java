@@ -25,6 +25,8 @@ public class ThemeAlertBase extends VStage {
             .setMaximizeAndResetButton(false)
             .setResizable(false));
 
+        getStage().centerOnScreen();
+
         var root = getInitialScene().getContentPane();
         root.getChildren().add(new HBox(
             new HPadding(PADDING_H),

@@ -21,6 +21,8 @@ import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.util.regex.Pattern;
+
 public class VStage {
     public static final int TITLE_BAR_HEIGHT = 28;
 
@@ -195,6 +197,8 @@ public class VStage {
         if (initParams.resizable) {
             rootContainer.getChildren().add(resizeButton);
         }
+
+        stage.setOnCloseRequest(e -> close());
     }
 
     public void useDefaultBorder() {
@@ -234,7 +238,7 @@ public class VStage {
     public void setBackground(Paint paint) {
         rootSceneGroup.getNode().setBackground(new Background(new BackgroundFill(
             paint,
-            new CornerRadii(8),
+            CornerRadii.EMPTY,
             Insets.EMPTY)));
     }
 
@@ -263,11 +267,32 @@ public class VStage {
         stage.setTitle(title);
     }
 
+    private boolean supportsIconify() {
+        if (!OSUtils.isMac()) {
+            return true;
+        }
+        var pattern = Pattern.compile("^(\\d+)(.*)$");
+        var version = System.getProperty("javafx.runtime.version", "");
+        var matcher = pattern.matcher(version);
+        if (!matcher.find() || matcher.groupCount() < 1) {
+            return false;
+        }
+        int v;
+        try {
+            v = Integer.parseInt(matcher.group(1));
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        return v >= 17;
+    }
+
     public void setIconified(boolean iconified) {
-        if (OSUtils.isMac()) {
-            stage.toBack();
-        } else {
+        if (supportsIconify()) {
             stage.setIconified(iconified);
+        } else {
+            if (iconified) {
+                stage.toBack();
+            }
         }
     }
 

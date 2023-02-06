@@ -10,6 +10,7 @@ import io.vproxy.vfx.ui.pane.FusionPane;
 import io.vproxy.vfx.ui.stage.VStage;
 import io.vproxy.vfx.util.FXUtils;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
@@ -25,6 +26,7 @@ public class VDialog<T> {
 
     private final VStage stage = new VStage();
     private final Label messageLabel = new Label();
+    private final Group content = new Group(messageLabel);
     private final FusionPane buttonPane = new FusionPane();
     private final HBox buttonHBox = new HBox();
 
@@ -32,6 +34,7 @@ public class VDialog<T> {
 
     public VDialog() {
         stage.getStage().setWidth(900);
+        stage.getStage().centerOnScreen();
 
         messageLabel.setWrapText(true);
         FontManager.get().setFont(FontUsages.dialogText, messageLabel);
@@ -65,7 +68,7 @@ public class VDialog<T> {
             new HPadding(10),
             new VBox(
                 new VPadding(10),
-                messageLabel,
+                content,
                 new VPadding(10),
                 buttonPane.getNode()
             )
@@ -100,10 +103,19 @@ public class VDialog<T> {
                 if (btn.provider != null) {
                     returnValue = btn.provider.get();
                 }
+                onButtonClicked(btn);
                 stage.close();
             });
         }
         buttonHBox.getChildren().addAll(ls);
+    }
+
+    public Group getCleanContent() {
+        content.getChildren().remove(messageLabel);
+        return content;
+    }
+
+    protected void onButtonClicked(VDialogButton<T> btn) {
     }
 
     public Optional<T> showAndWait() {
