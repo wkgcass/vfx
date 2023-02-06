@@ -37,13 +37,15 @@ public class VScrollPane implements NodeWithVScrollPane {
             scrollBarH.setOpacity(d.value);
         })
         .build(animationHide);
+    private ScrollDirection scrollDirection;
 
     public VScrollPane() {
         this(ScrollDirection.VERTICAL);
     }
 
     @SuppressWarnings("ReplaceNullCheck")
-    public VScrollPane(ScrollDirection scrollDirection) {
+    public VScrollPane(ScrollDirection scrollDirection0) {
+        this.scrollDirection = scrollDirection0;
         viewport.getNode().setOnScroll(e -> {
             if (scrollDirection == ScrollDirection.NONE) return;
             var ll = scrollDirection == ScrollDirection.HORIZONTAL ? viewport.getContentWidth() : viewport.getContentHeight();
@@ -255,6 +257,14 @@ public class VScrollPane implements NodeWithVScrollPane {
     public void setHorizontalScrollBarLayoutY(Double horizontalScrollBarLayoutY) {
         this.horizontalScrollBarLayoutY = horizontalScrollBarLayoutY;
         scrollBarH.setLayoutY(horizontalScrollBarLayoutY);
+    }
+
+    public ScrollDirection getScrollDirection() {
+        return scrollDirection;
+    }
+
+    public void setScrollDirection(ScrollDirection scrollDirection) {
+        this.scrollDirection = scrollDirection;
     }
 
     @Override
