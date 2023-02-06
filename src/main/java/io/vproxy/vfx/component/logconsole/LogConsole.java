@@ -8,9 +8,9 @@ import io.vproxy.vfx.ui.pane.FusionPane;
 import io.vproxy.vfx.ui.wrapper.ThemeLabel;
 import io.vproxy.vfx.util.FXUtils;
 import io.vproxy.vfx.util.Logger;
+import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.collections.WeakListChangeListener;
-import javafx.scene.Node;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.Region;
@@ -49,9 +49,9 @@ public class LogConsole {
         var logChangeListenerWrapper = new WeakListChangeListener<>(logChangeListener);
         Logger.observableLogHandler.addLogListener(logChangeListenerWrapper);
 
-        vbox.getChildren().addListener((ListChangeListener<? super Node>) change -> {
+        vbox.heightProperty().addListener((ob, old, now) -> {
             if (alwaysScrollToEnd) {
-                pane.setVvalue(1);
+                Platform.runLater(() -> pane.setVvalue(1));
             }
         });
 
