@@ -166,12 +166,7 @@ public class VSceneGroup {
         if (animatingHide.contains(scene)) {
             animatingHide.remove(scene);
             animatingShow.add(scene);
-            scene.animationGraph.play(scene.stateCenterShown, new Callback<>() {
-                @Override
-                protected void succeeded0(Void value) {
-                    postShowing(scene);
-                }
-            });
+            scene.animationGraph.play(scene.stateCenterShown, Callback.ignoreExceptionHandler(v -> postShowing(scene)));
             return;
         }
         if (animatingShow.contains(scene)) {
@@ -180,12 +175,7 @@ public class VSceneGroup {
         if (scene.role == VSceneRole.MAIN) {
             nextMainScene = scene;
         }
-        Callback<Void, Exception> cb = new Callback<>() {
-            @Override
-            protected void succeeded0(Void value) {
-                showStep2(scene, method);
-            }
-        };
+        Callback<Void, Exception> cb = Callback.ignoreExceptionHandler(v -> showStep2(scene, method));
         switch (method) {
             case FROM_TOP:
                 scene.animationGraph.play(scene.stateTop, cb);
@@ -271,12 +261,7 @@ public class VSceneGroup {
         if (animatingShow.contains(scene)) {
             animatingShow.remove(scene);
             animatingHide.add(scene);
-            scene.animationGraph.play(scene.stateRemoved, new Callback<>() {
-                @Override
-                protected void succeeded0(Void value) {
-                    postHiding(scene);
-                }
-            });
+            scene.animationGraph.play(scene.stateRemoved, Callback.ignoreExceptionHandler(v -> postHiding(scene)));
             return;
         }
         if (animatingHide.contains(scene)) {
@@ -320,17 +305,14 @@ public class VSceneGroup {
     private void doAnimate(VScene scene, AnimationNode<XYZTData> keyNode, boolean isShowing) {
         var animatingSet = isShowing ? animatingShow : animatingHide;
         animatingSet.add(scene);
-        Callback<Void, Exception> cb = new Callback<>() {
-            @Override
-            protected void succeeded0(Void value) {
-                animatingSet.remove(scene);
-                if (isShowing) {
-                    postShowing(scene);
-                } else {
-                    postHiding(scene);
-                }
+        Callback<Void, Exception> cb = Callback.ignoreExceptionHandler(v -> {
+            animatingSet.remove(scene);
+            if (isShowing) {
+                postShowing(scene);
+            } else {
+                postHiding(scene);
             }
-        };
+        });
         if (isShowing) {
             scene.animationGraph.play(scene.stateCenterShown, cb);
         } else {

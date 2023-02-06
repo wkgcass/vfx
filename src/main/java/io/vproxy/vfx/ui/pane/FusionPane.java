@@ -91,12 +91,7 @@ public class FusionPane {
         @Override
         protected void onMouseExited() {
             super.onMouseExited();
-            borderAnimation.play(noBorder, new Callback<>() {
-                @Override
-                protected void succeeded0(Void value) {
-                    setBorder(Border.EMPTY);
-                }
-            });
+            borderAnimation.play(noBorder, Callback.ignoreExceptionHandler(v -> setBorder(Border.EMPTY)));
         }
 
         @Override

@@ -83,11 +83,8 @@ public class AnimationGraph<T extends AlgebraData<T>> {
     }
 
     public void play(AnimationNode<T> key) {
-        play(key, new Callback<>() {
-            @Override
-            protected void succeeded0(Void value) {
-            }
-        });
+        play(key, Callback.ignoreExceptionHandler(v -> {
+        }));
     }
 
     public void play(AnimationNode<T> key, Callback<Void, Exception> cb) {
@@ -200,6 +197,11 @@ public class AnimationGraph<T extends AlgebraData<T>> {
                 stopAndSetNode(n);
                 play(keys, cb);
             }
+
+            @Override
+            protected void failed0(Exception e) {
+                cb.failed(e);
+            }
         });
     }
 
@@ -213,6 +215,11 @@ public class AnimationGraph<T extends AlgebraData<T>> {
             protected void succeeded0(Void value) {
                 stopAndSetNode(n);
                 play(keys, cb);
+            }
+
+            @Override
+            protected void failed0(Exception e) {
+                cb.failed(e);
             }
         });
     }

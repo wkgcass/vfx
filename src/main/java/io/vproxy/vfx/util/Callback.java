@@ -1,6 +1,7 @@
 package io.vproxy.vfx.util;
 
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 abstract public class Callback<T, EX> {
     public Callback() {
@@ -16,6 +17,20 @@ abstract public class Callback<T, EX> {
             @Override
             protected void failed0(EX ex) {
                 cb.accept(null, ex);
+            }
+        };
+    }
+
+    public static <T, EX> Callback<T, EX> ignoreExceptionHandler(Consumer<T> cb) {
+        return new Callback<>() {
+            @Override
+            protected void succeeded0(T value) {
+                cb.accept(value);
+            }
+
+            @Override
+            protected void failed0(EX ex) {
+                // do nothing
             }
         };
     }
