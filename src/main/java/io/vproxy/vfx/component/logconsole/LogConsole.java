@@ -76,12 +76,18 @@ public class LogConsole {
     }
 
     private void addAll(List<? extends String> added) {
-        for (var log : added) {
-            add(log);
-        }
+        FXUtils.runOnFX(() -> {
+            for (var log : added) {
+                add(log);
+            }
+        });
     }
 
     private void add(String log) {
+        FXUtils.runOnFX(() -> add0(log));
+    }
+
+    private void add0(String log) {
         var label = new ThemeLabel(log) {{
             setFont(new Font(FontManager.FONT_NAME_JetBrainsMono, 16));
         }};
