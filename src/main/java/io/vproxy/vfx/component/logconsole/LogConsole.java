@@ -77,8 +77,9 @@ public class LogConsole {
     }
 
     private void addAll(List<? extends String> added) {
+        var ls = new ArrayList<>(added);
         FXUtils.runOnFX(() -> {
-            for (var log : new ArrayList<>(added)) {
+            for (var log : ls) {
                 add(log);
             }
         });
