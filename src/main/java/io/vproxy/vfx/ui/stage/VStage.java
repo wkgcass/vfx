@@ -349,4 +349,12 @@ public class VStage {
     public void showAndWait() {
         stage.showAndWait();
     }
+
+    public void temporaryOnTop() {
+        if (stage.isAlwaysOnTop()) {
+            return;
+        }
+        stage.setAlwaysOnTop(true);
+        FXUtils.runDelay(500, () -> stage.setAlwaysOnTop(false));
+    }
 }

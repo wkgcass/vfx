@@ -120,6 +120,7 @@ public class VDialog<T> {
 
     public Optional<T> showAndWait() {
         stage.showAndWait();
+        getStage().temporaryOnTop();
         return Optional.ofNullable(returnValue);
     }
 

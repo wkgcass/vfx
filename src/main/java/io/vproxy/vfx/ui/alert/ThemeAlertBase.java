@@ -53,4 +53,16 @@ public class ThemeAlertBase extends VStage {
 
         okButton.setOnAction(e -> close());
     }
+
+    @Override
+    public void show() {
+        super.show();
+        temporaryOnTop();
+    }
+
+    @Override
+    public void showAndWait() {
+        super.showAndWait();
+        temporaryOnTop();
+    }
 }
