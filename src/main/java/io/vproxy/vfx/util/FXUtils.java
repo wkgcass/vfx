@@ -111,6 +111,20 @@ public class FXUtils {
         }
     }
 
+    public static void toBackWindow(Window window) {
+        try {
+            ((Stage) window).toBack();
+        } catch (Throwable ignore) {
+        }
+    }
+
+    public static void toFrontWindow(Window window) {
+        try {
+            ((Stage) window).toFront();
+        } catch (Throwable ignore) {
+        }
+    }
+
     public static float[] toHSB(Color color) {
         float[] ff = new float[3];
         java.awt.Color.RGBtoHSB((int) (color.getRed() * 255), (int) (color.getGreen() * 255), (int) (color.getBlue() * 255), ff);
