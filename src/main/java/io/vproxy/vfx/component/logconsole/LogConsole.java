@@ -8,6 +8,7 @@ import io.vproxy.vfx.ui.pane.FusionPane;
 import io.vproxy.vfx.ui.wrapper.ThemeLabel;
 import io.vproxy.vfx.util.FXUtils;
 import io.vproxy.vfx.util.Logger;
+import io.vproxy.vfx.util.logger.ObservableLogHandler;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.collections.WeakListChangeListener;
@@ -34,6 +35,10 @@ public class LogConsole {
     }
 
     public LogConsole(int preserveLogCount, int clearLogCount) {
+        this(Logger.observableLogHandler, preserveLogCount, clearLogCount);
+    }
+
+    public LogConsole(ObservableLogHandler logHandler, int preserveLogCount, int clearLogCount) {
         if (clearLogCount < preserveLogCount) {
             throw new IllegalArgumentException("clearLogCount = " + clearLogCount + " must not smaller than preserveLogCount = " + preserveLogCount);
         }
@@ -48,7 +53,7 @@ public class LogConsole {
 
         logChangeListener = this::logChange;
         var logChangeListenerWrapper = new WeakListChangeListener<>(logChangeListener);
-        Logger.observableLogHandler.addLogListener(logChangeListenerWrapper);
+        logHandler.addLogListener(logChangeListenerWrapper);
 
         vbox.heightProperty().addListener((ob, old, now) -> {
             if (alwaysScrollToEnd) {
@@ -56,7 +61,7 @@ public class LogConsole {
             }
         });
 
-        addAll(Logger.observableLogHandler.getLog());
+        addAll(logHandler.getLog());
     }
 
     public boolean isAlwaysScrollToEnd() {

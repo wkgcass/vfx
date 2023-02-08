@@ -28,6 +28,13 @@ public class ObservableLogHandler extends Handler {
         logs.removeListener(listener);
     }
 
+    public void publish(String msg) {
+        if (logs.size() > preserveLogCount) {
+            logs.remove(0);
+        }
+        logs.add(msg);
+    }
+
     @Override
     public void publish(LogRecord record) {
         if (!isLoggable(record)) {
@@ -40,10 +47,7 @@ public class ObservableLogHandler extends Handler {
             reportError(null, ex, ErrorManager.FORMAT_FAILURE);
             return;
         }
-        if (logs.size() > preserveLogCount) {
-            logs.remove(0);
-        }
-        logs.add(msg);
+        publish(msg);
     }
 
     public List<String> getLog() {
