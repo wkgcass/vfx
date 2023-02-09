@@ -1,6 +1,12 @@
 package io.vproxy.vfx.entity.input;
 
 import javafx.scene.input.MouseButton;
+import vjson.JSON;
+import vjson.deserializer.rule.BoolRule;
+import vjson.deserializer.rule.ObjectRule;
+import vjson.deserializer.rule.Rule;
+import vjson.deserializer.rule.StringRule;
+import vjson.util.ObjectBuilder;
 
 import java.util.Set;
 
@@ -9,6 +15,12 @@ public class InputData {
     public boolean alt;
     public boolean shift;
     public Key key;
+
+    public static final Rule<InputData> rule = new ObjectRule<>(InputData::new)
+        .put("ctrl", (o, it) -> o.ctrl = it, BoolRule.get())
+        .put("alt", (o, it) -> o.alt = it, BoolRule.get())
+        .put("shift", (o, it) -> o.shift = it, BoolRule.get())
+        .put("key", (o, it) -> o.key = new Key(it), StringRule.get());
 
     public InputData() {
     }
@@ -47,5 +59,16 @@ public class InputData {
         if (currentKey == KeyCode.ALT) return alt;
         if (currentKey == KeyCode.SHIFT) return shift;
         return false;
+    }
+
+    public JSON.Object toJson() {
+        var ob = new ObjectBuilder()
+            .put("ctrl", ctrl)
+            .put("alt", alt)
+            .put("shift", shift);
+        if (key != null) {
+            ob.put("key", key.toString());
+        }
+        return ob.build();
     }
 }

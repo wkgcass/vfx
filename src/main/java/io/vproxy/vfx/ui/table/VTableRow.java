@@ -3,6 +3,7 @@ package io.vproxy.vfx.ui.table;
 import io.vproxy.vfx.manager.font.FontManager;
 import io.vproxy.vfx.manager.font.FontUsages;
 import io.vproxy.vfx.theme.Theme;
+import io.vproxy.vfx.util.FXUtils;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -143,6 +144,10 @@ public class VTableRow<S> implements RowInformer {
 
     @Override
     public void informRowUpdate() {
+        FXUtils.runOnFX(this::informRowUpdate0);
+    }
+
+    private void informRowUpdate0() {
         for (int i = 0; i < shared.tableView.getColumns().size(); ++i) {
             var col = shared.tableView.getColumns().get(i);
             var node = buildNode(col);
