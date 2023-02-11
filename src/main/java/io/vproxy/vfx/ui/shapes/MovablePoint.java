@@ -14,9 +14,12 @@ import javafx.scene.shape.Circle;
 public class MovablePoint extends Group {
     public MovablePoint(String labelText) {
         var point = new Circle(5);
-        point.setFill(Color.RED);
-        point.setStrokeWidth(0);
-        point.setStroke(Color.TRANSPARENT);
+        point.setStrokeWidth(2);
+        point.setStroke(Color.RED);
+        point.setFill(Color.TRANSPARENT);
+        var dot = new Circle(2);
+        dot.setFill(Color.RED);
+        dot.setStrokeWidth(0);
         var label = new Label(labelText) {{
             FontManager.get().setFont(FontUsages.movableShapeLabel, this);
         }};
@@ -39,10 +42,11 @@ public class MovablePoint extends Group {
             }
         };
 
-        point.setOnMousePressed(handler);
-        point.setOnMouseDragged(handler);
+        var pointAndDotGroup = new Group(point, dot);
+        pointAndDotGroup.setOnMousePressed(handler);
+        pointAndDotGroup.setOnMouseDragged(handler);
 
-        getChildren().addAll(label, point);
+        getChildren().addAll(label, pointAndDotGroup);
     }
 
     public Point makePoint() {
