@@ -42,6 +42,7 @@ public class FusionW extends Pane {
     public FusionW(ComboBox<?> node) {
         this(node, n -> {
             var p = new SimpleStringProperty();
+            n.setOnMouseExited(e -> node.commitValue());
             n.valueProperty().addListener((ob, old, now) -> updateComboBox(p, node));
             n.converterProperty().addListener((ob, old, now) -> updateComboBox(p, node));
             updateComboBox(p, node);
