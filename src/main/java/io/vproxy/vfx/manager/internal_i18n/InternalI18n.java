@@ -78,4 +78,8 @@ public abstract class InternalI18n {
     public String emptyTableLabel() {
         return "No Data";
     }
+
+    public String extra(String key) {
+        return key;
+    }
 }
