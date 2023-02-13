@@ -2,10 +2,7 @@ package io.vproxy.vfx.entity.input;
 
 import javafx.scene.input.MouseButton;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Key {
     public final MouseButton button;
@@ -131,5 +128,27 @@ public class Key {
             ret = "Unknown";
         }
         return ret;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Key key1 = (Key) o;
+
+        if (isLeftKey != key1.isLeftKey) return false;
+        if (button != key1.button) return false;
+        if (key != key1.key) return false;
+        return Objects.equals(raw, key1.raw);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = button != null ? button.hashCode() : 0;
+        result = 31 * result + (key != null ? key.hashCode() : 0);
+        result = 31 * result + (isLeftKey ? 1 : 0);
+        result = 31 * result + (raw != null ? raw.hashCode() : 0);
+        return result;
     }
 }
