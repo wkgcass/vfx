@@ -80,6 +80,9 @@ public abstract class InternalI18n {
     }
 
     public String extra(String key) {
+        if (key.contains(":")) {
+            return key.substring(key.indexOf(":") + 1).trim();
+        }
         return key;
     }
 }
