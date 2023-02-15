@@ -1,85 +1,78 @@
 package io.vproxy.vfx.manager.internal_i18n;
 
-public abstract class InternalI18n {
-    private static InternalI18n instance = new InternalI18n() {
-    };
+import io.vproxy.vfx.util.Singleton;
 
-    public InternalI18n() {
+public interface InternalI18n {
+    static InternalI18n get() {
+        return Singleton.registerIfAbsent(InternalI18n.class, () -> new InternalI18n() {
+        });
     }
 
-    public static void setInstance(InternalI18n instance) {
-        InternalI18n.instance = instance;
-    }
-
-    public static InternalI18n get() {
-        return instance;
-    }
-
-    public String cancelButton() {
+    default String cancelButton() {
         return "Cancel";
     }
 
-    public String alertInfoTitle() {
+    default String alertInfoTitle() {
         return "Info";
     }
 
-    public String alertWarningTitle() {
+    default String alertWarningTitle() {
         return "Warning";
     }
 
-    public String alertErrorTitle() {
+    default String alertErrorTitle() {
         return "Error";
     }
 
-    public String alertOkButton() {
+    default String alertOkButton() {
         return "Ok";
     }
 
-    public String confirmationYesButton() {
+    default String confirmationYesButton() {
         return "Yes";
     }
 
-    public String confirmationNoButton() {
+    default String confirmationNoButton() {
         return "No";
     }
 
-    public String cannotFindAnyDisplay() {
+    default String cannotFindAnyDisplay() {
         return "cannot find any display";
     }
 
-    public String stacktraceAlertTitle() {
+    default String stacktraceAlertTitle() {
         return "Exception";
     }
 
-    public String stacktraceAlertHeaderText() {
+    default String stacktraceAlertHeaderText() {
         return "Exception Thrown";
     }
 
-    public String stacktraceAlertLabel() {
+    default String stacktraceAlertLabel() {
         return "The exception stacktrace was:";
     }
 
-    public String keyChooserLeftMouseButton() {
+    default String keyChooserLeftMouseButton() {
         return "Left mouse button";
     }
 
-    public String keyChooserRightMouseButton() {
+    default String keyChooserRightMouseButton() {
         return "Right mouse button";
     }
 
-    public String keyChooserDesc() {
+    default String keyChooserDesc() {
         return "Please press the key you want to use, or click the buttons to choose left or right mouse button.";
     }
 
-    public String keyChooserDescWithoutMouse() {
+    default String keyChooserDescWithoutMouse() {
         return "Please press the key you want to use.";
     }
 
-    public String emptyTableLabel() {
+    default String emptyTableLabel() {
         return "No Data";
     }
 
-    public String sceneGroupPreCheckShowSceneFailed() {
+    default String sceneGroupPreCheckShowSceneFailed() {
         return "An exception occurred when trying to show the scene.";
     }
 }
