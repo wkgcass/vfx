@@ -1,9 +1,12 @@
 package io.vproxy.vfx.ui.scene;
 
 import io.vproxy.vfx.animation.AnimationNode;
+import io.vproxy.vfx.manager.internal_i18n.InternalI18n;
 import io.vproxy.vfx.theme.Theme;
+import io.vproxy.vfx.ui.alert.StackTraceAlert;
 import io.vproxy.vfx.util.Callback;
 import io.vproxy.vfx.util.FXUtils;
+import io.vproxy.vfx.util.Logger;
 import io.vproxy.vfx.util.algebradata.XYZTData;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
@@ -166,10 +169,15 @@ public class VSceneGroup {
         if (animatingHide.contains(scene)) {
             animatingHide.remove(scene);
             animatingShow.add(scene);
-            scene.animationGraph.play(scene.stateCenterShown, Callback.ignoreExceptionHandler(v -> postShowing(scene)));
+            if (precheckShow(scene)) {
+                scene.animationGraph.play(scene.stateCenterShown, Callback.ignoreExceptionHandler(v -> postShowing(scene)));
+            }
             return;
         }
         if (animatingShow.contains(scene)) {
+            return;
+        }
+        if (!precheckShow(scene)) {
             return;
         }
         if (scene.role == VSceneRole.MAIN) {
@@ -208,6 +216,17 @@ public class VSceneGroup {
                 }
                 break;
         }
+    }
+
+    private boolean precheckShow(VScene scene) {
+        try {
+            scene.beforeShowing();
+        } catch (Exception e) {
+            Logger.error("failed running pre-check for showing scene " + scene, e);
+            StackTraceAlert.showAndWait(InternalI18n.get().sceneGroupPreCheckShowSceneFailed(), e);
+            return false;
+        }
+        return true;
     }
 
     private void showStep2(VScene scene, VSceneShowMethod method) {
@@ -335,6 +354,7 @@ public class VSceneGroup {
         if (scene.role != VSceneRole.MAIN) {
             currentMainScene.getContentPane().requestFocus();
         }
+        scene.onHidden();
     }
 
     public VScene getCurrentMainScene() {

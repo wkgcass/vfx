@@ -172,4 +172,11 @@ public class VScene implements NodeWithVScrollPane {
             }
         }
     }
+
+    @SuppressWarnings("RedundantThrows")
+    protected void beforeShowing() throws Exception {
+    }
+
+    protected void onHidden() {
+    }
 }

@@ -79,6 +79,10 @@ public abstract class InternalI18n {
         return "No Data";
     }
 
+    public String sceneGroupPreCheckShowSceneFailed() {
+        return "An exception occurred when trying to show the scene.";
+    }
+
     public String extra(String key) {
         if (key.contains(":")) {
             return key.substring(key.indexOf(":") + 1).trim();
