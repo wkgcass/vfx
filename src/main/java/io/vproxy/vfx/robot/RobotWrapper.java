@@ -114,4 +114,9 @@ public class RobotWrapper {
     public Point2D getMousePosition() {
         return robot.getMousePosition();
     }
+
+    public void mouseWheel(int wheelAmt) {
+        if (log) Logger.debug("mouse wheel: " + wheelAmt);
+        robot.mouseWheel(wheelAmt);
+    }
 }
