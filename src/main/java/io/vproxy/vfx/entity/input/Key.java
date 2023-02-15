@@ -1,14 +1,43 @@
 package io.vproxy.vfx.entity.input;
 
 import javafx.scene.input.MouseButton;
+import vjson.JSON;
+import vjson.JSONObject;
+import vjson.deserializer.rule.BoolRule;
+import vjson.deserializer.rule.ObjectRule;
+import vjson.deserializer.rule.Rule;
+import vjson.deserializer.rule.StringRule;
+import vjson.util.ObjectBuilder;
 
 import java.util.*;
 
-public class Key {
+public class Key implements JSONObject {
     public final MouseButton button;
     public final KeyCode key;
     public final boolean isLeftKey;
     public final String raw;
+
+    public static final Rule<Key> rule = ObjectRule.builder(KeyBuilder::new, KeyBuilder::build, builder -> builder
+        .put("button", (o, it) -> o.button = MouseButton.valueOf(it), StringRule.get())
+        .put("key", (o, it) -> o.key = KeyCode.valueOf(it), StringRule.get())
+        .put("isLeftKey", (o, it) -> o.isLeftKey = it, BoolRule.get())
+        .put("raw", (o, it) -> o.raw = it, StringRule.get())
+    );
+
+    private static class KeyBuilder {
+        MouseButton button;
+        KeyCode key;
+        boolean isLeftKey;
+        String raw;
+
+        Key build() {
+            if (button != null)
+                return new Key(button);
+            if (key != null)
+                return new Key(key, isLeftKey);
+            return new Key(raw);
+        }
+    }
 
     public Key(String raw) {
         this.raw = raw;
@@ -150,5 +179,22 @@ public class Key {
         result = 31 * result + (isLeftKey ? 1 : 0);
         result = 31 * result + (raw != null ? raw.hashCode() : 0);
         return result;
+    }
+
+    @SuppressWarnings("NullableProblems")
+    @Override
+    public JSON.Object toJson() {
+        var ob = new ObjectBuilder();
+        if (button != null) {
+            ob.put("button", button.name());
+        }
+        if (key != null) {
+            ob.put("key", key.name());
+            ob.put("isLeftKey", isLeftKey);
+        }
+        if (button == null && key == null && raw != null) {
+            ob.put("raw", raw);
+        }
+        return ob.build();
     }
 }
