@@ -33,6 +33,11 @@ public class VSceneGroup {
         if (initialMainScene.role != VSceneRole.MAIN) {
             throw new IllegalArgumentException(initialMainScene + " is not a MAIN scene");
         }
+        try {
+            initialMainScene.beforeShowing();
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e);
+        }
         this.initParams = initParams;
         if (initParams.useClip) {
             FXUtils.makeClipFor(root, 4);
