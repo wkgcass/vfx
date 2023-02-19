@@ -2,6 +2,7 @@ package io.vproxy.vfx.util;
 
 import javafx.scene.paint.Color;
 
+import java.text.DecimalFormat;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
@@ -25,6 +26,7 @@ public class MiscUtils {
             .appendValue(SECOND_OF_MINUTE, 2)
             .toFormatter())
         .toFormatter();
+    public static final DecimalFormat roughFloatValueFormat = new DecimalFormat("0.00");
 
     private MiscUtils() {
     }

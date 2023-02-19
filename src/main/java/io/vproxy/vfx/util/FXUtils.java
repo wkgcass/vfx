@@ -5,12 +5,14 @@ import io.vproxy.vfx.ui.alert.SimpleAlert;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
+import javafx.event.EventHandler;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -511,5 +513,53 @@ public class FXUtils {
 
     public static void disableFocusColor(Node node) {
         node.setStyle("-fx-focus-color: transparent; -fx-faint-focus-color: transparent;");
+    }
+
+    public static void setOnMouseEntered(Node node, EventHandler<? super MouseEvent> f) {
+        var ff = node.getOnMouseEntered();
+        if (ff == null) {
+            node.setOnMouseEntered(f);
+        } else {
+            node.setOnMouseEntered(e -> {
+                f.handle(e);
+                ff.handle(e);
+            });
+        }
+    }
+
+    public static void setOnMouseExited(Node node, EventHandler<? super MouseEvent> f) {
+        var ff = node.getOnMouseExited();
+        if (ff == null) {
+            node.setOnMouseExited(f);
+        } else {
+            node.setOnMouseExited(e -> {
+                f.handle(e);
+                ff.handle(e);
+            });
+        }
+    }
+
+    public static void setOnMousePressed(Node node, EventHandler<? super MouseEvent> f) {
+        var ff = node.getOnMousePressed();
+        if (ff == null) {
+            node.setOnMousePressed(f);
+        } else {
+            node.setOnMousePressed(e -> {
+                f.handle(e);
+                ff.handle(e);
+            });
+        }
+    }
+
+    public static void setOnMouseReleased(Node node, EventHandler<? super MouseEvent> f) {
+        var ff = node.getOnMouseReleased();
+        if (ff == null) {
+            node.setOnMouseReleased(f);
+        } else {
+            node.setOnMouseReleased(e -> {
+                f.handle(e);
+                ff.handle(e);
+            });
+        }
     }
 }

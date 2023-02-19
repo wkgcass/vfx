@@ -199,6 +199,30 @@ public abstract class Theme {
         return borderColor();
     }
 
+    public Color rangeSliderButtonNormalColor() {
+        return fusionButtonNormalBackgroundColor();
+    }
+
+    public Color rangeSliderButtonHoverColor() {
+        return fusionButtonHoverBackgroundColor();
+    }
+
+    public Color rangeSliderButtonDownColor() {
+        return fusionButtonDownBackgroundColor();
+    }
+
+    public Color rangeSliderButtonBorderColor() {
+        return borderColor();
+    }
+
+    public Color rangeSliderBackgroundColor() {
+        return progressBarBackgroundColor();
+    }
+
+    public Color rangeSliderRangeColor() {
+        return progressBarProgressColor();
+    }
+
     public Color fusionWrapperBackgroundColor() {
         return sceneBackgroundColor();
     }

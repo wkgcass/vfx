@@ -4,7 +4,6 @@ import io.vproxy.vfx.animation.AnimationGraph;
 import io.vproxy.vfx.animation.AnimationGraphBuilder;
 import io.vproxy.vfx.animation.AnimationNode;
 import io.vproxy.vfx.control.click.ClickEventHandler;
-import io.vproxy.vfx.theme.Theme;
 import io.vproxy.vfx.util.algebradata.ColorData;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
@@ -27,7 +26,6 @@ public class ClickableCircle extends Circle {
             .build(normal);
 
         setStrokeWidth(0.5);
-        setStroke(Theme.current().sliderButtonBorderColor());
 
         setCursor(Cursor.HAND);
 
