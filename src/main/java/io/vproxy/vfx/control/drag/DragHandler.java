@@ -3,10 +3,6 @@ package io.vproxy.vfx.control.drag;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
 /**
  * The drag handler<br>
  * Usage example:
@@ -41,7 +37,12 @@ abstract public class DragHandler implements EventHandler<MouseEvent> {
             pressed(e);
         } else if (e.getEventType() == MouseEvent.MOUSE_DRAGGED) {
             dragged(e);
+            consume(e);
         }
+    }
+
+    protected void consume(MouseEvent e) {
+        // do not consume
     }
 
     /**
