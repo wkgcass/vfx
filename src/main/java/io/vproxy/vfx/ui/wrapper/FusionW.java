@@ -14,14 +14,11 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Labeled;
 import javafx.scene.control.TextInputControl;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.*;
 
 import java.util.function.Function;
 
-public class FusionW extends Pane {
+public class FusionW extends StackPane {
     public final Node node;
     public final StringProperty property;
     private final Label label = new Label() {{
