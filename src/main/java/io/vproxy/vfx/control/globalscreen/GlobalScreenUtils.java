@@ -8,6 +8,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,27 +22,42 @@ public class GlobalScreenUtils {
             suffix = "." + suffix;
         }
         try {
-            File f = File.createTempFile("JNativeHook", suffix);
-            f.deleteOnExit();
-            String soName = f.getName();
-            soName = soName.substring(0, soName.length() - suffix.length());
+            File f = File.createTempFile("tmp", suffix);
+            String tmpDirPath = f.getParentFile().getAbsolutePath();
+            //noinspection ResultOfMethodCallIgnored
+            f.delete();
+            var prefix = suffix.endsWith(".dll") ? "" : "lib"; // add "lib" prefix for linux and macos
+            var soname = "vfx-extracted-JNativeHook";
+            f = Path.of(tmpDirPath, prefix + soname + suffix).toFile();
+            if (f.exists()) {
+                Logger.info("JNativeHook tmp dynamic library already exists: " + f.getAbsolutePath());
+                //noinspection ResultOfMethodCallIgnored
+                f.setExecutable(true);
+                return;
+            } else {
+                var ok = f.createNewFile();
+                if (!ok) {
+                    Logger.error("failed creating tmp file: " + f.getAbsolutePath());
+                    return;
+                }
+                // f.deleteOnExit(); // no, do not do this, just leave it there
+            }
 
             var libpaths = System.getProperty("java.library.path", "");
             var splitLibPaths = libpaths.split(File.pathSeparator);
+            Logger.info("java.library.path: " + Arrays.toString(splitLibPaths));
+            Logger.info("temp directory path: " + tmpDirPath);
+            Logger.info("dynamic library name: " + soname);
             var existsInLibPaths = false;
-            var tmpDir = f.getParentFile().getAbsolutePath();
             for (var p : splitLibPaths) {
-                if (tmpDir.equals(new File(p).getAbsolutePath())) {
+                if (tmpDirPath.equals(new File(p).getAbsolutePath())) {
                     existsInLibPaths = true;
                     break;
                 }
             }
             if (existsInLibPaths) {
-                System.setProperty("jnativehook.lib.name", soName);
+                System.setProperty("jnativehook.lib.name", soname);
             }
-
-            Logger.info("so name: " + soName);
-            Logger.info("java.library.path: " + libpaths);
 
             try (inputStream) {
                 try (var fos = new FileOutputStream(f)) {
