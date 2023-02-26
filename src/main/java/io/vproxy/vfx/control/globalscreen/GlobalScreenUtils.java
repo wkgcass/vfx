@@ -33,6 +33,7 @@ public class GlobalScreenUtils {
                 Logger.info("JNativeHook tmp dynamic library already exists: " + f.getAbsolutePath());
                 //noinspection ResultOfMethodCallIgnored
                 f.setExecutable(true);
+                checkAndSetJNativeHookLib(tmpDirPath, soname);
                 return;
             } else {
                 var ok = f.createNewFile();
@@ -43,21 +44,7 @@ public class GlobalScreenUtils {
                 // f.deleteOnExit(); // no, do not do this, just leave it there
             }
 
-            var libpaths = System.getProperty("java.library.path", "");
-            var splitLibPaths = libpaths.split(File.pathSeparator);
-            Logger.info("java.library.path: " + Arrays.toString(splitLibPaths));
-            Logger.info("temp directory path: " + tmpDirPath);
-            Logger.info("dynamic library name: " + soname);
-            var existsInLibPaths = false;
-            for (var p : splitLibPaths) {
-                if (tmpDirPath.equals(new File(p).getAbsolutePath())) {
-                    existsInLibPaths = true;
-                    break;
-                }
-            }
-            if (existsInLibPaths) {
-                System.setProperty("jnativehook.lib.name", soname);
-            }
+            checkAndSetJNativeHookLib(tmpDirPath, soname);
 
             try (inputStream) {
                 try (var fos = new FileOutputStream(f)) {
@@ -75,6 +62,26 @@ public class GlobalScreenUtils {
             }
         } catch (IOException e) {
             Logger.error("creating tmp file for jnative hook libs failed", e);
+        }
+    }
+
+    private static void checkAndSetJNativeHookLib(String tmpDirPath, String soname) {
+        var libpaths = System.getProperty("java.library.path", "");
+        var splitLibPaths = libpaths.split(File.pathSeparator);
+        Logger.info("java.library.path: " + Arrays.toString(splitLibPaths));
+        Logger.info("temp directory path: " + tmpDirPath);
+        Logger.info("dynamic library name: " + soname);
+        var existsInLibPaths = false;
+        for (var p : splitLibPaths) {
+            if (tmpDirPath.equals(new File(p).getAbsolutePath())) {
+                existsInLibPaths = true;
+                break;
+            }
+        }
+        if (existsInLibPaths) {
+            String key = "jnativehook.lib.name";
+            Logger.info("setting system property: " + key + " => " + soname);
+            System.setProperty(key, soname);
         }
     }
 
