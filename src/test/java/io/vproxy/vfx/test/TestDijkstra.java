@@ -1,9 +1,9 @@
 package io.vproxy.vfx.test;
 
-import io.vproxy.vfx.util.graph.GraphBuilder;
-import io.vproxy.vfx.util.graph.GraphEdge;
-import io.vproxy.vfx.util.graph.GraphNode;
-import io.vproxy.vfx.util.graph.GraphPath;
+import io.vproxy.commons.graph.GraphBuilder;
+import io.vproxy.commons.graph.GraphEdge;
+import io.vproxy.commons.graph.GraphNode;
+import io.vproxy.commons.graph.GraphPath;
 import org.junit.Test;
 
 import java.util.List;

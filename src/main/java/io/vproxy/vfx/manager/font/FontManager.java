@@ -1,7 +1,8 @@
 package io.vproxy.vfx.manager.font;
 
+import io.vproxy.base.util.LogType;
+import io.vproxy.base.util.Logger;
 import io.vproxy.vfx.theme.Theme;
-import io.vproxy.vfx.util.Logger;
 import javafx.scene.control.Labeled;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.text.Font;
@@ -17,15 +18,15 @@ public class FontManager {
     private FontManager() {
         var font = Font.loadFont(getClass().getResourceAsStream("/io/vproxy/vfx/res/font/SmileySans-Oblique.otf"), 1);
         if (font == null) {
-            Logger.error("failed loading font: SmileySans-Oblique");
+            Logger.error(LogType.FILE_ERROR, "failed loading font: SmileySans-Oblique");
         }
         font = Font.loadFont(getClass().getResourceAsStream("/io/vproxy/vfx/res/font/NotoSansSC-Regular.otf"), 1);
         if (font == null) {
-            Logger.error("failed loading font: NotoSansSC-Regular");
+            Logger.error(LogType.FILE_ERROR, "failed loading font: NotoSansSC-Regular");
         }
         font = Font.loadFont(getClass().getResourceAsStream("/io/vproxy/vfx/res/font/JetBrainsMono-Regular.ttf"), 1);
         if (font == null) {
-            Logger.error("failed loading font: JetBrainsMono-Regular");
+            Logger.error(LogType.FILE_ERROR, "failed loading font: JetBrainsMono-Regular");
         }
     }
 

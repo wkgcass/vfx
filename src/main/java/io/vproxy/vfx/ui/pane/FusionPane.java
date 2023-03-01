@@ -1,12 +1,12 @@
 package io.vproxy.vfx.ui.pane;
 
+import io.vproxy.base.util.callback.Callback;
 import io.vproxy.vfx.animation.AnimationGraph;
 import io.vproxy.vfx.animation.AnimationGraphBuilder;
 import io.vproxy.vfx.animation.AnimationNode;
 import io.vproxy.vfx.theme.Theme;
 import io.vproxy.vfx.ui.layout.HPadding;
 import io.vproxy.vfx.ui.layout.VPadding;
-import io.vproxy.vfx.util.Callback;
 import io.vproxy.vfx.util.FXUtils;
 import io.vproxy.vfx.util.algebradata.ColorData;
 import javafx.scene.Node;
@@ -91,7 +91,7 @@ public class FusionPane {
         @Override
         protected void onMouseExited() {
             super.onMouseExited();
-            borderAnimation.play(noBorder, Callback.ignoreExceptionHandler(v -> setBorder(Border.EMPTY)));
+            borderAnimation.play(noBorder, Callback.ofIgnoreExceptionFunction(v -> setBorder(Border.EMPTY)));
         }
 
         @Override

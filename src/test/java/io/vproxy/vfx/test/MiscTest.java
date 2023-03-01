@@ -1,5 +1,6 @@
 package io.vproxy.vfx.test;
 
+import io.vproxy.base.util.callback.Callback;
 import io.vproxy.vfx.control.dialog.VDialog;
 import io.vproxy.vfx.control.dialog.VDialogButton;
 import io.vproxy.vfx.manager.font.FontManager;
@@ -10,6 +11,7 @@ import io.vproxy.vfx.ui.alert.StackTraceAlert;
 import io.vproxy.vfx.ui.button.TransparentFusionButton;
 import io.vproxy.vfx.ui.button.TransparentFusionImageButton;
 import io.vproxy.vfx.ui.layout.HPadding;
+import io.vproxy.vfx.ui.loading.LoadingFailure;
 import io.vproxy.vfx.ui.loading.LoadingItem;
 import io.vproxy.vfx.ui.loading.LoadingPane;
 import io.vproxy.vfx.ui.loading.LoadingStage;
@@ -19,7 +21,6 @@ import io.vproxy.vfx.ui.scene.*;
 import io.vproxy.vfx.ui.shapes.BrokenLine;
 import io.vproxy.vfx.ui.shapes.EndpointStyle;
 import io.vproxy.vfx.ui.stage.VStage;
-import io.vproxy.vfx.util.Callback;
 import io.vproxy.vfx.util.FXUtils;
 import javafx.application.Application;
 import javafx.scene.control.Alert;
@@ -98,15 +99,15 @@ public class MiscTest extends Application {
             load.setItems(items);
             load.load(new Callback<>() {
                 @Override
-                protected void succeeded0(Void value) {
+                protected void onSucceeded(Void value) {
                     SimpleAlert.showAndWait(Alert.AlertType.INFORMATION, "加载完成");
                 }
 
                 @Override
-                public void failed(LoadingItem loadingItem) {
+                public void onFailed(LoadingFailure failure) {
                     SimpleAlert.showAndWait(Alert.AlertType.INFORMATION,
                         "加载失败：" +
-                        (loadingItem == null ? "用户取消" : loadingItem.name));
+                        (failure.failedItem == null ? failure.getMessage() : failure.failedItem.name));
                 }
             });
         });
@@ -138,7 +139,7 @@ public class MiscTest extends Application {
             }
             load.getProgressBar().setItems(items);
             stage.getSceneGroup().show(vScene, VSceneShowMethod.FADE_IN);
-            load.getProgressBar().load(Callback.handler((v, ex) -> {
+            load.getProgressBar().load(Callback.ofFunction((v, ex) -> {
                 stage.getSceneGroup().hide(vScene, VSceneHideMethod.FADE_OUT);
                 FXUtils.runDelay(VScene.ANIMATION_DURATION_MILLIS,
                     () -> stage.getSceneGroup().removeScene(vScene));

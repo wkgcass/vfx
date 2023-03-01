@@ -1,5 +1,6 @@
 package io.vproxy.vfx.ui.stage;
 
+import io.vproxy.base.util.OS;
 import io.vproxy.vfx.control.drag.DragHandler;
 import io.vproxy.vfx.manager.font.FontManager;
 import io.vproxy.vfx.manager.font.FontUsages;
@@ -9,7 +10,6 @@ import io.vproxy.vfx.ui.scene.VSceneGroup;
 import io.vproxy.vfx.ui.scene.VSceneGroupInitParams;
 import io.vproxy.vfx.ui.scene.VSceneRole;
 import io.vproxy.vfx.util.FXUtils;
-import io.vproxy.vfx.util.OSUtils;
 import javafx.geometry.Insets;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
@@ -268,7 +268,7 @@ public class VStage {
     }
 
     private boolean supportsIconify() {
-        if (!OSUtils.isMac()) {
+        if (!OS.isMac()) {
             return true;
         }
         var pattern = Pattern.compile("^(\\d+)(.*)$");
@@ -308,7 +308,7 @@ public class VStage {
         this.maximized = maximized;
         maxrstBtn.updateImage();
 
-        if (OSUtils.isMac()) {
+        if (OS.isMac()) {
             if (maximized) {
                 stageOriginalX = stage.getX();
                 stageOriginalY = stage.getY();

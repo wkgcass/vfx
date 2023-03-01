@@ -1,9 +1,10 @@
 package io.vproxy.vfx.ui.loading;
 
+import io.vproxy.base.util.callback.Callback;
+import io.vproxy.vfx.manager.internal_i18n.InternalI18n;
 import io.vproxy.vfx.manager.task.TaskManager;
 import io.vproxy.vfx.theme.Theme;
 import io.vproxy.vfx.ui.shapes.VLine;
-import io.vproxy.vfx.util.Callback;
 import io.vproxy.vfx.util.FXUtils;
 import io.vproxy.vfx.util.MiscUtils;
 import javafx.application.Platform;
@@ -87,7 +88,7 @@ public class VProgressBar extends Group {
 
     private List<LoadingItem> items = new ArrayList<>();
     private long interval = 0;
-    private Callback<Void, LoadingItem> cb = null;
+    private Callback<Void, LoadingFailure> cb = null;
     private volatile boolean isDone = false;
     private Consumer<LoadingItem> currentLoadingItemCallback = null;
 
@@ -103,7 +104,7 @@ public class VProgressBar extends Group {
         this.interval = interval;
     }
 
-    public void load(Callback<Void, LoadingItem> cb) {
+    public void load(Callback<Void, LoadingFailure> cb) {
         this.cb = cb;
 
         long total = 0;
@@ -132,7 +133,21 @@ public class VProgressBar extends Group {
             }
         });
         TaskManager.get().execute(() -> {
-            var ok = item.loadFunc.getAsBoolean();
+            final boolean ok;
+            final Throwable loadingException;
+            {
+                boolean _ok;
+                Throwable _ex;
+                try {
+                    _ok = item.loadFunc.getAsBoolean();
+                    _ex = null;
+                } catch (Throwable t) {
+                    _ex = t;
+                    _ok = false;
+                }
+                ok = _ok;
+                loadingException = _ex;
+            }
             if (ok) {
                 if (interval > 0) {
                     MiscUtils.threadSleep(interval);
@@ -141,7 +156,7 @@ public class VProgressBar extends Group {
             Platform.runLater(() -> {
                 if (!ok) {
                     isDone = true;
-                    Platform.runLater(() -> this.cb.failed(item));
+                    Platform.runLater(() -> this.cb.failed(new LoadingFailure(item, loadingException)));
                     return;
                 }
                 long newCurr = current + item.weight;
@@ -156,7 +171,7 @@ public class VProgressBar extends Group {
             return false;
         }
         isDone = true;
-        FXUtils.runOnFX(() -> cb.failed(null));
+        FXUtils.runOnFX(() -> cb.failed(new LoadingFailure(InternalI18n.get().loadingCanceled())));
         return true;
     }
 }

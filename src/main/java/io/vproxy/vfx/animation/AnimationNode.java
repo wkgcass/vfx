@@ -1,7 +1,7 @@
 package io.vproxy.vfx.animation;
 
 import io.vproxy.vfx.util.algebradata.AlgebraData;
-import io.vproxy.vfx.util.graph.GraphNode;
+import io.vproxy.commons.graph.GraphNode;
 
 public class AnimationNode<T extends AlgebraData<T>> extends GraphNode<AnimationNode<T>> {
     public final String name;

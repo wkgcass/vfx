@@ -9,6 +9,7 @@ module io.vproxy.vfx {
     requires com.github.kwhat.jnativehook;
     requires vjson;
     requires kotlin.stdlib;
+    requires io.vproxy.base;
 
     exports io.vproxy.vfx.animation;
     exports io.vproxy.vfx.component.keychooser;
@@ -44,9 +45,7 @@ module io.vproxy.vfx {
     exports io.vproxy.vfx.ui.wrapper;
     exports io.vproxy.vfx.util;
     exports io.vproxy.vfx.util.algebradata;
-    exports io.vproxy.vfx.util.graph;
     exports io.vproxy.vfx.util.imagewrapper;
-    exports io.vproxy.vfx.util.logger;
 
     opens io.vproxy.vfx.res.font;
     opens io.vproxy.vfx.res.image;

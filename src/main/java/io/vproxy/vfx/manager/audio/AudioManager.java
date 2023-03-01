@@ -1,6 +1,7 @@
 package io.vproxy.vfx.manager.audio;
 
-import io.vproxy.vfx.util.Logger;
+import io.vproxy.base.util.LogType;
+import io.vproxy.base.util.Logger;
 import javafx.scene.media.AudioClip;
 
 import java.io.IOException;
@@ -34,13 +35,13 @@ public class AudioManager {
         }
         var audio = map.get(path);
         if (audio != null) {
-            Logger.debug("using cached audio: " + path);
+            assert Logger.lowLevelDebug("using cached audio: " + path);
             return audio;
         }
         try {
             var res = getClass().getClassLoader().getResource(path);
             if (res == null) {
-                Logger.error("unable to find resource for audio " + path);
+                Logger.error(LogType.FILE_ERROR, "unable to find resource for audio " + path);
                 if (throwException) {
                     throw new IOException("cannot find audio " + path);
                 }
@@ -48,14 +49,14 @@ public class AudioManager {
             }
             audio = new AudioClip(res.toExternalForm());
         } catch (Exception e) {
-            Logger.error("failed loading audio " + path, e);
+            Logger.error(LogType.FILE_ERROR, "failed loading audio " + path, e);
             if (throwException) {
                 throw e;
             }
             return null;
         }
         map.put(path, audio);
-        Logger.debug("new audio loaded: " + path);
+        assert Logger.lowLevelDebug("new audio loaded: " + path);
         return audio;
     }
 }

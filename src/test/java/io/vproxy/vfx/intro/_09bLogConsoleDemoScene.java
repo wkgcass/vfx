@@ -1,5 +1,6 @@
 package io.vproxy.vfx.intro;
 
+import io.vproxy.base.util.Logger;
 import io.vproxy.vfx.component.logconsole.LogConsole;
 import io.vproxy.vfx.manager.font.FontManager;
 import io.vproxy.vfx.theme.Theme;
@@ -9,7 +10,6 @@ import io.vproxy.vfx.ui.pane.FusionPane;
 import io.vproxy.vfx.ui.scene.VSceneRole;
 import io.vproxy.vfx.ui.wrapper.ThemeLabel;
 import io.vproxy.vfx.util.FXUtils;
-import io.vproxy.vfx.util.Logger;
 import javafx.scene.control.CheckBox;
 import javafx.scene.layout.HBox;
 
@@ -47,7 +47,7 @@ public class _09bLogConsoleDemoScene extends DemoVScene {
             setPrefHeight(40);
         }};
         makeSomeLogButton.setOnAction(e ->
-            Logger.info(logTemplates[ThreadLocalRandom.current().nextInt(logTemplates.length)]));
+            Logger.alert(logTemplates[ThreadLocalRandom.current().nextInt(logTemplates.length)]));
 
         bottomButtons.getChildren().addAll(new FusionPane() {{
             getContentPane().getChildren().add(scrollCheckBox);

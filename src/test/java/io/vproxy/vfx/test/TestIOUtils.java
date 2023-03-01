@@ -1,6 +1,6 @@
 package io.vproxy.vfx.test;
 
-import io.vproxy.vfx.util.IOUtils;
+import io.vproxy.commons.util.IOUtils;
 import org.junit.Test;
 
 import java.io.File;

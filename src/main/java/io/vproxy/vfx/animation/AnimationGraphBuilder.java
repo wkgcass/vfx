@@ -2,7 +2,7 @@ package io.vproxy.vfx.animation;
 
 import io.vproxy.vfx.util.algebradata.AlgebraData;
 import io.vproxy.vfx.util.algebradata.DoubleDoubleFunction;
-import io.vproxy.vfx.util.graph.GraphBuilder;
+import io.vproxy.commons.graph.GraphBuilder;
 
 public class AnimationGraphBuilder<T extends AlgebraData<T>> {
 

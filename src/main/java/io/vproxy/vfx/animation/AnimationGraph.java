@@ -1,10 +1,11 @@
 package io.vproxy.vfx.animation;
 
-import io.vproxy.vfx.util.Callback;
-import io.vproxy.vfx.util.Logger;
+import io.vproxy.base.util.LogType;
+import io.vproxy.base.util.Logger;
+import io.vproxy.base.util.callback.Callback;
 import io.vproxy.vfx.util.algebradata.AlgebraData;
-import io.vproxy.vfx.util.graph.Graph;
-import io.vproxy.vfx.util.graph.GraphPath;
+import io.vproxy.commons.graph.Graph;
+import io.vproxy.commons.graph.GraphPath;
 import javafx.animation.AnimationTimer;
 
 import java.util.*;
@@ -83,7 +84,7 @@ public class AnimationGraph<T extends AlgebraData<T>> {
     }
 
     public void play(AnimationNode<T> key) {
-        play(key, Callback.ignoreExceptionHandler(v -> {
+        play(key, Callback.ofIgnoreExceptionFunction(v -> {
         }));
     }
 
@@ -126,7 +127,7 @@ public class AnimationGraph<T extends AlgebraData<T>> {
             try {
                 newPath = prepareForPlaying(lastNode, key, path, keys);
             } catch (Exception e) {
-                Logger.warn("unable to find path for playing animation " + keys + ": from " + lastNode + " to " + key);
+                Logger.warn(LogType.ALERT, "unable to find path for playing animation " + keys + ": from " + lastNode + " to " + key);
                 cb.failed(e);
                 return;
             }
@@ -167,7 +168,7 @@ public class AnimationGraph<T extends AlgebraData<T>> {
         try {
             currentNodePath = findShortestPaths(currentNode, firstNode, Collections.emptySet());
         } catch (Exception e) {
-            Logger.warn("unable to find path for playing animation from " + currentNode + " to " + firstNode);
+            Logger.warn(LogType.ALERT, "unable to find path for playing animation from " + currentNode + " to " + firstNode);
             cb.failed(e);
             return;
         }
@@ -175,7 +176,7 @@ public class AnimationGraph<T extends AlgebraData<T>> {
         try {
             nextNodePath = findShortestPaths(nextNode, firstNode, Collections.emptySet());
         } catch (Exception e) {
-            Logger.warn("unable to find path for playing animation from " + nextNode + " to " + firstNode);
+            Logger.warn(LogType.ALERT, "unable to find path for playing animation from " + nextNode + " to " + firstNode);
             cb.failed(e);
             return;
         }
@@ -193,13 +194,13 @@ public class AnimationGraph<T extends AlgebraData<T>> {
         }
         timer.stopAtNext(new Callback<>() {
             @Override
-            protected void succeeded0(Void value) {
+            protected void onSucceeded(Void value) {
                 stopAndSetNode(n);
                 play(keys, cb);
             }
 
             @Override
-            protected void failed0(Exception e) {
+            protected void onFailed(Exception e) {
                 cb.failed(e);
             }
         });
@@ -212,13 +213,13 @@ public class AnimationGraph<T extends AlgebraData<T>> {
         }
         revertToLastNode(new Callback<>() {
             @Override
-            protected void succeeded0(Void value) {
+            protected void onSucceeded(Void value) {
                 stopAndSetNode(n);
                 play(keys, cb);
             }
 
             @Override
-            protected void failed0(Exception e) {
+            protected void onFailed(Exception e) {
                 cb.failed(e);
             }
         });

@@ -1,13 +1,13 @@
 package io.vproxy.vfx.intro;
 
+import io.vproxy.base.util.callback.Callback;
 import io.vproxy.vfx.test.TUtils;
 import io.vproxy.vfx.ui.alert.SimpleAlert;
 import io.vproxy.vfx.ui.button.FusionButton;
-import io.vproxy.vfx.ui.loading.LoadingItem;
+import io.vproxy.vfx.ui.loading.LoadingFailure;
 import io.vproxy.vfx.ui.loading.LoadingStage;
 import io.vproxy.vfx.ui.scene.VSceneRole;
 import io.vproxy.vfx.ui.wrapper.ThemeLabel;
-import io.vproxy.vfx.util.Callback;
 import io.vproxy.vfx.util.FXUtils;
 import javafx.scene.control.Alert;
 
@@ -33,17 +33,17 @@ public class _08bLoadingStageDemoScene extends DemoVScene {
             stage.setItems(TUtils.buildLoadingItems());
             stage.load(new Callback<>() {
                 @Override
-                protected void succeeded0(Void value) {
+                protected void onSucceeded(Void value) {
                     FXUtils.runDelay(200, () ->
                         SimpleAlert.showAndWait(Alert.AlertType.INFORMATION, "loading complete"));
                 }
 
                 @Override
-                public void failed(LoadingItem loadingItem) {
-                    if (loadingItem == null)
-                        SimpleAlert.showAndWait(Alert.AlertType.ERROR, "loading process canceled");
+                public void onFailed(LoadingFailure failure) {
+                    if (failure.failedItem == null)
+                        SimpleAlert.showAndWait(Alert.AlertType.ERROR, failure.getMessage());
                     else
-                        SimpleAlert.showAndWait(Alert.AlertType.ERROR, "failed to load item: " + loadingItem.name);
+                        SimpleAlert.showAndWait(Alert.AlertType.ERROR, "failed to load item: " + failure.failedItem.name);
                 }
             });
         });

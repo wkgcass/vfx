@@ -1,10 +1,10 @@
 package io.vproxy.vfx.ui.loading;
 
+import io.vproxy.base.util.callback.Callback;
 import io.vproxy.vfx.ui.layout.HPadding;
 import io.vproxy.vfx.ui.layout.VPadding;
 import io.vproxy.vfx.ui.stage.VStage;
 import io.vproxy.vfx.ui.stage.VStageInitParams;
-import io.vproxy.vfx.util.Callback;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -50,21 +50,21 @@ public class LoadingStage extends VStage {
         loadingPane.getProgressBar().setInterval(interval);
     }
 
-    public void load(Callback<Void, LoadingItem> cb) {
+    public void load(Callback<Void, LoadingFailure> cb) {
         show();
         loadingPane.getProgressBar().load(new Callback<>() {
             @Override
-            protected void succeeded0(Void value) {
+            protected void onSucceeded(Void value) {
                 cb.succeeded();
             }
 
             @Override
-            protected void failed0(LoadingItem loadingItem) {
-                cb.failed(loadingItem);
+            protected void onFailed(LoadingFailure failure) {
+                cb.failed(failure);
             }
 
             @Override
-            protected void finally0() {
+            protected void doFinally() {
                 close();
             }
         });

@@ -1,12 +1,13 @@
 package io.vproxy.vfx.ui.scene;
 
+import io.vproxy.base.util.LogType;
+import io.vproxy.base.util.Logger;
+import io.vproxy.base.util.callback.Callback;
 import io.vproxy.vfx.animation.AnimationNode;
 import io.vproxy.vfx.manager.internal_i18n.InternalI18n;
 import io.vproxy.vfx.theme.Theme;
 import io.vproxy.vfx.ui.alert.StackTraceAlert;
-import io.vproxy.vfx.util.Callback;
 import io.vproxy.vfx.util.FXUtils;
-import io.vproxy.vfx.util.Logger;
 import io.vproxy.vfx.util.algebradata.XYZTData;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
@@ -175,7 +176,7 @@ public class VSceneGroup {
             animatingHide.remove(scene);
             animatingShow.add(scene);
             if (precheckShow(scene)) {
-                scene.animationGraph.play(scene.stateCenterShown, Callback.ignoreExceptionHandler(v -> postShowing(scene)));
+                scene.animationGraph.play(scene.stateCenterShown, Callback.ofIgnoreExceptionFunction(v -> postShowing(scene)));
             }
             return;
         }
@@ -188,7 +189,7 @@ public class VSceneGroup {
         if (scene.role == VSceneRole.MAIN) {
             nextMainScene = scene;
         }
-        Callback<Void, Exception> cb = Callback.ignoreExceptionHandler(v -> showStep2(scene, method));
+        Callback<Void, Exception> cb = Callback.ofIgnoreExceptionFunction(v -> showStep2(scene, method));
         switch (method) {
             case FROM_TOP:
                 scene.animationGraph.play(scene.stateTop, cb);
@@ -227,7 +228,7 @@ public class VSceneGroup {
         try {
             scene.beforeShowing();
         } catch (Exception e) {
-            Logger.error("failed running pre-check for showing scene " + scene, e);
+            Logger.error(LogType.USER_HANDLE_FAIL, "failed running pre-check for showing scene " + scene, e);
             StackTraceAlert.showAndWait(InternalI18n.get().sceneGroupPreCheckShowSceneFailed(), e);
             return false;
         }
@@ -285,7 +286,7 @@ public class VSceneGroup {
         if (animatingShow.contains(scene)) {
             animatingShow.remove(scene);
             animatingHide.add(scene);
-            scene.animationGraph.play(scene.stateRemoved, Callback.ignoreExceptionHandler(v -> postHiding(scene)));
+            scene.animationGraph.play(scene.stateRemoved, Callback.ofIgnoreExceptionFunction(v -> postHiding(scene)));
             return;
         }
         if (animatingHide.contains(scene)) {
@@ -329,7 +330,7 @@ public class VSceneGroup {
     private void doAnimate(VScene scene, AnimationNode<XYZTData> keyNode, boolean isShowing) {
         var animatingSet = isShowing ? animatingShow : animatingHide;
         animatingSet.add(scene);
-        Callback<Void, Exception> cb = Callback.ignoreExceptionHandler(v -> {
+        Callback<Void, Exception> cb = Callback.ofIgnoreExceptionFunction(v -> {
             animatingSet.remove(scene);
             if (isShowing) {
                 postShowing(scene);

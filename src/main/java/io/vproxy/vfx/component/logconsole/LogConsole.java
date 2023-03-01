@@ -1,5 +1,9 @@
 package io.vproxy.vfx.component.logconsole;
 
+import io.vproxy.base.util.Logger;
+import io.vproxy.base.util.log.LogDispatcher;
+import io.vproxy.base.util.log.LogHandler;
+import io.vproxy.base.util.log.LogRecord;
 import io.vproxy.vfx.control.scroll.ScrollDirection;
 import io.vproxy.vfx.control.scroll.VScrollPane;
 import io.vproxy.vfx.manager.font.FontManager;
@@ -7,19 +11,12 @@ import io.vproxy.vfx.ui.pane.ClickableFusionPane;
 import io.vproxy.vfx.ui.pane.FusionPane;
 import io.vproxy.vfx.ui.wrapper.ThemeLabel;
 import io.vproxy.vfx.util.FXUtils;
-import io.vproxy.vfx.util.Logger;
-import io.vproxy.vfx.util.logger.ObservableLogHandler;
 import javafx.application.Platform;
-import javafx.collections.ListChangeListener;
-import javafx.collections.WeakListChangeListener;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class LogConsole {
     private final int preserveLogCount;
@@ -27,7 +24,7 @@ public class LogConsole {
     private final VScrollPane pane;
     private final VBox vbox;
     @SuppressWarnings("FieldCanBeLocal")
-    private final ListChangeListener<String> logChangeListener;
+    private final LogHandler logHandler;
     private boolean alwaysScrollToEnd = true;
 
     public LogConsole() {
@@ -35,10 +32,10 @@ public class LogConsole {
     }
 
     public LogConsole(int preserveLogCount, int clearLogCount) {
-        this(Logger.observableLogHandler, preserveLogCount, clearLogCount);
+        this(Logger.logDispatcher, preserveLogCount, clearLogCount);
     }
 
-    public LogConsole(ObservableLogHandler logHandler, int preserveLogCount, int clearLogCount) {
+    public LogConsole(LogDispatcher logDispatcher, int preserveLogCount, int clearLogCount) {
         if (clearLogCount < preserveLogCount) {
             throw new IllegalArgumentException("clearLogCount = " + clearLogCount + " must not smaller than preserveLogCount = " + preserveLogCount);
         }
@@ -51,17 +48,14 @@ public class LogConsole {
         FXUtils.observeWidth(pane.getNode(), vbox);
         pane.setContent(vbox);
 
-        logChangeListener = this::logChange;
-        var logChangeListenerWrapper = new WeakListChangeListener<>(logChangeListener);
-        logHandler.addLogListener(logChangeListenerWrapper);
+        logHandler = this::handleLog;
+        logDispatcher.addLogHandler(logHandler);
 
         vbox.heightProperty().addListener((ob, old, now) -> {
             if (alwaysScrollToEnd) {
                 Platform.runLater(() -> pane.setVvalue(1));
             }
         });
-
-        addAll(logHandler.getLog());
     }
 
     public boolean isAlwaysScrollToEnd() {
@@ -75,19 +69,8 @@ public class LogConsole {
         }
     }
 
-    private void logChange(ListChangeListener.Change<? extends String> change) {
-        while (change.next()) {
-            addAll(change.getAddedSubList());
-        }
-    }
-
-    private void addAll(List<? extends String> added) {
-        var ls = new ArrayList<>(added);
-        FXUtils.runOnFX(() -> {
-            for (var log : ls) {
-                add(log);
-            }
-        });
+    private void handleLog(LogRecord record) {
+        add(record.toStringNoColor());
     }
 
     private void add(String log) {

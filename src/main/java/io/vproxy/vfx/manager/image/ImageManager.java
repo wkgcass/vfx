@@ -1,7 +1,8 @@
 package io.vproxy.vfx.manager.image;
 
+import io.vproxy.base.util.LogType;
+import io.vproxy.base.util.Logger;
 import io.vproxy.vfx.util.FXUtils;
-import io.vproxy.vfx.util.Logger;
 import javafx.scene.image.Image;
 
 import java.util.Map;
@@ -40,20 +41,20 @@ public class ImageManager {
         }
         var image = map.get(path);
         if (image != null) {
-            Logger.debug("using cached image: " + path);
+            assert Logger.lowLevelDebug("using cached image: " + path);
             return image;
         }
         try {
             image = new Image(path, false);
         } catch (Exception e) {
-            Logger.error("failed loading image " + path, e);
+            Logger.error(LogType.FILE_ERROR, "failed loading image " + path, e);
             if (throwException) {
                 throw e;
             }
             return null;
         }
         map.put(path, image);
-        Logger.debug("new image loaded: " + path);
+        assert Logger.lowLevelDebug("new image loaded: " + path);
         return image;
     }
 
@@ -70,7 +71,7 @@ public class ImageManager {
             int setArgb = entry.getValue();
             var wImg = FXUtils.changeColorOfBlackImage(img, setArgb);
             var newPath = path + ":" + name;
-            Logger.debug("new image loaded: " + newPath);
+            assert Logger.lowLevelDebug("new image loaded: " + newPath);
             map.put(newPath, wImg);
         }
     }
@@ -81,21 +82,21 @@ public class ImageManager {
         }
         var img = map.get(baseName + ":" + subName);
         if (img != null) {
-            Logger.debug("using cached image: " + baseName + ":" + subName);
+            assert Logger.lowLevelDebug("using cached image: " + baseName + ":" + subName);
             return img;
         }
         img = map.get(baseName);
         if (img == null) {
-            Logger.warn("unable to find base image " + baseName + ", cannot make sub image for it");
+            Logger.warn(LogType.ALERT, "unable to find base image " + baseName + ", cannot make sub image for it");
             return null;
         }
         img = makeFunc.apply(img);
         if (img == null) {
-            Logger.warn("failed making image for " + baseName + ":" + subName + ", the make function returns null");
+            Logger.warn(LogType.ALERT, "failed making image for " + baseName + ":" + subName + ", the make function returns null");
             return null;
         }
         map.put(baseName + ":" + subName, img);
-        Logger.debug("new image loaded: " + baseName + ":" + subName);
+        assert Logger.lowLevelDebug("new image loaded: " + baseName + ":" + subName);
         return img;
     }
 }

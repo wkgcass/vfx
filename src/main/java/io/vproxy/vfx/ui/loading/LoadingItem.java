@@ -1,11 +1,11 @@
 package io.vproxy.vfx.ui.loading;
 
-import java.util.function.BooleanSupplier;
+import io.vproxy.base.util.functional.BooleanSupplierEx;
 
 public class LoadingItem {
     public final int weight;
     public final String name;
-    public final BooleanSupplier loadFunc;
+    public final BooleanSupplierEx<? extends Throwable> loadFunc;
 
     public LoadingItem(int weight, String name, Runnable loadFunc) {
         this(weight, name, () -> {
@@ -14,7 +14,7 @@ public class LoadingItem {
         });
     }
 
-    public LoadingItem(int weight, String name, BooleanSupplier loadFunc) {
+    public LoadingItem(int weight, String name, BooleanSupplierEx<? extends Throwable> loadFunc) {
         this.weight = weight;
         this.name = name;
         this.loadFunc = loadFunc;

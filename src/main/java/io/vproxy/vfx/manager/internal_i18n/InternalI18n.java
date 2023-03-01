@@ -1,6 +1,6 @@
 package io.vproxy.vfx.manager.internal_i18n;
 
-import io.vproxy.vfx.util.Singleton;
+import io.vproxy.commons.util.Singleton;
 
 public interface InternalI18n {
     static InternalI18n get() {
@@ -74,5 +74,9 @@ public interface InternalI18n {
 
     default String sceneGroupPreCheckShowSceneFailed() {
         return "An exception occurred when trying to show the scene.";
+    }
+
+    default String loadingCanceled() {
+        return "loading process canceled";
     }
 }

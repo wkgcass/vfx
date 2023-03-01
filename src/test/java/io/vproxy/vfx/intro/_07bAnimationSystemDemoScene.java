@@ -1,5 +1,6 @@
 package io.vproxy.vfx.intro;
 
+import io.vproxy.base.util.callback.Callback;
 import io.vproxy.vfx.animation.AnimationGraphBuilder;
 import io.vproxy.vfx.animation.AnimationInterrupted;
 import io.vproxy.vfx.animation.AnimationNode;
@@ -10,7 +11,6 @@ import io.vproxy.vfx.ui.layout.HPadding;
 import io.vproxy.vfx.ui.pane.FusionPane;
 import io.vproxy.vfx.ui.scene.VSceneRole;
 import io.vproxy.vfx.ui.wrapper.ThemeLabel;
-import io.vproxy.vfx.util.Callback;
 import io.vproxy.vfx.util.FXUtils;
 import io.vproxy.vfx.util.algebradata.XYData;
 import javafx.geometry.Insets;
@@ -133,12 +133,12 @@ public class _07bAnimationSystemDemoScene extends DemoVScene {
             animation.stopAndSetNode(first);
             animation.play(nodes, new Callback<>() {
                 @Override
-                protected void succeeded0(Void value) {
+                protected void onSucceeded(Void value) {
                     resetAll.run();
                 }
 
                 @Override
-                protected void failed0(Exception e) {
+                protected void onFailed(Exception e) {
                     if (e instanceof AnimationInterrupted) {
                         return;
                     }
@@ -149,12 +149,9 @@ public class _07bAnimationSystemDemoScene extends DemoVScene {
         });
         softStopBtn.setOnAction(ev -> {
             softStopBtn.setDisable(true);
-            animation.play(animation.getCurrentNode(), new Callback<>() {
-                @Override
-                protected void succeeded0(Void value) {
-                    resetAll.run();
-                }
-            });
+            animation.play(animation.getCurrentNode(), Callback.ofFunction((v, ex) ->
+                resetAll.run()
+            ));
         });
 
         var buttonPane = new FusionPane(false);

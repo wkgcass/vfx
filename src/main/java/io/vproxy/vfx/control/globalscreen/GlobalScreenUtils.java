@@ -2,7 +2,8 @@ package io.vproxy.vfx.control.globalscreen;
 
 import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.NativeHookException;
-import io.vproxy.vfx.util.Logger;
+import io.vproxy.base.util.LogType;
+import io.vproxy.base.util.Logger;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -30,7 +31,7 @@ public class GlobalScreenUtils {
             var soname = "vfx-extracted-JNativeHook";
             f = Path.of(tmpDirPath, prefix + soname + suffix).toFile();
             if (f.exists()) {
-                Logger.info("JNativeHook tmp dynamic library already exists: " + f.getAbsolutePath());
+                Logger.alert("JNativeHook tmp dynamic library already exists: " + f.getAbsolutePath());
                 //noinspection ResultOfMethodCallIgnored
                 f.setExecutable(true);
                 checkAndSetJNativeHookLib(tmpDirPath, soname);
@@ -38,7 +39,7 @@ public class GlobalScreenUtils {
             } else {
                 var ok = f.createNewFile();
                 if (!ok) {
-                    Logger.error("failed creating tmp file: " + f.getAbsolutePath());
+                    Logger.error(LogType.FILE_ERROR, "failed creating tmp file: " + f.getAbsolutePath());
                     return;
                 }
                 // f.deleteOnExit(); // no, do not do this, just leave it there
@@ -58,19 +59,19 @@ public class GlobalScreenUtils {
                     }
                 }
             } catch (IOException e) {
-                Logger.error("extracting jnative hook native library failed", e);
+                Logger.error(LogType.FILE_ERROR, "extracting jnative hook native library failed", e);
             }
         } catch (IOException e) {
-            Logger.error("creating tmp file for jnative hook libs failed", e);
+            Logger.error(LogType.FILE_ERROR, "creating tmp file for jnative hook libs failed", e);
         }
     }
 
     private static void checkAndSetJNativeHookLib(String tmpDirPath, String soname) {
         var libpaths = System.getProperty("java.library.path", "");
         var splitLibPaths = libpaths.split(File.pathSeparator);
-        Logger.info("java.library.path: " + Arrays.toString(splitLibPaths));
-        Logger.info("temp directory path: " + tmpDirPath);
-        Logger.info("dynamic library name: " + soname);
+        Logger.alert("java.library.path: " + Arrays.toString(splitLibPaths));
+        Logger.alert("temp directory path: " + tmpDirPath);
+        Logger.alert("dynamic library name: " + soname);
         var existsInLibPaths = false;
         for (var p : splitLibPaths) {
             if (tmpDirPath.equals(new File(p).getAbsolutePath())) {
@@ -80,7 +81,7 @@ public class GlobalScreenUtils {
         }
         if (existsInLibPaths) {
             String key = "jnativehook.lib.name";
-            Logger.info("setting system property: " + key + " => " + soname);
+            Logger.alert("setting system property: " + key + " => " + soname);
             System.setProperty(key, soname);
         }
     }
@@ -96,11 +97,11 @@ public class GlobalScreenUtils {
         enableKeys.put(key, n);
 
         if (enableKeys.size() == 1 && n == 1) {
-            Logger.debug("register GlobalScreen");
+            assert Logger.lowLevelDebug("register GlobalScreen");
             try {
                 GlobalScreen.registerNativeHook();
             } catch (NativeHookException e) {
-                Logger.error("failed to run GlobalScreen.registerNativeHook", e);
+                Logger.error(LogType.SYS_ERROR, "failed to run GlobalScreen.registerNativeHook", e);
             }
         }
     }
@@ -108,7 +109,7 @@ public class GlobalScreenUtils {
     public static synchronized void disable(Object key) {
         var n = enableKeys.get(key);
         if (n == null) {
-            Logger.error("GlobalScreenUtils.disable is called with " + key + ", but it's not enabled with this key before");
+            Logger.error(LogType.IMPROPER_USE, "GlobalScreenUtils.disable is called with " + key + ", but it's not enabled with this key before");
             return;
         }
         n -= 1;
@@ -123,12 +124,12 @@ public class GlobalScreenUtils {
     }
 
     public static void unregister() {
-        Logger.debug("unregister GlobalScreen");
+        assert Logger.lowLevelDebug("unregister GlobalScreen");
         try {
             GlobalScreen.unregisterNativeHook();
             GlobalScreen.setEventDispatcher(null);
         } catch (NativeHookException e) {
-            Logger.error("failed to run GlobalScreen.unregisterNativeHook", e);
+            Logger.error(LogType.SYS_ERROR, "failed to run GlobalScreen.unregisterNativeHook", e);
         }
     }
 }

@@ -2,7 +2,7 @@ package io.vproxy.vfx.animation;
 
 import io.vproxy.vfx.util.algebradata.AlgebraData;
 import io.vproxy.vfx.util.algebradata.DoubleDoubleFunction;
-import io.vproxy.vfx.util.graph.GraphEdge;
+import io.vproxy.commons.graph.GraphEdge;
 
 public class AnimationEdge<T extends AlgebraData<T>> extends GraphEdge<AnimationNode<T>> {
     public final AnimationNode<T> from;
