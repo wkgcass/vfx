@@ -92,7 +92,7 @@ publishing {
             pom.withXml {
                 def pomNode = asNode()
                 pomNode.dependencies.'*'.findAll() {
-                    it.groupId.text() == 'org.openjfx'
+                    it.groupId.text() == 'org.openjfx' || it.groupId.text() == 'org.jetbrains.kotlin'
                 }.each {
                     it.parent().remove(it)
                 }
