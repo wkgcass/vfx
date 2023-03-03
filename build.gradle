@@ -35,8 +35,7 @@ dependencies {
     //noinspection DifferentStdlibGradleVersion
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.31"
     api group: 'com.github.kwhat', name: 'jnativehook', version: '2.2.2'
-    api group: 'io.vproxy', name: 'commons', version: '1.0.0'
-    api group: 'io.vproxy', name: 'vjson', version: '1.4.6'
+    api group: 'io.vproxy', name: 'commons', version: '1.0.1'
     testImplementation group: 'junit', name: 'junit', version: '4.13.2'
 }
 
