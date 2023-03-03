@@ -8,7 +8,6 @@ module io.vproxy.vfx {
     requires java.desktop;
     requires com.github.kwhat.jnativehook;
     requires vjson;
-    requires kotlin.stdlib;
     requires io.vproxy.base;
 
     exports io.vproxy.vfx.animation;

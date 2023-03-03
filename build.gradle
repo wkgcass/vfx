@@ -32,10 +32,8 @@ javafx {
 }
 
 dependencies {
-    //noinspection DifferentStdlibGradleVersion
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.31"
     api group: 'com.github.kwhat', name: 'jnativehook', version: '2.2.2'
-    api group: 'io.vproxy', name: 'commons', version: '1.0.1'
+    api group: 'io.vproxy', name: 'commons', version: '1.0.2'
     testImplementation group: 'junit', name: 'junit', version: '4.13.2'
 }
 
@@ -91,7 +89,7 @@ publishing {
             pom.withXml {
                 def pomNode = asNode()
                 pomNode.dependencies.'*'.findAll() {
-                    it.groupId.text() == 'org.openjfx' || it.groupId.text() == 'org.jetbrains.kotlin'
+                    it.groupId.text() == 'org.openjfx'
                 }.each {
                     it.parent().remove(it)
                 }
