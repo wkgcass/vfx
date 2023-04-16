@@ -63,9 +63,9 @@ public class MouseWheelScroll {
     @Override
     public String toString() {
         if (value == 0) {
-            return "MouseWheelScroll(" + direction + ")";
+            return "scroll-" + direction.name().toLowerCase();
         } else {
-            return "MouseWheelScroll(" + direction + "," + value + ")";
+            return "scroll-" + direction.name().toLowerCase() + ":" + value;
         }
     }
 

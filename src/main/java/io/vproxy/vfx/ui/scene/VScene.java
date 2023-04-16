@@ -191,11 +191,11 @@ public class VScene implements NodeWithVScrollPane {
         if (backgroundImage == null) {
             backgroundImage = new ImageView(img);
             backgroundImage.setPreserveRatio(true);
-            updateBackgroundImagePos();
             root.getChildren().add(0, backgroundImage);
         } else {
             backgroundImage.setImage(img);
         }
+        updateBackgroundImagePos();
     }
 
     private void updateBackgroundImagePos() {
