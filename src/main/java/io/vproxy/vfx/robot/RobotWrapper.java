@@ -3,6 +3,7 @@ package io.vproxy.vfx.robot;
 import io.vproxy.base.util.LogType;
 import io.vproxy.base.util.Logger;
 import io.vproxy.vfx.entity.input.Key;
+import io.vproxy.vfx.entity.input.MouseWheelScroll;
 import io.vproxy.vfx.util.FXUtils;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Point2D;
@@ -33,6 +34,15 @@ public class RobotWrapper {
         if (key.button != null) {
             robot.mousePress(key.button);
             assert Logger.lowLevelDebug("mouse press: " + key);
+        } else if (key.scroll != null) {
+            int n = key.scroll.value;
+            if (n == 0) {
+                n = 1;
+            }
+            if (key.scroll.direction == MouseWheelScroll.Direction.DOWN) {
+                n = -n;
+            }
+            robot.mouseWheel(n);
         } else if (key.key != null) {
             robot.keyPress(key.key.java);
             assert Logger.lowLevelDebug("key press: " + key);

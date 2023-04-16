@@ -60,6 +60,18 @@ public interface InternalI18n {
         return "Right mouse button";
     }
 
+    default String keyChooserMiddleMouseButton() {
+        return "Middle mouse button";
+    }
+
+    default String keyChooserWheelScrollUpButton() {
+        return "Wheel scroll up";
+    }
+
+    default String keyChooserWheelScrollDownButton() {
+        return "Wheel scroll down";
+    }
+
     default String keyChooserDesc() {
         return "Please press the key you want to use, or click the buttons to choose left or right mouse button.";
     }

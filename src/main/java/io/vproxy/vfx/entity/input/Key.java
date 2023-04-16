@@ -13,12 +13,14 @@ import java.util.*;
 
 public class Key implements JSONObject {
     public final MouseButton button;
+    public final MouseWheelScroll scroll;
     public final KeyCode key;
     public final boolean isLeftKey;
     public final String raw;
 
     public static final Rule<Key> rule = ObjectRule.builder(KeyBuilder::new, KeyBuilder::build, builder -> builder
         .put("button", (o, it) -> o.button = MouseButton.valueOf(it), StringRule.get())
+        .put("scroll", (o, it) -> o.scroll = it, MouseWheelScroll.rule)
         .put("key", (o, it) -> o.key = KeyCode.valueOf(it), StringRule.get())
         .put("isLeftKey", (o, it) -> o.isLeftKey = it, BoolRule.get())
         .put("raw", (o, it) -> o.raw = it, StringRule.get())
@@ -26,6 +28,7 @@ public class Key implements JSONObject {
 
     private static class KeyBuilder {
         MouseButton button;
+        MouseWheelScroll scroll;
         KeyCode key;
         boolean isLeftKey;
         String raw;
@@ -33,6 +36,8 @@ public class Key implements JSONObject {
         Key build() {
             if (button != null)
                 return new Key(button);
+            if (scroll != null)
+                return new Key(scroll);
             if (key != null)
                 return new Key(key, isLeftKey);
             return new Key(raw);
@@ -42,33 +47,45 @@ public class Key implements JSONObject {
     public Key(String raw) {
         this.raw = raw;
         this.button = formatButton(raw);
+        this.scroll = null;
         this.key = formatKey(raw);
         this.isLeftKey = checkIsLeftKey(raw);
     }
 
     public Key(MouseButton button) {
         this.button = button;
+        this.scroll = null;
         this.key = null;
         this.isLeftKey = false;
-        this.raw = toString(button, null, false);
+        this.raw = toString(button, null, null, false);
+    }
+
+    public Key(MouseWheelScroll scroll) {
+        this.button = null;
+        this.scroll = scroll;
+        this.key = null;
+        this.isLeftKey = false;
+        this.raw = toString(null, scroll, null, false);
     }
 
     public Key(KeyCode key) {
         this.button = null;
+        this.scroll = null;
         this.key = key;
         this.isLeftKey = false;
-        this.raw = toString(null, key, false);
+        this.raw = toString(null, null, key, false);
     }
 
     public Key(KeyCode key, boolean isLeftKey) {
         this.button = null;
+        this.scroll = null;
         this.key = key;
         this.isLeftKey = isLeftKey;
-        this.raw = toString(null, key, isLeftKey);
+        this.raw = toString(null, null, key, isLeftKey);
     }
 
     public boolean isValid() {
-        return toString(button, key, isLeftKey) != null;
+        return toString(button, scroll, key, isLeftKey) != null;
     }
 
     private static MouseButton formatButton(String raw) {
@@ -132,10 +149,12 @@ public class Key implements JSONObject {
         }};
     }
 
-    private String toString(MouseButton button, KeyCode key, boolean isLeftKey) {
+    private String toString(MouseButton button, MouseWheelScroll scroll, KeyCode key, boolean isLeftKey) {
         String ret = null;
         if (button != null) {
             ret = mouseButtonToStringMap.get(button);
+        } else if (scroll != null) {
+            ret = scroll.toString();
         } else if (key != null) {
             ret = keyCodeToStringMap.get(key);
             if (ret != null) {
@@ -149,7 +168,7 @@ public class Key implements JSONObject {
 
     @Override
     public String toString() {
-        String ret = toString(button, key, isLeftKey);
+        String ret = toString(button, scroll, key, isLeftKey);
         if (ret == null) {
             ret = raw;
         }
@@ -181,12 +200,14 @@ public class Key implements JSONObject {
         return result;
     }
 
-    @SuppressWarnings("NullableProblems")
     @Override
     public JSON.Object toJson() {
         var ob = new ObjectBuilder();
         if (button != null) {
             ob.put("button", button.name());
+        }
+        if (scroll != null) {
+            ob.putInst("scroll", scroll.toJson());
         }
         if (key != null) {
             ob.put("key", key.name());
