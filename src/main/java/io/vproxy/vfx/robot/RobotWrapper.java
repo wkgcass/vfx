@@ -39,10 +39,11 @@ public class RobotWrapper {
             if (n == 0) {
                 n = 1;
             }
-            if (key.scroll.direction == MouseWheelScroll.Direction.DOWN) {
+            if (key.scroll.direction == MouseWheelScroll.Direction.UP) {
                 n = -n;
             }
             robot.mouseWheel(n);
+            assert Logger.lowLevelDebug("mouse wheel: " + key);
         } else if (key.key != null) {
             robot.keyPress(key.key.java);
             assert Logger.lowLevelDebug("key press: " + key);

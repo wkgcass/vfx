@@ -47,7 +47,7 @@ public class Key implements JSONObject {
     public Key(String raw) {
         this.raw = raw;
         this.button = formatButton(raw);
-        this.scroll = null;
+        this.scroll = formatScroll(raw);
         this.key = formatKey(raw);
         this.isLeftKey = checkIsLeftKey(raw);
     }
@@ -90,6 +90,39 @@ public class Key implements JSONObject {
 
     private static MouseButton formatButton(String raw) {
         return stringToMouseButtonMap.get(raw.toLowerCase());
+    }
+
+    private static MouseWheelScroll formatScroll(String raw) {
+        if (!raw.startsWith("scroll-")) {
+            return null;
+        }
+        raw = raw.substring("scroll-".length());
+        String dir;
+        String val;
+        if (raw.contains(":")) {
+            var split = raw.split(":");
+            if (split.length != 2) {
+                return null;
+            }
+            dir = split[0];
+            val = split[1];
+        } else {
+            dir = raw;
+            val = "0";
+        }
+        MouseWheelScroll.Direction d;
+        int v;
+        try {
+            d = MouseWheelScroll.Direction.valueOf(dir.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+        try {
+            v = Integer.parseInt(val);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+        return new MouseWheelScroll(d, v);
     }
 
     private static KeyCode formatKey(String raw) {
