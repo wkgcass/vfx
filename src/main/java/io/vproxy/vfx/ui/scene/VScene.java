@@ -10,6 +10,8 @@ import io.vproxy.vfx.util.algebradata.XYZTData;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 
@@ -24,6 +26,7 @@ public class VScene implements NodeWithVScrollPane {
     private final VScrollPane scrollPane = new VScrollPane();
     private final Pane content = new Pane();
     public final VSceneRole role;
+    private ImageView backgroundImage;
 
     final AnimationNode<XYZTData> stateTop = new AnimationNode<>("top", new XYZTData(0, -1, 1, 0));
     final AnimationNode<XYZTData> stateRight = new AnimationNode<>("right", new XYZTData(1, 0, 1, 0));
@@ -84,6 +87,9 @@ public class VScene implements NodeWithVScrollPane {
         scrollPane.setContent(content);
         FXUtils.observeWidthHeight(root, scrollPane.getNode());
         root.getChildren().add(scrollPane.getNode());
+
+        root.widthProperty().addListener(ob -> updateBackgroundImagePos());
+        root.heightProperty().addListener(ob -> updateBackgroundImagePos());
     }
 
     public Region getNode() {
@@ -171,6 +177,49 @@ public class VScene implements NodeWithVScrollPane {
                 }
             }
         }
+    }
+
+    public void setBackgroundImage(Image img) {
+        if (img == null) {
+            if (backgroundImage == null) {
+                return;
+            }
+            root.getChildren().remove(backgroundImage);
+            backgroundImage = null;
+            return;
+        }
+        if (backgroundImage == null) {
+            backgroundImage = new ImageView(img);
+            backgroundImage.setPreserveRatio(true);
+            updateBackgroundImagePos();
+            root.getChildren().add(0, backgroundImage);
+        } else {
+            backgroundImage.setImage(img);
+        }
+    }
+
+    private void updateBackgroundImagePos() {
+        if (backgroundImage == null)
+            return;
+        if (backgroundImage.getImage() == null)
+            return;
+        var iw = backgroundImage.getImage().getWidth();
+        var ih = backgroundImage.getImage().getHeight();
+        var nw = root.getWidth();
+        var nh = root.getHeight();
+        if (nw <= 0 || nh <= 0 || iw <= 0 || ih <= 0)
+            return;
+        if (iw / ih > nw / nh) {
+            backgroundImage.setFitHeight(nh);
+            backgroundImage.setFitWidth(nh * iw / ih);
+        } else {
+            backgroundImage.setFitWidth(nw);
+            backgroundImage.setFitHeight(nw * ih / iw);
+        }
+        var bw = backgroundImage.getFitWidth();
+        var bh = backgroundImage.getFitHeight();
+        backgroundImage.setLayoutX((nw - bw) / 2);
+        backgroundImage.setLayoutY((nh - bh) / 2);
     }
 
     @SuppressWarnings("RedundantThrows")

@@ -25,13 +25,7 @@ public class _xxcComponentsDemo2Scene extends DemoVScene {
         FXUtils.observeWidthCenter(getContentPane(), msgLabel);
         msgLabel.setLayoutY(100);
 
-        getContentPane().setBackground(new Background(new BackgroundImage(
-            ImageManager.get().load("images/bg1.png"),
-            BackgroundRepeat.NO_REPEAT,
-            BackgroundRepeat.NO_REPEAT,
-            BackgroundPosition.CENTER,
-            BackgroundSize.DEFAULT
-        )));
+        setBackgroundImage(ImageManager.get().load("images/bg1.png"));
 
         var transparentButton = new TransparentFusionButton("TransparentFusionButton") {{
             setPrefWidth(300);
