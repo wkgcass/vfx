@@ -79,4 +79,8 @@ public interface InternalI18n {
     default String loadingCanceled() {
         return "loading process canceled";
     }
+
+    default String globalScreenRegisterFailed() {
+        return "Enabling GlobalScreen failed.";
+    }
 }
