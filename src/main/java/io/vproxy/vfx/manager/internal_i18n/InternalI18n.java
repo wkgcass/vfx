@@ -88,6 +88,10 @@ public interface InternalI18n {
         return "An exception occurred when trying to show the scene.";
     }
 
+    default String sceneGroupPreCheckHideSceneFailed() {
+        return "An exception occurred when trying to hide the scene.";
+    }
+
     default String loadingCanceled() {
         return "loading process canceled";
     }

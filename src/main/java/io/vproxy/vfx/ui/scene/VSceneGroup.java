@@ -35,10 +35,15 @@ public class VSceneGroup {
             throw new IllegalArgumentException(initialMainScene + " is not a MAIN scene");
         }
         try {
-            initialMainScene.beforeShowing();
+            var res = initialMainScene.checkBeforeShowing();
+            if (!res)
+                throw new IllegalArgumentException("unable to show because beforeShowing() method returned false");
+        } catch (IllegalArgumentException e) {
+            throw e;
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
+        initialMainScene.beforeShowing();
         this.initParams = initParams;
         if (initParams.useClip) {
             FXUtils.makeClipFor(root, 4);
@@ -60,6 +65,7 @@ public class VSceneGroup {
         );
 
         initialMainScene.animationGraph.stopAndSetNode(initialMainScene.stateCenterShown);
+        initialMainScene.onShown();
     }
 
     public void addScene(VScene scene) {
@@ -187,8 +193,13 @@ public class VSceneGroup {
             return;
         }
         if (scene.role == VSceneRole.MAIN) {
+            if (!precheckHide(currentMainScene)) {
+                return;
+            }
+            currentMainScene.beforeHiding();
             nextMainScene = scene;
         }
+        scene.beforeShowing();
         Callback<Void, Exception> cb = Callback.ofIgnoreExceptionFunction(v -> showStep2(scene, method));
         switch (method) {
             case FROM_TOP:
@@ -226,13 +237,23 @@ public class VSceneGroup {
 
     private boolean precheckShow(VScene scene) {
         try {
-            scene.beforeShowing();
+            return scene.checkBeforeShowing();
         } catch (Exception e) {
             Logger.error(LogType.USER_HANDLE_FAIL, "failed running pre-check for showing scene " + scene, e);
             StackTraceAlert.showAndWait(InternalI18n.get().sceneGroupPreCheckShowSceneFailed(), e);
             return false;
         }
-        return true;
+    }
+
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    private boolean precheckHide(VScene scene) {
+        try {
+            return scene.checkBeforeHiding();
+        } catch (Exception e) {
+            Logger.error(LogType.USER_HANDLE_FAIL, "failed running pre-check for hiding scene " + scene, e);
+            StackTraceAlert.showAndWait(InternalI18n.get().sceneGroupPreCheckHideSceneFailed(), e);
+            return false;
+        }
     }
 
     private void showStep2(VScene scene, VSceneShowMethod method) {
@@ -279,6 +300,10 @@ public class VSceneGroup {
         if (scene.role == VSceneRole.MAIN) {
             throw new IllegalArgumentException(scenes + " cannot be hidden manually");
         }
+        if (!precheckHide(scene)) {
+            return;
+        }
+        scene.beforeHiding();
         hideSkipCheck(scene, method);
     }
 
@@ -353,6 +378,7 @@ public class VSceneGroup {
             showingScenes.add(scene);
         }
         scene.getContentPane().requestFocus();
+        scene.onShown();
     }
 
     private void postHiding(VScene scene) {

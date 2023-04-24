@@ -3,8 +3,8 @@ package io.vproxy.vfx.ui.scene;
 import io.vproxy.vfx.animation.AnimationGraph;
 import io.vproxy.vfx.animation.AnimationGraphBuilder;
 import io.vproxy.vfx.animation.AnimationNode;
-import io.vproxy.vfx.control.scroll.VScrollPane;
 import io.vproxy.vfx.control.scroll.NodeWithVScrollPane;
+import io.vproxy.vfx.control.scroll.VScrollPane;
 import io.vproxy.vfx.util.FXUtils;
 import io.vproxy.vfx.util.algebradata.XYZTData;
 import javafx.beans.value.ChangeListener;
@@ -223,7 +223,22 @@ public class VScene implements NodeWithVScrollPane {
     }
 
     @SuppressWarnings("RedundantThrows")
-    protected void beforeShowing() throws Exception {
+    protected boolean checkBeforeShowing() throws Exception {
+        return true;
+    }
+
+    protected void beforeShowing() {
+    }
+
+    protected void onShown() {
+    }
+
+    @SuppressWarnings("RedundantThrows")
+    protected boolean checkBeforeHiding() throws Exception {
+        return true;
+    }
+
+    protected void beforeHiding() {
     }
 
     protected void onHidden() {
