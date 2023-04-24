@@ -3,16 +3,19 @@
 ## Add Dependency
 
 ```groovy
-implementation 'io.vproxy:vfx:1.2.0'
+implementation 'io.vproxy:vfx:1.3.0'
 ```
 
 ```xml
 <dependency>
   <groupId>io.vproxy</groupId>
   <artifactId>vfx</artifactId>
-  <version>1.2.0</version>
+  <version>1.3.0</version>
 </dependency>
 ```
+
+> If you are using vfx with kotlin, you may need to see [vjson](https://github.com/wkgcass/vjson) for more info about how to exclude `kotlin-stdlib-lite`.  
+> If you are not using kotlin, you can ignore this.
 
 ## How to Use
 
@@ -43,4 +46,4 @@ If you want to make some changes, you might have to modify the source codes.
 
 PRs are welcome, we can make it better!
 
-Finally, the most important part of this announcement: I might make incompatible API upgrades if really needed. For example, the current FontManager works, but is really hard to use and hard to maintain, I might make a full refactor on that in the near future. And new abstract methods will be added to `Theme` when needed.
+Finally, the most important part of this announcement: I might make incompatible API upgrades if really needed. For example, new abstract methods will be added to `Theme` when needed.
