@@ -33,7 +33,7 @@ javafx {
 
 dependencies {
     api group: 'com.github.kwhat', name: 'jnativehook', version: '2.2.2'
-    api group: 'io.vproxy', name: 'commons', version: '1.0.2'
+    api group: 'io.vproxy', name: 'commons', version: '1.1.1'
     testImplementation group: 'junit', name: 'junit', version: '4.13.2'
 }
 

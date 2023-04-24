@@ -9,6 +9,7 @@ module io.vproxy.vfx {
     requires com.github.kwhat.jnativehook;
     requires vjson;
     requires io.vproxy.base;
+    requires kotlin.stdlib;
 
     exports io.vproxy.vfx.animation;
     exports io.vproxy.vfx.component.keychooser;
