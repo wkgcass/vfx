@@ -38,7 +38,7 @@ As well as some other small UI components.
 > The managers, control functions, utilities and other non-UI stuff are not presented in this demo.  
 > However, this library very is simple, you can read each code snippet in less than one minute.  
 > Currently no plan on making a detailed doc about this project.  
-> You can find usage of this library in `vproxy-ui` and `hotta-pc-assistant`.  
+> You can find usage of this library in `vproxy-ui`, `xbox-relay` and `hotta-pc-assistant`.  
 > If you want to read this project, check the `module-info.java` first, which will give you a general view of what this library provides.
 
 Please note that this project is currently only made to meet my own needs. Some UI design patterns are hard coded, for example most paddings of the UI components are stored in static fields and do not allow you to modify them.  
@@ -46,4 +46,4 @@ If you want to make some changes, you might have to modify the source codes.
 
 PRs are welcome, we can make it better!
 
-Finally, the most important part of this announcement: I might make incompatible API upgrades if really needed. For example, new abstract methods will be added to `Theme` when needed.
+Finally, the most important part of this announcement: I might make incompatible API upgrades if really needed.
