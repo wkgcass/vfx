@@ -44,6 +44,7 @@ public class VDialog<T> {
         buttonPane.getNode().setPrefHeight(BUTTON_PANE_HEIGHT);
 
         buttonHBox.setAlignment(Pos.CENTER_RIGHT);
+        buttonHBox.setSpacing(5);
         FXUtils.observeWidth(buttonPane.getContentPane(), buttonHBox);
 
         FXUtils.observeWidth(
@@ -86,15 +87,9 @@ public class VDialog<T> {
     public void setButtons(List<VDialogButton<T>> buttons) {
         buttonHBox.getChildren().clear();
         var ls = new ArrayList<Node>();
-        var isFirst = true;
         for (var btn : buttons) {
             var name = btn.name;
             var button = new FusionButton(name);
-            if (isFirst) {
-                isFirst = false;
-            } else {
-                ls.add(new HPadding(5));
-            }
             var textBounds = FXUtils.calculateTextBounds(button.getTextNode());
             button.setPrefWidth(Math.max(textBounds.getWidth() + 40, 120));
             button.setPrefHeight(BUTTON_HEIGHT);
@@ -106,6 +101,7 @@ public class VDialog<T> {
                 onButtonClicked(btn);
                 stage.close();
             });
+            btn.button = button;
         }
         buttonHBox.getChildren().addAll(ls);
     }
