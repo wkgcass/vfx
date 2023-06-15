@@ -32,7 +32,7 @@ public class RobotWrapper {
 
     public void press(Key key) {
         if (key.button != null) {
-            robot.mousePress(key.button);
+            FXUtils.runOnFX(() -> robot.mousePress(key.button));
             assert Logger.lowLevelDebug("mouse press: " + key);
         } else if (key.scroll != null) {
             int n = key.scroll.value;
@@ -42,20 +42,21 @@ public class RobotWrapper {
             if (key.scroll.direction == MouseWheelScroll.Direction.UP) {
                 n = -n;
             }
-            robot.mouseWheel(n);
+            final var fn = n;
+            FXUtils.runOnFX(() -> robot.mouseWheel(fn));
             assert Logger.lowLevelDebug("mouse wheel: " + key);
         } else if (key.key != null) {
-            robot.keyPress(key.key.java);
+            FXUtils.runOnFX(() -> robot.keyPress(key.key.java));
             assert Logger.lowLevelDebug("key press: " + key);
         }
     }
 
     public void release(Key key) {
         if (key.button != null) {
-            robot.mouseRelease(key.button);
+            FXUtils.runOnFX(() -> robot.mouseRelease(key.button));
             assert Logger.lowLevelDebug("mouse release: " + key);
         } else if (key.key != null) {
-            robot.keyRelease(key.key.java);
+            FXUtils.runOnFX(() -> robot.keyRelease(key.key.java));
             assert Logger.lowLevelDebug("key release: " + key);
         }
     }
@@ -114,7 +115,7 @@ public class RobotWrapper {
 
     public void mouseMove(double x, double y) {
         assert Logger.lowLevelDebug("mouse move: (" + x + ", " + y + ")");
-        robot.mouseMove(x, y);
+        FXUtils.runOnFX(() -> robot.mouseMove(x, y));
     }
 
     public Point2D getMousePosition() {
@@ -123,6 +124,6 @@ public class RobotWrapper {
 
     public void mouseWheel(int wheelAmt) {
         assert Logger.lowLevelDebug("mouse wheel: " + wheelAmt);
-        robot.mouseWheel(wheelAmt);
+        FXUtils.runOnFX(() -> robot.mouseWheel(wheelAmt));
     }
 }
