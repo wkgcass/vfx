@@ -9,6 +9,7 @@ import io.vproxy.vfx.ui.layout.HPadding;
 import io.vproxy.vfx.ui.layout.VPadding;
 import io.vproxy.vfx.util.FXUtils;
 import io.vproxy.vfx.util.algebradata.ColorData;
+import io.vproxy.vfx.util.algebradata.DoubleData;
 import javafx.scene.Node;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -16,6 +17,10 @@ import javafx.scene.paint.Color;
 public class FusionPane {
     public static final int PADDING_V = 10;
     public static final int PADDING_H = 10;
+
+    private final AnimationGraph<DoubleData> contentOpacityAnimation;
+    private final AnimationNode<DoubleData> contentOpacityNormalNode;
+    private final AnimationNode<DoubleData> contentOpacityHoverNode;
 
     private final AbstractFusionPane root = buildRootNode();
 
@@ -48,6 +53,18 @@ public class FusionPane {
         }
         FXUtils.makeClipFor(content, 4);
         getContentPane().getChildren().addAll(nodes);
+
+        contentOpacityNormalNode = new AnimationNode<>("normal", new DoubleData(
+            root.normalContentOpacity()
+        ));
+        contentOpacityHoverNode = new AnimationNode<>("hover", new DoubleData(
+            root.hoverContentOpacity()
+        ));
+
+        contentOpacityAnimation = AnimationGraphBuilder
+            .simpleTwoNodeGraph(contentOpacityNormalNode, contentOpacityHoverNode, 300)
+            .setApply((from, to, data) -> content.setOpacity(data.value))
+            .build(contentOpacityNormalNode);
     }
 
     protected AbstractFusionPane buildRootNode() {
@@ -62,17 +79,12 @@ public class FusionPane {
         return content;
     }
 
-    protected static class FusionPaneImpl extends AbstractFusionPane {
+    protected class FusionPaneImpl extends AbstractFusionPane {
         private final AnimationNode<ColorData> border = new AnimationNode<>("solid",
-            new ColorData(Theme.current().fusionPaneBorderColor()));
+            new ColorData(hoverBorderColor()));
         private final AnimationNode<ColorData> noBorder = new AnimationNode<>("transparent",
-            new ColorData(
-                new Color(
-                    border.value.getColor().getRed(),
-                    border.value.getColor().getGreen(),
-                    border.value.getColor().getBlue(),
-                    0)
-            ));
+            new ColorData(normalBorderColor()));
+
         private final AnimationGraph<ColorData> borderAnimation = AnimationGraphBuilder
             .simpleTwoNodeGraph(noBorder, border, 300)
             .setApply((from, to, data) ->
@@ -86,12 +98,14 @@ public class FusionPane {
         protected void onMouseEntered() {
             super.onMouseEntered();
             borderAnimation.play(border);
+            contentOpacityAnimation.play(contentOpacityHoverNode);
         }
 
         @Override
         protected void onMouseExited() {
             super.onMouseExited();
             borderAnimation.play(noBorder, Callback.ofIgnoreExceptionFunction(v -> setBorder(Border.EMPTY)));
+            contentOpacityAnimation.play(contentOpacityNormalNode);
         }
 
         @Override
@@ -101,6 +115,19 @@ public class FusionPane {
         @Override
         protected CornerRadii getCornerRadii() {
             return new CornerRadii(8);
+        }
+
+        protected Color normalBorderColor() {
+            var c = Theme.current().fusionPaneBorderColor();
+            return new Color(
+                c.getRed(),
+                c.getGreen(),
+                c.getBlue(),
+                0);
+        }
+
+        protected Color hoverBorderColor() {
+            return Theme.current().fusionPaneBorderColor();
         }
     }
 }

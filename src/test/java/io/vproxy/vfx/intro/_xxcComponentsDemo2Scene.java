@@ -3,6 +3,7 @@ package io.vproxy.vfx.intro;
 import io.vproxy.vfx.manager.font.FontManager;
 import io.vproxy.vfx.manager.image.ImageManager;
 import io.vproxy.vfx.ui.button.TransparentFusionButton;
+import io.vproxy.vfx.ui.pane.TransparentContentFusionPane;
 import io.vproxy.vfx.ui.pane.TransparentFusionPane;
 import io.vproxy.vfx.ui.scene.VSceneRole;
 import io.vproxy.vfx.ui.wrapper.ThemeLabel;
@@ -36,15 +37,20 @@ public class _xxcComponentsDemo2Scene extends DemoVScene {
         transparentFusionPane.getContentPane().getChildren().add(new ThemeLabel("TransparentFusionPane") {{
             setTextFill(Color.BLACK);
         }});
+        var transparentContentFusionPane = new TransparentContentFusionPane(false);
+        transparentContentFusionPane.getContentPane().getChildren().add(new ThemeLabel("TransparentContentFusionPane") {{
+            setTextFill(Color.BLACK);
+        }});
 
         var gridPane = new GridPane();
         FXUtils.observeWidthCenter(getContentPane(), gridPane);
         gridPane.setLayoutY(250);
-        gridPane.setHgap(10);
-        gridPane.setVgap(10);
+        gridPane.setHgap(20);
+        gridPane.setVgap(20);
 
         gridPane.add(transparentButton, 0, 0, 2, 1);
         gridPane.add(transparentFusionPane.getNode(), 0, 1);
+        gridPane.add(transparentContentFusionPane.getNode(), 0, 2);
 
         getContentPane().getChildren().addAll(msgLabel, gridPane);
     }

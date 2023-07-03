@@ -17,7 +17,7 @@ public class TransparentFusionPane extends FusionPane {
         return new TransparentFusionPaneImpl();
     }
 
-    protected static class TransparentFusionPaneImpl extends FusionPaneImpl {
+    protected class TransparentFusionPaneImpl extends FusionPaneImpl {
         @Override
         protected Color normalColor() {
             return Theme.current().transparentFusionPaneNormalBackgroundColor();

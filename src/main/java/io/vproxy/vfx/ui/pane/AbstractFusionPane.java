@@ -109,4 +109,12 @@ public abstract class AbstractFusionPane extends Pane {
     protected Color downColor() {
         return hoverColor();
     }
+
+    protected double normalContentOpacity() {
+        return 1;
+    }
+
+    protected double hoverContentOpacity() {
+        return 1;
+    }
 }

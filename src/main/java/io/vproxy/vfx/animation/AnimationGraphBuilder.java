@@ -73,6 +73,7 @@ public class AnimationGraphBuilder<T extends AlgebraData<T>> {
             beginCB = (from, to) -> {
             };
         }
+        apply.apply(null, initialNode, initialNode.value);
         return new AnimationGraph<>(builder.build(), apply, beginCB, initialNode);
     }
 }
