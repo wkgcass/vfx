@@ -53,7 +53,7 @@ public class SimpleAlert extends ThemeAlertBase {
     }
 
     public static void show(String title, String contentText, FontUsage fontUsage) {
-        new SimpleAlert(title, contentText, fontUsage).show();
+        FXUtils.runOnFX(() -> new SimpleAlert(title, contentText, fontUsage).show());
     }
 
     public static void showAndWait(String title, String contentText) {

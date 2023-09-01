@@ -71,7 +71,7 @@ public class StackTraceAlert extends ThemeAlertBase {
     }
 
     public static void show(String desc, Throwable throwable) {
-        new StackTraceAlert(desc, throwable).show();
+        FXUtils.runOnFX(() -> new StackTraceAlert(desc, throwable).show());
     }
 
     public static void showAndWait(Throwable throwable) {
