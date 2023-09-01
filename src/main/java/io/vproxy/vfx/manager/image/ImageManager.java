@@ -99,4 +99,12 @@ public class ImageManager {
         assert Logger.lowLevelDebug("new image loaded: " + baseName + ":" + subName);
         return img;
     }
+
+    public void remove(String path) {
+        if (!map.containsKey(path)) {
+            return;
+        }
+        map.remove(path);
+        assert Logger.lowLevelDebug("image removed: " + path);
+    }
 }

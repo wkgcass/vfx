@@ -59,4 +59,12 @@ public class AudioManager {
         assert Logger.lowLevelDebug("new audio loaded: " + path);
         return audio;
     }
+
+    public void removeAudio(String path) {
+        if (!map.containsKey(path)) {
+            return;
+        }
+        map.remove(path);
+        assert Logger.lowLevelDebug("audio removed: " + path);
+    }
 }
