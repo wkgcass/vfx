@@ -6,6 +6,7 @@ import io.vproxy.vfx.util.FXUtils;
 import javafx.scene.image.Image;
 
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
@@ -25,6 +26,7 @@ public class ImageManager {
     }
 
     private final Map<String, Image> map = new ConcurrentHashMap<>();
+    private final WeakHashMap<String, Image> weakMap = new WeakHashMap<>();
 
     public Image load(String path) {
         try {
@@ -40,6 +42,9 @@ public class ImageManager {
             path = "/" + path;
         }
         var image = map.get(path);
+        if (image == null) {
+            image = weakMap.get(path);
+        }
         if (image != null) {
             assert Logger.lowLevelDebug("using cached image: " + path);
             return image;
@@ -80,31 +85,48 @@ public class ImageManager {
         if (!baseName.startsWith("/")) {
             baseName = "/" + baseName;
         }
-        var img = map.get(baseName + ":" + subName);
+        var key = baseName + ":" + subName;
+        var img = map.get(key);
+        if (img == null) {
+            img = weakMap.get(key);
+        }
         if (img != null) {
-            assert Logger.lowLevelDebug("using cached image: " + baseName + ":" + subName);
+            assert Logger.lowLevelDebug("using cached image: " + key);
             return img;
         }
         img = map.get(baseName);
+        if (img == null) {
+            img = weakMap.get(baseName);
+        }
         if (img == null) {
             Logger.warn(LogType.ALERT, "unable to find base image " + baseName + ", cannot make sub image for it");
             return null;
         }
         img = makeFunc.apply(img);
         if (img == null) {
-            Logger.warn(LogType.ALERT, "failed making image for " + baseName + ":" + subName + ", the make function returns null");
+            Logger.warn(LogType.ALERT, "failed making image for " + key + ", the make function returns null");
             return null;
         }
-        map.put(baseName + ":" + subName, img);
-        assert Logger.lowLevelDebug("new image loaded: " + baseName + ":" + subName);
+        map.put(key, img);
+        assert Logger.lowLevelDebug("new image loaded: " + key);
         return img;
     }
 
+    public Image weakRef(String path) {
+        var audio = map.remove(path);
+        if (audio == null) {
+            return null;
+        }
+        weakMap.put(path, audio);
+        return audio;
+    }
+
     public void remove(String path) {
-        if (!map.containsKey(path)) {
+        if (!map.containsKey(path) && !weakMap.containsKey(path)) {
             return;
         }
         map.remove(path);
+        weakMap.remove(path);
         assert Logger.lowLevelDebug("image removed: " + path);
     }
 }

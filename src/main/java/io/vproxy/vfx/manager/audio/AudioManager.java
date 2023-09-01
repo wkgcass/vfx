@@ -6,6 +6,7 @@ import javafx.scene.media.AudioClip;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class AudioManager {
@@ -19,6 +20,7 @@ public class AudioManager {
     }
 
     private final Map<String, AudioClip> map = new ConcurrentHashMap<>();
+    private final WeakHashMap<String, AudioClip> weakMap = new WeakHashMap<>();
 
     public AudioClip loadAudio(String path) {
         try {
@@ -34,6 +36,9 @@ public class AudioManager {
             path = path.substring(1);
         }
         var audio = map.get(path);
+        if (audio == null) {
+            audio = weakMap.get(path);
+        }
         if (audio != null) {
             assert Logger.lowLevelDebug("using cached audio: " + path);
             return audio;
@@ -60,11 +65,21 @@ public class AudioManager {
         return audio;
     }
 
+    public AudioClip weakRefAudio(String path) {
+        var audio = map.remove(path);
+        if (audio == null) {
+            return null;
+        }
+        weakMap.put(path, audio);
+        return audio;
+    }
+
     public void removeAudio(String path) {
-        if (!map.containsKey(path)) {
+        if (!map.containsKey(path) && !weakMap.containsKey(path)) {
             return;
         }
         map.remove(path);
+        weakMap.remove(path);
         assert Logger.lowLevelDebug("audio removed: " + path);
     }
 }
