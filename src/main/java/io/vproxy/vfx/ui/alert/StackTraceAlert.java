@@ -1,5 +1,7 @@
 package io.vproxy.vfx.ui.alert;
 
+import io.vproxy.base.util.LogType;
+import io.vproxy.base.util.Logger;
 import io.vproxy.vfx.manager.font.FontManager;
 import io.vproxy.vfx.manager.font.FontUsages;
 import io.vproxy.vfx.manager.internal_i18n.InternalI18n;
@@ -18,6 +20,8 @@ import java.util.Map;
 
 public class StackTraceAlert extends ThemeAlertBase {
     private StackTraceAlert(String desc, Throwable throwable) {
+        Logger.error(LogType.ALERT, "StackTraceAlert: " + desc, throwable);
+
         setTitle(InternalI18n.get().stacktraceAlertTitle());
 
         var headerText = new ThemeLabel(InternalI18n.get().stacktraceAlertHeaderText()) {{

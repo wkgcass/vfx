@@ -1,5 +1,6 @@
 package io.vproxy.vfx.ui.alert;
 
+import io.vproxy.base.util.Logger;
 import io.vproxy.vfx.manager.font.FontManager;
 import io.vproxy.vfx.manager.font.FontUsage;
 import io.vproxy.vfx.manager.font.FontUsages;
@@ -10,6 +11,8 @@ import javafx.scene.control.Alert;
 
 public class SimpleAlert extends ThemeAlertBase {
     private SimpleAlert(String title, String contentText, FontUsage fontUsage) {
+        Logger.alert("SimpleAlert: [" + title + "] " + contentText);
+
         setTitle(title);
         var alertMessage = new ThemeLabel(contentText) {{
             setWrapText(true);
