@@ -75,6 +75,9 @@ public class AudioManager {
     }
 
     public void removeAudio(String path) {
+        if (path.startsWith("/")) {
+            path = path.substring(1);
+        }
         if (!map.containsKey(path) && !weakMap.containsKey(path)) {
             return;
         }

@@ -122,6 +122,9 @@ public class ImageManager {
     }
 
     public void remove(String path) {
+        if (!path.startsWith("/")) {
+            path = "/" + path;
+        }
         if (!map.containsKey(path) && !weakMap.containsKey(path)) {
             return;
         }
