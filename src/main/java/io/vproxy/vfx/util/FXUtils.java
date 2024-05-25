@@ -1,5 +1,8 @@
 package io.vproxy.vfx.util;
 
+import io.vproxy.base.util.LogType;
+import io.vproxy.base.util.Logger;
+import io.vproxy.base.util.OS;
 import io.vproxy.vfx.manager.internal_i18n.InternalI18n;
 import io.vproxy.vfx.ui.alert.SimpleAlert;
 import javafx.animation.AnimationTimer;
@@ -17,6 +20,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -24,10 +28,40 @@ import javafx.stage.Window;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.lang.reflect.InaccessibleObjectException;
 import java.util.List;
 import java.util.function.Supplier;
 
 public class FXUtils {
+    public static void generalInitialization(String[] args) {
+        // `args` not used for now ...
+
+        // configure default font
+        {
+            Font defaultFont = null;
+            if (OS.isWindows()) {
+                defaultFont = Font.font("Microsoft YaHei UI", 12);
+            }
+            if (defaultFont != null) {
+                setDefaultFont(defaultFont);
+            }
+        }
+    }
+
+    public static void setDefaultFont(Font defaultFont) {
+        try {
+            var field = Font.class.getDeclaredField("DEFAULT");
+            field.setAccessible(true);
+            field.set(null, defaultFont);
+            Logger.alert("The default font is set to " + defaultFont);
+        } catch (InaccessibleObjectException e) {
+            Logger.warn(LogType.SYS_ERROR, "unable to set default font, you may need to add the following jvm argument:\n" +
+                                           "\t\t--add-opens=javafx.graphics/javafx.scene.text=io.vproxy.vfx");
+        } catch (Throwable t) {
+            Logger.error(LogType.SYS_ERROR, "failed setting default font to " + defaultFont, t);
+        }
+    }
+
     public static void runOnFX(Runnable r) {
         if (Platform.isFxApplicationThread()) {
             r.run();
