@@ -1,0 +1,27 @@
+[package]
+name = "vfx-app"
+version = "1.4.0"
+description = "Tauri shell for the vfx TypeScript UI port"
+authors = ["wkgcass"]
+edition = "2021"
+rust-version = "1.77"
+
+[lib]
+name = "vfx_app_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["unstable"] }
+tauri-plugin-os = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+enigo = "0.6"
+xcap = "0.9"
+base64 = "0.22"
+image = { version = "0.25", default-features = false, features = ["png"] }
+
+[features]
+custom-protocol = ["tauri/custom-protocol"]

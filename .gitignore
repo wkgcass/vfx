@@ -37,3 +37,11 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### Node / Tauri / TS port ###
+node_modules/
+dist/
+src-tauri/target/
+src-tauri/gen/
+*.tsbuildinfo
+
