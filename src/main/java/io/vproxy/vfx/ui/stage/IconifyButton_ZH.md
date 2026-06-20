@@ -1,0 +1,7 @@
+# IconifyButton.java 与 IconifyButton.ts 对比
+
+## 摘要
+使用主题提供的悬停图像的窗口最小化按钮。TS 通过 Tauri 异步 API 最小化窗口。
+
+## 结论
+一致。
