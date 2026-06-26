@@ -1,5 +1,7 @@
 # VFX
 
+![](app-icon.png)
+
 ## Add Dependency
 
 ```groovy
