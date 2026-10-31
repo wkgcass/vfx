@@ -104,6 +104,10 @@ public class FusionButton extends AbstractFusionButton {
         text.setLayoutY((getHeight() - bounds.getHeight()) / 2);
     }
 
+    public String getText() {
+        return text.getText();
+    }
+
     public void setText(String text) {
         this.text.setText(text);
     }
