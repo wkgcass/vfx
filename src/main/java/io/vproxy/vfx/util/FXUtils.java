@@ -29,10 +29,31 @@ import javafx.stage.Window;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.InaccessibleObjectException;
+import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.function.Supplier;
 
 public class FXUtils {
+    public static boolean isPrismGodot() {
+        return PrismGodotDetection.ENABLED;
+    }
+
+    private static class PrismGodotDetection {
+        private static final boolean ENABLED = detect();
+
+        private static boolean detect() {
+            try {
+                var type = Class.forName("javafx.application.GodotRuntime");
+                var field = type.getField("PRISM_GODOT_ENABLED");
+                return field.getType() == boolean.class
+                    && Modifier.isStatic(field.getModifiers())
+                    && field.getBoolean(null);
+            } catch (ReflectiveOperationException | LinkageError | SecurityException e) {
+                return false;
+            }
+        }
+    }
+
     public static void generalInitialization(String[] args) {
         // `args` not used for now ...
 

@@ -199,7 +199,15 @@ public class IntroFXMain extends Application {
         }
         menuVBox.getChildren().add(new VPadding(20));
 
+        if (FXUtils.isPrismGodot()) {
+            var blackhole = new BlackholeEffectControl(stage.getStage().getScene(), sceneGroup.getNode());
+            menuVBox.getChildren().add(blackhole.getControl());
+            menuVBox.getChildren().add(new VPadding(20));
+            stage.getStage().addEventHandler(javafx.stage.WindowEvent.WINDOW_HIDDEN, e -> blackhole.close());
+        }
+
         var menuBtn = new FusionImageButton(ImageManager.get().load("images/menu.png:white")) {{
+            setId("intro-menu-button");
             setPrefWidth(40);
             setPrefHeight(VStage.TITLE_BAR_HEIGHT + 1);
             getImageView().setFitHeight(15);
