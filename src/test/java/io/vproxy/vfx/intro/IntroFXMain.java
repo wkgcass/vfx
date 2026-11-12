@@ -203,7 +203,13 @@ public class IntroFXMain extends Application {
             var blackhole = new BlackholeEffectControl(stage.getStage().getScene(), sceneGroup.getNode());
             menuVBox.getChildren().add(blackhole.getControl());
             menuVBox.getChildren().add(new VPadding(20));
-            stage.getStage().addEventHandler(javafx.stage.WindowEvent.WINDOW_HIDDEN, e -> blackhole.close());
+            var ripples = new RippleEffectControl(stage.getStage().getScene().getRoot());
+            menuVBox.getChildren().add(ripples.getControl());
+            menuVBox.getChildren().add(new VPadding(20));
+            stage.getStage().addEventHandler(javafx.stage.WindowEvent.WINDOW_HIDDEN, e -> {
+                blackhole.close();
+                ripples.close();
+            });
         }
 
         var menuBtn = new FusionImageButton(ImageManager.get().load("images/menu.png:white")) {{
